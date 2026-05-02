@@ -14,6 +14,23 @@ const _db = window.supabase
 let currentSession = null;
 let currentProfile = null;
 
+// Cache local del username para mostrar siempre el nombre correcto
+const UCR_USERNAME_KEY = 'ucr_last_username';
+function _getStoredUsername() { 
+    let u = localStorage.getItem(UCR_USERNAME_KEY);
+    if (u) return u;
+    
+    // Si no está en caché pero hay sesión, sacarlo del correo falso
+    if (currentSession && currentSession.user && currentSession.user.email) {
+        const email = currentSession.user.email;
+        if (email.endsWith('@campus-ucr.app')) return email.split('@')[0];
+        if (email === 'diegodengosoto@gmail.com') return 'DENGO1106'; // Soporte cuenta vieja
+    }
+    return ''; 
+}
+function _setStoredUsername(u) { if (u) localStorage.setItem(UCR_USERNAME_KEY, u); }
+function _clearStoredUsername() { localStorage.removeItem(UCR_USERNAME_KEY); }
+
 // ==========================================
 // INICIALIZACIÓN Y ESCUCHA DE SESIÓN
 // ==========================================
@@ -29,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('[Auth] Sesión activa:', session.user.email);
             fetchUserProfile(session.user.id);
             updateAuthUI(session);
+            _actualizarNombreHome(); // <-- LLAMADA AGREGADA AQUÍ
             if (isSessionChanged) {
                 window.dispatchEvent(new CustomEvent('supabase_auth_changed'));
             }
@@ -52,7 +70,7 @@ function updateAuthUI(session) {
     if (!authContainer) return;
 
     if (session) {
-        const displayName = currentProfile?.full_name || currentProfile?.username || 'Usuario';
+        const displayName = currentProfile?.full_name || currentProfile?.username || _getStoredUsername() || 'Usuario';
         authContainer.innerHTML = `
             <button id="auth-btn" class="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-xl transition-all border border-emerald-500/20">
                 <i data-lucide="user-check" class="w-4 h-4"></i>
@@ -71,8 +89,8 @@ function updateAuthUI(session) {
 function _actualizarNombreHome() {
     // Top bar en Home
     const homeEl = document.getElementById('home-user-name');
-    if (homeEl && currentProfile) {
-        homeEl.textContent = currentProfile.full_name || currentProfile.username || 'Usuario';
+    if (homeEl) {
+        homeEl.textContent = currentProfile?.full_name || currentProfile?.username || _getStoredUsername() || 'Usuario';
     }
 
     // Header en Mi Plan
@@ -85,9 +103,9 @@ function _actualizarNombreHome() {
         planCarnetEl.textContent = currentProfile.student_id ? `${currentProfile.student_id}` : '';
     }
     
-    // Iniciar sistema de notificaciones y admin si está disponible
-    if (typeof initNotificationsAndAdmin === 'function') {
-        initNotificationsAndAdmin();
+    // Mostrar botón admin si corresponde
+    if (typeof initAdminBtn === 'function') {
+        initAdminBtn();
     }
 }
 
@@ -99,9 +117,6 @@ function _actualizarNombreHome() {
 // Helper para convertir username a un email falso para Supabase,
 // pero si el username es DENGO1106, retorna el correo de administrador real.
 function usernameToEmail(username) {
-    if (username.toUpperCase() === 'DENGO1106') {
-        return 'diegodengosoto@gmail.com';
-    }
     const cleaned = username.toLowerCase().replace(/[^a-z0-9_.-]/g, '');
     return `${cleaned}@campus-ucr.app`;
 }
@@ -117,9 +132,13 @@ async function handleSignUp(username, password, fullName, studentId) {
         });
         if (error) throw error;
 
+        // Guardar username localmente
+        _setStoredUsername(username);
+
         if (data.user) {
             await _db.from('profiles').upsert({
                 id: data.user.id,
+                username: username,
                 full_name: fullName,
                 student_id: studentId,
                 email: emailToUse,
@@ -149,6 +168,20 @@ async function handleSignIn(username, password) {
         const emailToUse = usernameToEmail(username);
         const { data, error } = await _db.auth.signInWithPassword({ email: emailToUse, password });
         if (error) throw error;
+
+        // Guardar el username localmente para mostrar el nombre siempre
+        _setStoredUsername(username);
+
+        // Intentar persistir en BD (funciona si la columna username existe)
+        if (data.user) {
+            try {
+                await _db.from('profiles').upsert({
+                    id: data.user.id,
+                    username: username,
+                    email: emailToUse
+                }, { onConflict: 'id' });
+            } catch(_) { /* silenciar si columna username no existe aún */ }
+        }
         // onAuthStateChange se encarga del resto
     } catch (error) {
         showAuthError('Usuario o contraseña incorrectos.');
@@ -159,6 +192,7 @@ async function handleSignIn(username, password) {
 
 async function handleSignOut() {
     try {
+        _clearStoredUsername();
         await _db.auth.signOut();
         location.reload();
     } catch (error) {
@@ -194,6 +228,7 @@ async function fetchUserProfile(userId) {
         }
     } catch (error) {
         console.error('[Auth] Error cargando perfil:', error);
+        _actualizarNombreHome(); // <-- Asegurar que el UI se actualice aunque falle
         // Si falla, ir al home igual
         if (typeof window.navigateTo === 'function') window.navigateTo('home');
     }
@@ -264,7 +299,8 @@ window.supaAuth = {
     guardarSeleccionCarreras: guardarSeleccionCarreras,
     editarCarreras: editarCarreras,
     getCurrentSession: function() { return currentSession; },
-    getCurrentProfile: function() { return currentProfile; }
+    getCurrentProfile: function() { return currentProfile; },
+    getStoredUsername: _getStoredUsername
 };
 // Acceso directo desde HTML onclick
 window.guardarSeleccionCarreras = guardarSeleccionCarreras;

@@ -97,497 +97,85 @@ const CARRERAS = {
     codigo: "CP",
     descripcion: "Escuela de Administración - Universidad de Costa Rica",
     cursos: [
+
       // ============ I CICLO ============
-      {
-        codigo: "EG-I",
-        nombre: "Curso Integrado de Humanidades I",
-        creditos: 6,
-        nivel: 1,
-        requisitos: [],
-        estado: 0
-      },
-      {
-        codigo: "EG-",
-        nombre: "Curso de Arte",
-        creditos: 2,
-        nivel: 1,
-        requisitos: [],
-        estado: 0
-      },
-      {
-        codigo: "RP-",
-        nombre: "Repertorio",
-        creditos: 3,
-        nivel: 1,
-        requisitos: [],
-        estado: 0
-      },
-      {
-        codigo: "DN-0101",
-        nombre: "Introducción a la Administración de Negocios",
-        creditos: 3,
-        nivel: 1,
-        requisitos: [],
-        estado: 0
-      },
-      {
-        codigo: "MA0001",
-        nombre: "Pre-Cálculo",
-        creditos: 0,
-        nivel: 1,
-        requisitos: [],
-        estado: 0
-      },
-      {
-        codigo: "DN-0102",
-        nombre: "Aplicaciones Ofimáticas para la Toma de Decisiones",
-        creditos: 3,
-        nivel: 1,
-        requisitos: [],
-        estado: 0
-      },
+      { codigo: "EG-I",    nombre: "Curso Integrado de Humanidades I",                            creditos: 6, nivel: 1,  requisitos: [],                                      estado: 0 },
+      { codigo: "EG-",     nombre: "Curso de Arte",                                               creditos: 2, nivel: 1,  requisitos: [],                                      estado: 0 },
+      { codigo: "RP-",     nombre: "Repertorio",                                                  creditos: 3, nivel: 1,  requisitos: [],                                      estado: 0 },
+      { codigo: "DN-0101", nombre: "Introducción a la Administración de Negocios",                creditos: 3, nivel: 1,  requisitos: [],                                      estado: 0 },
+      { codigo: "MA0001",  nombre: "Pre-Cálculo",                                                 creditos: 0, nivel: 1,  requisitos: [],                                      estado: 0 },
+      { codigo: "DN-0102", nombre: "Aplicaciones Ofimáticas para la Toma de Decisiones",         creditos: 3, nivel: 1,  requisitos: [],                                      estado: 0 },
 
       // ============ II CICLO ============
-      {
-        codigo: "EG-II",
-        nombre: "Curso Integrado de Humanidades II",
-        creditos: 6,
-        nivel: 2,
-        requisitos: ["EG-I"],
-        estado: 0
-      },
-      {
-        codigo: "EF-",
-        nombre: "Actividad Deportiva",
-        creditos: 0,
-        nivel: 2,
-        requisitos: [],
-        estado: 0
-      },
-      {
-        codigo: "DN-0104",
-        nombre: "Elementos Fundamentales de Legislación Empresarial",
-        creditos: 3,
-        nivel: 2,
-        requisitos: ["DN-0101"],
-        estado: 0
-      },
-      {
-        codigo: "DN-0103",
-        nombre: "Administración de Proyectos y Herramientas para el Análisis de Datos",
-        creditos: 3,
-        nivel: 2,
-        requisitos: ["DN-0102"],
-        estado: 0
-      },
-      {
-        codigo: "MA-1021",
-        nombre: "Cálculo para Ciencias Económicas",
-        creditos: 4,
-        nivel: 2,
-        requisitos: ["MA0001"],
-        estado: 0
-      },
+      { codigo: "EG-II",   nombre: "Curso Integrado de Humanidades II",                          creditos: 6, nivel: 2,  requisitos: ["EG-I"],                                estado: 0 },
+      { codigo: "EF-",     nombre: "Actividad Deportiva",                                        creditos: 0, nivel: 2,  requisitos: [],                                      estado: 0 },
+      { codigo: "DN-0104", nombre: "Elementos Fundamentales de Legislación Empresarial",         creditos: 3, nivel: 2,  requisitos: ["DN-0101"],                             estado: 0 },
+      { codigo: "DN-0103", nombre: "Administración de Proyectos y Herramientas para el Análisis de Datos", creditos: 3, nivel: 2, requisitos: ["DN-0102"],               estado: 0 },
+      { codigo: "MA-1021", nombre: "Cálculo para Ciencias Económicas",                           creditos: 4, nivel: 2,  requisitos: ["MA0001"],                             estado: 0 },
 
       // ============ III CICLO ============
-      {
-        codigo: "PC-0200",
-        nombre: "Contabilidad Básica",
-        creditos: 4,
-        nivel: 3,
-        requisitos: ["DN-0101"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0240",
-        nombre: "Matemática Financiera",
-        creditos: 3,
-        nivel: 3,
-        requisitos: ["MA-1021", "DN-0103"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0261",
-        nombre: "Legislación Comercial, Bancaria y Financiera",
-        creditos: 3,
-        nivel: 3,
-        requisitos: ["DN-0104"],
-        estado: 0
-      },
-      {
-        codigo: "XS-0276",
-        nombre: "Estadística General I",
-        creditos: 4,
-        nivel: 3,
-        requisitos: ["MA-1021"],
-        estado: 0
-      },
-      {
-        codigo: "MA-1022",
-        nombre: "Cálculo para Ciencias Económicas II",
-        creditos: 4,
-        nivel: 3,
-        requisitos: ["MA-1021"],
-        estado: 0
-      },
-      {
-        codigo: "OPT-ING",
-        nombre: "Opcional I (Inglés)",
-        creditos: 0,
-        nivel: 3,
-        requisitos: ["DN-0101"],
-        estado: 0
-      },
+      { codigo: "PC-0200", nombre: "Contabilidad Básica",                                        creditos: 4, nivel: 3,  requisitos: ["DN-0101"],                             estado: 0 },
+      { codigo: "PC-0240", nombre: "Matemática Financiera",                                      creditos: 3, nivel: 3,  requisitos: ["MA-1021", "DN-0103"],                  estado: 0 },
+      { codigo: "PC-0261", nombre: "Legislación Comercial, Bancaria y Financiera",               creditos: 3, nivel: 3,  requisitos: ["DN-0104"],                             estado: 0 },
+      { codigo: "XS-0276", nombre: "Estadística General I",                                      creditos: 4, nivel: 3,  requisitos: ["MA-1021"],                             estado: 0 },
+      { codigo: "MA-1022", nombre: "Cálculo para Ciencias Económicas II",                        creditos: 4, nivel: 3,  requisitos: ["MA-1021"],                             estado: 0 },
+      { codigo: "OPT-ING", nombre: "Opcional I (Inglés)",                                        creditos: 0, nivel: 3,  requisitos: ["DN-0101"],                             estado: 0 },
 
       // ============ IV CICLO ============
-      {
-        codigo: "SR-I",
-        nombre: "Seminario de Realidad Nacional I",
-        creditos: 2,
-        nivel: 4,
-        requisitos: ["EG-II"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0260",
-        nombre: "Legislación Laboral",
-        creditos: 3,
-        nivel: 4,
-        requisitos: ["PC-0261"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0202",
-        nombre: "Contabilidad Intermedia I",
-        creditos: 3,
-        nivel: 4,
-        requisitos: ["PC-0200"],
-        estado: 0
-      },
-      {
-        codigo: "DN-0123",
-        nombre: "Metodología de la Investigación",
-        creditos: 3,
-        nivel: 4,
-        requisitos: ["XS-0276"],
-        estado: 0
-      },
-      {
-        codigo: "XS-0277",
-        nombre: "Estadística General II",
-        creditos: 4,
-        nivel: 4,
-        requisitos: ["XS-0276", "MA-1022"],
-        estado: 0
-      },
-      {
-        codigo: "DN-0340",
-        nombre: "Administración Financiera I",
-        creditos: 3,
-        nivel: 4,
-        requisitos: ["PC-0240", "PC-0200"],
-        estado: 0
-      },
+      { codigo: "SR-I",    nombre: "Seminario de Realidad Nacional I",                           creditos: 2, nivel: 4,  requisitos: ["EG-II"],                               estado: 0 },
+      { codigo: "PC-0260", nombre: "Legislación Laboral",                                        creditos: 3, nivel: 4,  requisitos: ["PC-0261"],                             estado: 0 },
+      { codigo: "PC-0202", nombre: "Contabilidad Intermedia I",                                  creditos: 3, nivel: 4,  requisitos: ["PC-0200"],                             estado: 0 },
+      { codigo: "DN-0123", nombre: "Metodología de la Investigación",                            creditos: 3, nivel: 4,  requisitos: ["XS-0276"],                             estado: 0 },
+      { codigo: "XS-0277", nombre: "Estadística General II",                                     creditos: 4, nivel: 4,  requisitos: ["XS-0276", "MA-1022"],                  estado: 0 },
+      { codigo: "DN-0340", nombre: "Administración Financiera I",                                creditos: 3, nivel: 4,  requisitos: ["PC-0240", "PC-0200"],                  estado: 0 },
 
       // ============ V CICLO ============
-      {
-        codigo: "SR-II",
-        nombre: "Seminario de Realidad Nacional II",
-        creditos: 2,
-        nivel: 5,
-        requisitos: ["SR-I"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0304",
-        nombre: "Contabilidad Intermedia II",
-        creditos: 3,
-        nivel: 5,
-        requisitos: ["PC-0240", "PC-0202"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0320",
-        nombre: "Auditoría Financiera I",
-        creditos: 3,
-        nivel: 5,
-        requisitos: ["PC-0202", "XS-0276"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0241",
-        nombre: "Negocios y Entorno Económico",
-        creditos: 3,
-        nivel: 5,
-        requisitos: ["PC-0261"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0212",
-        nombre: "Gerencia y Liderazgo para Contadores",
-        creditos: 3,
-        nivel: 5,
-        requisitos: ["DN-0101"],
-        estado: 0
-      },
-      {
-        codigo: "DN-0341",
-        nombre: "Administración Financiera II",
-        creditos: 3,
-        nivel: 5,
-        requisitos: ["DN-0340", "XS-0277"],
-        estado: 0
-      },
+      { codigo: "SR-II",   nombre: "Seminario de Realidad Nacional II",                          creditos: 2, nivel: 5,  requisitos: ["SR-I"],                                estado: 0 },
+      { codigo: "PC-0304", nombre: "Contabilidad Intermedia II",                                 creditos: 3, nivel: 5,  requisitos: ["PC-0240", "PC-0202"],                  estado: 0 },
+      { codigo: "PC-0320", nombre: "Auditoría Financiera I",                                     creditos: 3, nivel: 5,  requisitos: ["PC-0202", "XS-0276"],                  estado: 0 },
+      { codigo: "PC-0241", nombre: "Negocios y Entorno Económico",                               creditos: 3, nivel: 5,  requisitos: ["PC-0261"],                             estado: 0 },
+      { codigo: "PC-0212", nombre: "Gerencia y Liderazgo para Contadores",                       creditos: 3, nivel: 5,  requisitos: ["DN-0101"],                             estado: 0 },
+      { codigo: "DN-0341", nombre: "Administración Financiera II",                               creditos: 3, nivel: 5,  requisitos: ["DN-0340", "XS-0277"],                  estado: 0 },
 
       // ============ VI CICLO ============
-      {
-        codigo: "PC-0305",
-        nombre: "Contabilizaciones Especiales",
-        creditos: 3,
-        nivel: 6,
-        requisitos: ["PC-0304"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0321",
-        nombre: "Auditoría Financiera II",
-        creditos: 3,
-        nivel: 6,
-        requisitos: ["PC-0320"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0211",
-        nombre: "Muestreo Aplicado a la Auditoría",
-        creditos: 3,
-        nivel: 6,
-        requisitos: ["XS-0277", "PC-0320"],
-        estado: 0
-      },
-      {
-        codigo: "DN-0105",
-        nombre: "Métodos Cuantitativos para la Toma de Decisiones I",
-        creditos: 3,
-        nivel: 6,
-        requisitos: ["DN-0340", "XS-0277", "DN-0341", "DN-0320"],
-        estado: 0
-      },
-      {
-        codigo: "DN-0320",
-        nombre: "Principios de Mercadeo",
-        creditos: 3,
-        nivel: 6,
-        requisitos: ["PC-0200", "XS-0276"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0242",
-        nombre: "Entorno, Gestión y Control",
-        creditos: 3,
-        nivel: 6,
-        requisitos: ["PC-0241"],
-        estado: 0
-      },
+      { codigo: "PC-0305", nombre: "Contabilizaciones Especiales",                               creditos: 3, nivel: 6,  requisitos: ["PC-0304"],                             estado: 0 },
+      { codigo: "PC-0321", nombre: "Auditoría Financiera II",                                    creditos: 3, nivel: 6,  requisitos: ["PC-0320"],                             estado: 0 },
+      { codigo: "PC-0211", nombre: "Muestreo Aplicado a la Auditoría",                           creditos: 3, nivel: 6,  requisitos: ["XS-0277", "PC-0320"],                  estado: 0 },
+      { codigo: "DN-0105", nombre: "Métodos Cuantitativos para la Toma de Decisiones I",         creditos: 3, nivel: 6,  requisitos: ["DN-0340", "XS-0277", "DN-0341", "DN-0320"], estado: 0 },
+      { codigo: "DN-0320", nombre: "Principios de Mercadeo",                                     creditos: 3, nivel: 6,  requisitos: ["PC-0200", "XS-0276"],                  estado: 0 },
+      { codigo: "PC-0242", nombre: "Entorno, Gestión y Control",                                 creditos: 3, nivel: 6,  requisitos: ["PC-0241"],                             estado: 0 },
 
       // ============ VII CICLO ============
-      {
-        codigo: "PC-0407",
-        nombre: "Contabilidad Avanzada I",
-        creditos: 3,
-        nivel: 7,
-        requisitos: ["PC-0305"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0204",
-        nombre: "Laboratorio de Contabilidad",
-        creditos: 3,
-        nivel: 7,
-        requisitos: ["PC-0305"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0421",
-        nombre: "Auditoría Financiera III",
-        creditos: 3,
-        nivel: 7,
-        requisitos: ["PC-0321"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0462",
-        nombre: "Legislación Tributaria y Aduanera",
-        creditos: 3,
-        nivel: 7,
-        requisitos: ["PC-0304", "PC-0260"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0306",
-        nombre: "Sistemas de Costeo Básico",
-        creditos: 3,
-        nivel: 7,
-        requisitos: ["PC-0304"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0344",
-        nombre: "Formulación y Evaluación de Proyectos I",
-        creditos: 3,
-        nivel: 7,
-        requisitos: ["DN-0341", "DN-0110"],
-        estado: 0
-      },
+      { codigo: "PC-0407", nombre: "Contabilidad Avanzada I",                                    creditos: 3, nivel: 7,  requisitos: ["PC-0305"],                             estado: 0 },
+      { codigo: "PC-0204", nombre: "Laboratorio de Contabilidad",                                creditos: 3, nivel: 7,  requisitos: ["PC-0305"],                             estado: 0 },
+      { codigo: "PC-0421", nombre: "Auditoría Financiera III",                                   creditos: 3, nivel: 7,  requisitos: ["PC-0321"],                             estado: 0 },
+      { codigo: "PC-0462", nombre: "Legislación Tributaria y Aduanera",                          creditos: 3, nivel: 7,  requisitos: ["PC-0304", "PC-0260"],                  estado: 0 },
+      { codigo: "PC-0306", nombre: "Sistemas de Costeo Básico",                                  creditos: 3, nivel: 7,  requisitos: ["PC-0304"],                             estado: 0 },
+      { codigo: "PC-0344", nombre: "Formulación y Evaluación de Proyectos I",                    creditos: 3, nivel: 7,  requisitos: ["DN-0341", "DN-0110"],                  estado: 0 },
 
       // ============ VIII CICLO ============
-      {
-        codigo: "PC-0409",
-        nombre: "Sistemas de Costeo Gerencial",
-        creditos: 3,
-        nivel: 8,
-        requisitos: ["PC-0306"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0410",
-        nombre: "Contabilidad Avanzada II",
-        creditos: 3,
-        nivel: 8,
-        requisitos: ["PC-0407"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0205",
-        nombre: "Contabilidad Gubernamental",
-        creditos: 3,
-        nivel: 8,
-        requisitos: ["PC-0407"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0531",
-        nombre: "Auditoría Financiera IV",
-        creditos: 3,
-        nivel: 8,
-        requisitos: ["PC-0421"],
-        estado: 0
-      },
-      {
-        codigo: "DN-0110",
-        nombre: "Métodos Cuantitativos para la Toma de Decisiones II",
-        creditos: 3,
-        nivel: 8,
-        requisitos: ["DN-0105", "PC-0344"],
-        estado: 0
-      },
-      {
-        codigo: "DN-0525",
-        nombre: "Mercadeo de Servicios",
-        creditos: 3,
-        nivel: 8,
-        requisitos: ["DN-0320"],
-        estado: 0
-      },
+      { codigo: "PC-0409", nombre: "Sistemas de Costeo Gerencial",                               creditos: 3, nivel: 8,  requisitos: ["PC-0306"],                             estado: 0 },
+      { codigo: "PC-0410", nombre: "Contabilidad Avanzada II",                                   creditos: 3, nivel: 8,  requisitos: ["PC-0407"],                             estado: 0 },
+      { codigo: "PC-0205", nombre: "Contabilidad Gubernamental",                                 creditos: 3, nivel: 8,  requisitos: ["PC-0407"],                             estado: 0 },
+      { codigo: "PC-0531", nombre: "Auditoría Financiera IV",                                    creditos: 3, nivel: 8,  requisitos: ["PC-0421"],                             estado: 0 },
+      { codigo: "DN-0110", nombre: "Métodos Cuantitativos para la Toma de Decisiones II",        creditos: 3, nivel: 8,  requisitos: ["DN-0105", "PC-0344"],                  estado: 0 },
+      { codigo: "DN-0525", nombre: "Mercadeo de Servicios",                                      creditos: 3, nivel: 8,  requisitos: ["DN-0320"],                             estado: 0 },
 
       // ============ IX CICLO (LICENCIATURA) ============
-      {
-        codigo: "PC-0423",
-        nombre: "Auditoría Informática I",
-        creditos: 3,
-        nivel: 9,
-        requisitos: ["PC-0531"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0424",
-        nombre: "Laboratorio de Auditoría Informática I",
-        creditos: 1,
-        nivel: 9,
-        requisitos: ["PC-0531"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0425",
-        nombre: "Control Interno y Auditorías Especiales",
-        creditos: 3,
-        nivel: 9,
-        requisitos: ["PC-0531"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0528",
-        nombre: "Auditoría de Gestión I",
-        creditos: 4,
-        nivel: 9,
-        requisitos: ["PC-0531"],
-        estado: 0
-      },
-      {
-        codigo: "OPT-2",
-        nombre: "Inteligencia Emocional en el Trabajo",
-        creditos: 3,
-        nivel: 9,
-        requisitos: ["DN-0104"],
-        estado: 0
-      },
-      {
-        codigo: "DN-0114",
-        nombre: "Comunicación Intercultural de los Negocios",
-        creditos: 3,
-        nivel: 9,
-        requisitos: ["PC-0409"],
-        estado: 0
-      },
+      { codigo: "PC-0423", nombre: "Auditoría Informática I",                                    creditos: 3, nivel: 9,  requisitos: ["PC-0531"],                             estado: 0 },
+      { codigo: "PC-0424", nombre: "Laboratorio de Auditoría Informática I",                     creditos: 1, nivel: 9,  requisitos: ["PC-0531"],                             estado: 0 },
+      { codigo: "PC-0425", nombre: "Control Interno y Auditorías Especiales",                    creditos: 3, nivel: 9,  requisitos: ["PC-0531"],                             estado: 0 },
+      { codigo: "PC-0528", nombre: "Auditoría de Gestión I",                                     creditos: 4, nivel: 9,  requisitos: ["PC-0531"],                             estado: 0 },
+      { codigo: "OPT-2",   nombre: "Inteligencia Emocional en el Trabajo",                       creditos: 3, nivel: 9,  requisitos: ["DN-0104"],                             estado: 0 },
+      { codigo: "DN-0114", nombre: "Comunicación Intercultural de los Negocios",                 creditos: 3, nivel: 9,  requisitos: ["PC-0409"],                             estado: 0 },
 
       // ============ X CICLO ============
-      {
-        codigo: "PC-0526",
-        nombre: "Auditoría Informática II",
-        creditos: 3,
-        nivel: 10,
-        requisitos: ["PC-0423", "PC-0424"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0527",
-        nombre: "Laboratorio de Auditoría Informática II",
-        creditos: 1,
-        nivel: 10,
-        requisitos: ["PC-0423", "PC-0424"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0529",
-        nombre: "Auditoría de Gestión II",
-        creditos: 4,
-        nivel: 10,
-        requisitos: ["PC-0528"],
-        estado: 0
-      },
-      {
-        codigo: "OPT-3",
-        nombre: "Valoraciones, Fusiones y Adquisiciones de Empresas",
-        creditos: 3,
-        nivel: 10,
-        requisitos: ["DN-0104"],
-        estado: 0
-      },
-      {
-        codigo: "DN-0115",
-        nombre: "Taller de Investigación",
-        creditos: 3,
-        nivel: 10,
-        requisitos: ["DN-0114"],
-        estado: 0
-      },
-      {
-        codigo: "PC-0210",
-        nombre: "Auditoría Interna",
-        creditos: 3,
-        nivel: 10,
-        requisitos: ["PC-0425"],
-        estado: 0
-      }
+      { codigo: "PC-0526", nombre: "Auditoría Informática II",                                   creditos: 3, nivel: 10, requisitos: ["PC-0423", "PC-0424"],                  estado: 0 },
+      { codigo: "PC-0527", nombre: "Laboratorio de Auditoría Informática II",                    creditos: 1, nivel: 10, requisitos: ["PC-0423", "PC-0424"],                  estado: 0 },
+      { codigo: "PC-0529", nombre: "Auditoría de Gestión II",                                    creditos: 4, nivel: 10, requisitos: ["PC-0528"],                             estado: 0 },
+      { codigo: "OPT-3",   nombre: "Valoraciones, Fusiones y Adquisiciones de Empresas",         creditos: 3, nivel: 10, requisitos: ["DN-0104"],                             estado: 0 },
+      { codigo: "DN-0115", nombre: "Taller de Investigación",                                    creditos: 3, nivel: 10, requisitos: ["DN-0114"],                             estado: 0 },
+      { codigo: "PC-0210", nombre: "Auditoría Interna",                                          creditos: 3, nivel: 10, requisitos: ["PC-0425"],                             estado: 0 }
     ]
   },
 
@@ -673,6 +261,337 @@ const CARRERAS = {
       { codigo: "DN-OPTX2", nombre: "Curso Optativo VIII", creditos: 3, nivel: 10, requisitos: [], estado: 0 },
       { codigo: "DN-OPTX3", nombre: "Curso Optativo IX", creditos: 3, nivel: 10, requisitos: [], estado: 0 },
       { codigo: "DN-OPTX4", nombre: "Curso Optativo X", creditos: 3, nivel: 10, requisitos: [], estado: 0 }
+    ]
+  },
+
+  cienciasActuariales: {
+    nombre: "Ciencias Actuariales",
+    codigo: "CA",
+    descripcion: "Bach. y Lic. en Ciencias Actuariales — Plan 1999 · Escuela de Matemática, UCR (Carrera 210402)",
+    cursos: [
+
+      // ============ I CICLO (Bachillerato) ============
+      { codigo: "EC1100",  nombre: "Introducción a la Economía",                creditos: 4, nivel: 1,  requisitos: [],                                      estado: 0 },
+      { codigo: "EF-",     nombre: "Actividad Deportiva",                       creditos: 0, nivel: 1,  requisitos: [],                                      estado: 0 },
+      { codigo: "EG-I",    nombre: "Curso Integrado de Humanidades I",          creditos: 6, nivel: 1,  requisitos: [],                                      estado: 0 },
+      { codigo: "MA0001",  nombre: "Pre-Cálculo",                               creditos: 0, nivel: 1,  requisitos: [],                                      estado: 0 },
+      { codigo: "MA0150",  nombre: "Principios de Matemática",                  creditos: 4, nivel: 1,  requisitos: ["MA0001"],                              estado: 0 },
+      { codigo: "RP-1",    nombre: "Repertorio",                                creditos: 3, nivel: 1,  requisitos: [],                                      estado: 0 },
+
+      // ============ II CICLO ============
+      { codigo: "EG-",     nombre: "Curso de Arte",                             creditos: 2, nivel: 2,  requisitos: [],                                      estado: 0 },
+      { codigo: "EG-II",   nombre: "Curso Integrado de Humanidades II",         creditos: 6, nivel: 2,  requisitos: ["EG-I"],                                estado: 0 },
+      { codigo: "LM1030",  nombre: "Estrategias de Lectura en Inglés I",        creditos: 4, nivel: 2,  requisitos: [],                                      estado: 0 },
+      { codigo: "MA0250",  nombre: "Cálculo en una Variable I",                 creditos: 4, nivel: 2,  requisitos: ["MA0150"],                              estado: 0 },
+
+      // ============ III CICLO ============
+      { codigo: "CI0112",  nombre: "Programación I",                            creditos: 4, nivel: 3,  requisitos: ["MA0250"],                              estado: 0 },
+      { codigo: "EC2100",  nombre: "Teoría Microeconómica 1",                   creditos: 4, nivel: 3,  requisitos: ["EC1100", "MA0250"],                    estado: 0 },
+      { codigo: "MA0350",  nombre: "Cálculo en una Variable II",                creditos: 4, nivel: 3,  requisitos: ["MA0250"],                              estado: 0 },
+      { codigo: "MA0360",  nombre: "Álgebra Lineal I",                          creditos: 4, nivel: 3,  requisitos: ["MA0250"],                              estado: 0 },
+      { codigo: "SR-I",    nombre: "Seminario de Realidad Nacional I",          creditos: 2, nivel: 3,  requisitos: ["EG-II"],                               estado: 0 },
+
+      // ============ IV CICLO ============
+      { codigo: "CA0201",  nombre: "Teoría Matemática del Interés",             creditos: 4, nivel: 4,  requisitos: ["MA0350"],                              estado: 0 },
+      { codigo: "CA0202",  nombre: "Herramientas de Cómputo Actuarial",         creditos: 4, nivel: 4,  requisitos: ["CI0112", "MA0350"],                    estado: 0 },
+      { codigo: "MA0450",  nombre: "Cálculo en Varias Variables",               creditos: 4, nivel: 4,  requisitos: ["MA0350"],                              estado: 0 },
+      { codigo: "MA0460",  nombre: "Álgebra Lineal II",                         creditos: 4, nivel: 4,  requisitos: ["MA0360"],                              estado: 0 },
+      { codigo: "SR-II",   nombre: "Seminario de Realidad Nacional II",         creditos: 2, nivel: 4,  requisitos: ["SR-I"],                                estado: 0 },
+
+      // ============ V CICLO ============
+      { codigo: "CA0408",  nombre: "Análisis de Instrumentos de Inversión",     creditos: 4, nivel: 5,  requisitos: ["CA0201", "CA0202"],                    estado: 0 },
+      { codigo: "EC3200",  nombre: "Teoría Macroeconómica I",                   creditos: 4, nivel: 5,  requisitos: ["EC2100", "MA0450"],                    estado: 0 },
+      { codigo: "MA0455",  nombre: "Ecuaciones Diferenciales Ordinarias",       creditos: 4, nivel: 5,  requisitos: ["MA0450", "MA0460"],                    estado: 0 },
+      { codigo: "MA0720",  nombre: "Probabilidades I",                          creditos: 5, nivel: 5,  requisitos: ["MA0450", "MA0460"],                    estado: 0 },
+
+      // ============ VI CICLO ============
+      { codigo: "CA0301",  nombre: "Matemática Actuarial I",                    creditos: 4, nivel: 6,  requisitos: ["MA0455", "MA0720"],                    estado: 0 },
+      { codigo: "CA0302",  nombre: "Laboratorio Actuarial I",                   creditos: 2, nivel: 6,  requisitos: ["MA0455", "MA0720"],                    estado: 0 },
+      { codigo: "CA0303",  nombre: "Estadística Actuarial I",                   creditos: 4, nivel: 6,  requisitos: ["MA0720"],                              estado: 0 },
+      { codigo: "CA0304",  nombre: "Fundamentos de Riesgos y Seguros",          creditos: 4, nivel: 6,  requisitos: ["MA0720"],                              estado: 0 },
+      { codigo: "MA0501",  nombre: "Análisis Numérico I",                       creditos: 4, nivel: 6,  requisitos: ["CI0112", "MA0450", "MA0455", "MA0460"], estado: 0 },
+
+      // ============ VII CICLO ============
+      { codigo: "CA0401",  nombre: "Matemáticas Actuariales II",                creditos: 4, nivel: 7,  requisitos: ["CA0301", "CA0302"],                    estado: 0 },
+      { codigo: "CA0402",  nombre: "Laboratorio Actuarial II",                  creditos: 2, nivel: 7,  requisitos: ["CA0301", "CA0302"],                    estado: 0 },
+      { codigo: "CA0403",  nombre: "Estadística Actuarial II",                  creditos: 4, nivel: 7,  requisitos: ["CA0303"],                              estado: 0 },
+      { codigo: "CA0406",  nombre: "Procesos Estocásticos y Series Temporales", creditos: 4, nivel: 7,  requisitos: ["MA0455", "MA0720"],                    estado: 0 },
+      { codigo: "OPT787",  nombre: "Cursos Optativos",                          creditos: 4, nivel: 7,  requisitos: [],                                      estado: 0 },
+
+      // ============ VIII CICLO ============
+      { codigo: "CA0404",  nombre: "Modelos Lineales",                          creditos: 4, nivel: 8,  requisitos: ["MA0455", "MA0720"],                    estado: 0 },
+      { codigo: "CA0405",  nombre: "Matemáticas Actuariales III",               creditos: 4, nivel: 8,  requisitos: ["CA0401", "CA0402"],                    estado: 0 },
+      { codigo: "CA0407",  nombre: "Práctica Actuarial I",                      creditos: 3, nivel: 8,  requisitos: ["CA0401"],                              estado: 0 },
+      { codigo: "CA0409",  nombre: "Distribuciones de Pérdidas",                creditos: 4, nivel: 8,  requisitos: ["CA0406"],                              estado: 0 },
+      { codigo: "CA0410",  nombre: "Teoría de Riesgos",                         creditos: 4, nivel: 8,  requisitos: ["CA0406"],                              estado: 0 },
+
+      // ============ IX CICLO (Licenciatura) ============
+      { codigo: "CA0501",  nombre: "Regímenes de Pensiones",                    creditos: 4, nivel: 9,  requisitos: ["CA0405"],                              estado: 0 },
+      { codigo: "CA0502",  nombre: "Laboratorio Actuarial III",                 creditos: 3, nivel: 9,  requisitos: ["CA0402", "CA0405"],                    estado: 0 },
+      { codigo: "CA0503",  nombre: "Modelos de Vida",                           creditos: 4, nivel: 9,  requisitos: ["CA0405"],                              estado: 0 },
+      { codigo: "CA0504",  nombre: "Introducción a la Optimización",            creditos: 4, nivel: 9,  requisitos: ["MA0450", "MA0460"],                    estado: 0 },
+
+      // ============ X CICLO ============
+      { codigo: "CA0506",  nombre: "Análisis de Datos",                         creditos: 4, nivel: 10, requisitos: ["CA0403"],                              estado: 0 },
+      { codigo: "CA0508",  nombre: "Práctica Actuarial II",                     creditos: 4, nivel: 10, requisitos: ["CA0504"],                              estado: 0 },
+      { codigo: "CA0509",  nombre: "Teoría de Credibilidad",                    creditos: 4, nivel: 10, requisitos: ["CA0409", "CA0410"],                    estado: 0 },
+      { codigo: "CA0510",  nombre: "Análisis de Estados Financieros",           creditos: 4, nivel: 10, requisitos: ["CA0410"],                              estado: 0 },
+
+      // ============ XI CICLO — Trabajo Final de Graduación ============
+      { codigo: "MA9500",  nombre: "Investigación Dirigida 1",                  creditos: 0, nivel: 11, requisitos: [],                                      estado: 0 },
+      { codigo: "MA9501",  nombre: "Investigación Dirigida 2",                  creditos: 0, nivel: 11, requisitos: ["MA9500"],                              estado: 0 },
+      { codigo: "MA9600",  nombre: "Seminario de Graduación 1",                 creditos: 0, nivel: 11, requisitos: [],                                      estado: 0 },
+      { codigo: "MA9700",  nombre: "Práctica Dirigida 1",                       creditos: 0, nivel: 11, requisitos: [],                                      estado: 0 }
+    ]
+  },
+
+  farmacia: {
+    nombre: "Farmacia",
+    codigo: "FA",
+    descripcion: "Licenciatura en Farmacia — Plan 2016 · Facultad de Farmacia, UCR (Carrera 540101)",
+    cursos: [
+
+      // ============ I CICLO ============
+      { codigo: "EG-",     nombre: "Curso de Arte",                                      creditos: 2, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "EG-I",    nombre: "Curso Integrado de Humanidades I",                   creditos: 6, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "FS0132",  nombre: "Física Aplicada a Farmacia",                         creditos: 3, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "FS0133",  nombre: "Lab. Física Aplicada a Farmacia",                    creditos: 1, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "MA1210",  nombre: "Cálculo I",                                          creditos: 3, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "QU0100",  nombre: "Química General I",                                  creditos: 3, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "QU0101",  nombre: "Lab. Química General I",                             creditos: 1, nivel: 1, requisitos: [],                                      estado: 0 },
+
+      // ============ II CICLO ============
+      { codigo: "B0106",   nombre: "Biología General",                                   creditos: 3, nivel: 2, requisitos: [],                                      estado: 0 },
+      { codigo: "B0107",   nombre: "Lab. Biología General",                              creditos: 1, nivel: 2, requisitos: [],                                      estado: 0 },
+      { codigo: "EF-",     nombre: "Actividad Deportiva",                                creditos: 0, nivel: 2, requisitos: [],                                      estado: 0 },
+      { codigo: "EG-II",   nombre: "Curso Integrado de Humanidades II",                  creditos: 6, nivel: 2, requisitos: ["EG-I"],                                estado: 0 },
+      { codigo: "MA2210",  nombre: "Ecuaciones Diferenciales Aplicadas",                 creditos: 3, nivel: 2, requisitos: ["MA1210"],                              estado: 0 },
+      { codigo: "QU0102",  nombre: "Química General II",                                 creditos: 3, nivel: 2, requisitos: ["QU0100", "QU0101"],                    estado: 0 },
+      { codigo: "QU0103",  nombre: "Lab. Química General II",                            creditos: 1, nivel: 2, requisitos: ["QU0100", "QU0101"],                    estado: 0 },
+
+      // ============ III CICLO ============
+      { codigo: "FA2009",  nombre: "Introducción a la Farmacia",                         creditos: 3, nivel: 3, requisitos: [],                                      estado: 0 },
+      { codigo: "MN0220",  nombre: "Anatomía Macroscópica",                              creditos: 4, nivel: 3, requisitos: ["B0106", "B0107"],                      estado: 0 },
+      { codigo: "QU0212",  nombre: "Química Orgánica General I",                         creditos: 4, nivel: 3, requisitos: ["QU0102", "QU0103"],                    estado: 0 },
+      { codigo: "QU0213",  nombre: "Lab. Química Orgánica General I",                    creditos: 1, nivel: 3, requisitos: ["QU0102", "QU0103"],                    estado: 0 },
+      { codigo: "SR-I",    nombre: "Seminario de Realidad Nacional I",                   creditos: 2, nivel: 3, requisitos: ["EG-II"],                               estado: 0 },
+      { codigo: "XS0215",  nombre: "Estadística para Biociencias",                       creditos: 4, nivel: 3, requisitos: ["MA1210"],                              estado: 0 },
+
+      // ============ IV CICLO ============
+      { codigo: "FA0217",  nombre: "Metodología de la Investigación Farmacéutica",       creditos: 3, nivel: 4, requisitos: ["FA2009", "XS0215"],                    estado: 0 },
+      { codigo: "FA0335",  nombre: "Fisicoquímica Farmacéutica I",                       creditos: 4, nivel: 4, requisitos: ["FS0132", "FS0133", "MA2210", "QU0212", "QU0213", "XS0215"], estado: 0 },
+      { codigo: "FA3030",  nombre: "Conferencia General I",                              creditos: 0, nivel: 4, requisitos: [],                                      estado: 0 },
+      { codigo: "QU0214",  nombre: "Química Orgánica General II",                        creditos: 4, nivel: 4, requisitos: ["QU0212", "QU0213"],                    estado: 0 },
+      { codigo: "QU0215",  nombre: "Lab. Química Orgánica General II",                   creditos: 1, nivel: 4, requisitos: ["QU0212", "QU0213"],                    estado: 0 },
+      { codigo: "RP-1",    nombre: "Repertorio",                                         creditos: 3, nivel: 4, requisitos: [],                                      estado: 0 },
+      { codigo: "SR-II",   nombre: "Seminario de Realidad Nacional II",                  creditos: 2, nivel: 4, requisitos: ["SR-I"],                                estado: 0 },
+
+      // ============ V CICLO ============
+      { codigo: "FA0218",  nombre: "Análisis de Medicamentos I",                         creditos: 5, nivel: 5, requisitos: ["FS0132", "FS0133", "QU0214", "QU0215", "XS0215"], estado: 0 },
+      { codigo: "FA0336",  nombre: "Fisicoquímica Farmacéutica II",                      creditos: 4, nivel: 5, requisitos: ["FA0335"],                              estado: 0 },
+      { codigo: "FA0337",  nombre: "Elementos de Salud Pública",                         creditos: 2, nivel: 5, requisitos: ["FA0217", "FA3030"],                    estado: 0 },
+      { codigo: "MQ0208",  nombre: "Bioquímica para Farmacia",                           creditos: 4, nivel: 5, requisitos: ["B0106", "B0107", "QU0214", "QU0215"],  estado: 0 },
+      { codigo: "OPT1043", nombre: "Cursos Optativos del V Ciclo",                       creditos: 2, nivel: 5, requisitos: [],                                      estado: 0 },
+
+      // ============ VI CICLO ============
+      { codigo: "FA0219",  nombre: "Elementos de Fisiopatología y Terapeútica",          creditos: 2, nivel: 6, requisitos: ["MN0220"],                              estado: 0 },
+      { codigo: "FA0222",  nombre: "Análisis de Medicamentos II",                        creditos: 4, nivel: 6, requisitos: ["FA0218"],                              estado: 0 },
+      { codigo: "FA0223",  nombre: "Fundamentos de Inmunología",                         creditos: 3, nivel: 6, requisitos: ["MQ0208"],                              estado: 0 },
+      { codigo: "FA0338",  nombre: "Biofarmacia y Farmacocinética",                      creditos: 4, nivel: 6, requisitos: ["FA0336"],                              estado: 0 },
+      { codigo: "MF1000",  nombre: "Fisiología Humana",                                  creditos: 6, nivel: 6, requisitos: ["MQ0208"],                              estado: 0 },
+
+      // ============ VII CICLO ============
+      { codigo: "F5001",   nombre: "Ética Profesional Farmaceútica",                     creditos: 1, nivel: 7, requisitos: ["FA0337"],                              estado: 0 },
+      { codigo: "FA0224",  nombre: "Microbiología Clínica y Terapeútica",                creditos: 3, nivel: 7, requisitos: ["FA0219", "FA0223", "MF1000"],          estado: 0 },
+      { codigo: "FA0225",  nombre: "Farmacología I",                                     creditos: 3, nivel: 7, requisitos: ["FA0223", "FA0338", "MF1000"],          estado: 0 },
+      { codigo: "FA0226",  nombre: "Laboratorio de Farmacología I",                      creditos: 1, nivel: 7, requisitos: ["FA0225"],                              estado: 0 },
+      { codigo: "FA0227",  nombre: "Análisis de Medicamentos III",                       creditos: 4, nivel: 7, requisitos: ["FA0222"],                              estado: 0 },
+      { codigo: "FA0228",  nombre: "Farmacognosia",                                      creditos: 2, nivel: 7, requisitos: ["MQ0208"],                              estado: 0 },
+      { codigo: "FA0229",  nombre: "Laboratorio de Farmacognosia",                       creditos: 2, nivel: 7, requisitos: ["FA0217", "FA0228"],                    estado: 0 },
+      { codigo: "FA0230",  nombre: "Fundamentos de Biotecnología Farmaceútica",          creditos: 2, nivel: 7, requisitos: ["FA0219", "FA0223", "FA0338"],          estado: 0 },
+
+      // ============ VIII CICLO ============
+      { codigo: "FA0231",  nombre: "Farmacología II",                                    creditos: 3, nivel: 8, requisitos: ["FA0219", "FA0224", "FA0225"],          estado: 0 },
+      { codigo: "FA0232",  nombre: "Laboratorio de Farmacología II",                     creditos: 1, nivel: 8, requisitos: ["FA0226", "FA0231"],                    estado: 0 },
+      { codigo: "FA0233",  nombre: "Tecnología Farmaceútica I",                          creditos: 4, nivel: 8, requisitos: ["FA0227", "FA0338"],                    estado: 0 },
+      { codigo: "FA0234",  nombre: "Atención Farmaceútica I",                            creditos: 4, nivel: 8, requisitos: ["F5001", "FA0225"],                     estado: 0 },
+      { codigo: "FA0235",  nombre: "Farmacia de Comunidad",                              creditos: 2, nivel: 8, requisitos: ["FA2009", "FA0234"],                    estado: 0 },
+      { codigo: "FA0310",  nombre: "Química Medicinal I",                                creditos: 3, nivel: 8, requisitos: ["FA0228", "FA0338"],                    estado: 0 },
+      { codigo: "OPT1064", nombre: "Optativos del Ciclo VIII",                           creditos: 2, nivel: 8, requisitos: [],                                      estado: 0 },
+
+      // ============ IX CICLO ============
+      { codigo: "FA0215",  nombre: "Gestión de la Innovación en el Área de Salud",       creditos: 2, nivel: 9, requisitos: ["FA0217", "FA2009"],                    estado: 0 },
+      { codigo: "FA0236",  nombre: "Química Medicinal II",                               creditos: 3, nivel: 9, requisitos: ["FA0224", "FA0310"],                    estado: 0 },
+      { codigo: "FA0237",  nombre: "Farmacología III",                                   creditos: 3, nivel: 9, requisitos: ["FA0223", "FA0225"],                    estado: 0 },
+      { codigo: "FA0238",  nombre: "Laboratorio de Farmacología III",                    creditos: 1, nivel: 9, requisitos: ["FA0237"],                              estado: 0 },
+      { codigo: "FA0239",  nombre: "Atención Farmaceútica II",                           creditos: 4, nivel: 9, requisitos: ["FA0231", "FA0234"],                    estado: 0 },
+      { codigo: "FA0315",  nombre: "Tecnología Farmaceútica II",                         creditos: 4, nivel: 9, requisitos: ["FA0227", "FA0338"],                    estado: 0 },
+      { codigo: "OPT1065", nombre: "Optativos del Ciclo IX",                             creditos: 2, nivel: 9, requisitos: [],                                      estado: 0 },
+
+      // ============ X CICLO ============
+      { codigo: "FA0316",  nombre: "Administración de Establecimientos Farmaceúticos",   creditos: 2, nivel: 10, requisitos: ["FA0215"],                             estado: 0 },
+      { codigo: "FA0317",  nombre: "Farmacia Industrial",                                creditos: 2, nivel: 10, requisitos: ["FA0233", "FA0315"],                   estado: 0 },
+      { codigo: "FA0339",  nombre: "Legislación y Deontología Farmacéutica",             creditos: 2, nivel: 10, requisitos: ["F5001", "FA0235", "FA0317"],          estado: 0 },
+      { codigo: "FA0341",  nombre: "Farmacia de Hospital",                               creditos: 4, nivel: 10, requisitos: ["FA0237", "FA0239"],                   estado: 0 },
+      { codigo: "FA5026",  nombre: "Toxicología",                                        creditos: 3, nivel: 10, requisitos: ["FA0237"],                             estado: 0 },
+      { codigo: "OPT1044", nombre: "Optativos Ciclo 10, Bloque A",                       creditos: 2, nivel: 10, requisitos: [],                                     estado: 0 },
+      { codigo: "OPT1045", nombre: "Optativos Ciclo 10, Bloque B",                       creditos: 3, nivel: 10, requisitos: [],                                     estado: 0 },
+
+      // ============ XI CICLO — Trabajo Final de Graduación ============
+      { codigo: "FA9500",  nombre: "Investigación Dirigida 1",                           creditos: 0, nivel: 11, requisitos: [],                                     estado: 0 },
+      { codigo: "FA9501",  nombre: "Investigación Dirigida 2",                           creditos: 0, nivel: 11, requisitos: ["FA9500"],                             estado: 0 },
+      { codigo: "FA9502",  nombre: "Investigación Dirigida 3",                           creditos: 0, nivel: 11, requisitos: ["FA9501"],                             estado: 0 },
+      { codigo: "FA9700",  nombre: "Práctica Dirigida I",                                creditos: 0, nivel: 11, requisitos: [],                                     estado: 0 },
+      { codigo: "FA9701",  nombre: "Práctica Dirigida II",                               creditos: 0, nivel: 11, requisitos: ["FA9700"],                             estado: 0 },
+      { codigo: "FA9702",  nombre: "Práctica Dirigida III",                              creditos: 0, nivel: 11, requisitos: ["FA9701"],                             estado: 0 },
+      { codigo: "FA9800",  nombre: "Proyecto de Graduación I",                           creditos: 0, nivel: 11, requisitos: [],                                     estado: 0 },
+      { codigo: "FA9801",  nombre: "Proyecto de Graduación II",                          creditos: 0, nivel: 11, requisitos: ["FA9800"],                             estado: 0 },
+      { codigo: "FA9802",  nombre: "Proyecto de Graduación III",                         creditos: 0, nivel: 11, requisitos: ["FA9801"],                             estado: 0 }
+    ]
+  },
+
+  ingenieriaQuimica: {
+    nombre: "Ingeniería Química",
+    codigo: "IQ",
+    descripcion: "Licenciatura en Ingeniería Química · Escuela de Ingeniería Química, UCR",
+    cursos: [
+      // ============ I CICLO ============
+      { codigo: "EG-",     nombre: "Curso de Arte",                                      creditos: 2, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "EG-I",    nombre: "Curso Integrado de Humanidades I",                   creditos: 6, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "LM1030",  nombre: "Estrategias de Lectura en Inglés I",                 creditos: 4, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "MA0001",  nombre: "Precálculo",                                         creditos: 0, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "MA1001",  nombre: "Cálculo I",                                          creditos: 3, nivel: 1, requisitos: ["MA0001"],                              estado: 0 },
+      { codigo: "QU0100",  nombre: "Química General I",                                  creditos: 3, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "QU0101",  nombre: "Laboratorio de Química General I",                   creditos: 1, nivel: 1, requisitos: [],                                      estado: 0 },
+
+      // ============ II CICLO ============
+      { codigo: "EF-",     nombre: "Actividad Deportiva",                                creditos: 0, nivel: 2, requisitos: [],                                      estado: 0 },
+      { codigo: "EG-II",   nombre: "Curso Integrado de Humanidades II",                  creditos: 6, nivel: 2, requisitos: ["EG-I"],                                estado: 0 },
+      { codigo: "FS0210",  nombre: "Física General I",                                   creditos: 3, nivel: 2, requisitos: ["MA1001"],                              estado: 0 },
+      { codigo: "FS0211",  nombre: "Laboratorio de Física General I",                    creditos: 1, nivel: 2, requisitos: ["MA1001"],                              estado: 0 },
+      { codigo: "MA1002",  nombre: "Cálculo II",                                         creditos: 4, nivel: 2, requisitos: ["MA1001"],                              estado: 0 },
+      { codigo: "QU0102",  nombre: "Química General II",                                 creditos: 3, nivel: 2, requisitos: ["QU0100", "QU0101"],                    estado: 0 },
+      { codigo: "QU0103",  nombre: "Laboratorio de Química General II",                  creditos: 1, nivel: 2, requisitos: ["QU0100", "QU0101"],                    estado: 0 },
+
+      // ============ III CICLO ============
+      { codigo: "FS0310",  nombre: "Física General II",                                  creditos: 3, nivel: 3, requisitos: ["FS0210", "FS0211", "MA1002"],          estado: 0 },
+      { codigo: "FS0311",  nombre: "Laboratorio de Física General II",                   creditos: 1, nivel: 3, requisitos: ["FS0210", "FS0211", "MA1002"],          estado: 0 },
+      { codigo: "IQ0200",  nombre: "Análisis Gráfico para Ing. Química",                 creditos: 3, nivel: 3, requisitos: ["FS0210", "MA1002", "QU0102"],          estado: 0 },
+      { codigo: "MA1003",  nombre: "Cálculo III",                                        creditos: 4, nivel: 3, requisitos: ["MA1002"],                              estado: 0 },
+      { codigo: "MA1004",  nombre: "Álgebra Lineal",                                     creditos: 3, nivel: 3, requisitos: [],                                      estado: 0 },
+      { codigo: "QU0200",  nombre: "Química Analítica Cuantitativa I",                   creditos: 3, nivel: 3, requisitos: ["QU0102", "QU0103"],                    estado: 0 },
+      { codigo: "QU0201",  nombre: "Lab. Química Analítica Cuantitativa I",              creditos: 2, nivel: 3, requisitos: ["QU0102", "QU0103"],                    estado: 0 },
+
+      // ============ IV CICLO ============
+      { codigo: "CI0202",  nombre: "Principios de Informática",                          creditos: 4, nivel: 4, requisitos: ["MA1001"],                              estado: 0 },
+      { codigo: "FS0410",  nombre: "Física General III",                                 creditos: 3, nivel: 4, requisitos: ["FS0310", "FS0311", "MA1003"],          estado: 0 },
+      { codigo: "FS0411",  nombre: "Laboratorio de Física General III",                  creditos: 1, nivel: 4, requisitos: ["FS0310", "FS0311", "MA1003"],          estado: 0 },
+      { codigo: "IQ0332",  nombre: "Análisis de Procesos I",                             creditos: 4, nivel: 4, requisitos: ["FS0310", "IQ0200"],                    estado: 0 },
+      { codigo: "MA1005",  nombre: "Ecuaciones Diferenciales",                           creditos: 4, nivel: 4, requisitos: ["MA1002", "MA1004"],                    estado: 0 },
+      { codigo: "QU0260",  nombre: "Físico Química para Ing. Química",                   creditos: 4, nivel: 4, requisitos: ["FS0310", "FS0311", "MA1002", "QU0102", "QU0103"], estado: 0 },
+
+      // ============ V CICLO ============
+      { codigo: "IQ0312",  nombre: "Mecánica I",                                         creditos: 4, nivel: 5, requisitos: ["FS0210", "FS0211", "MA1003", "MA1004"], estado: 0 },
+      { codigo: "IQ0333",  nombre: "Análisis de Procesos II",                            creditos: 3, nivel: 5, requisitos: ["CI0202", "IQ0332", "MA1003", "MA1005"], estado: 0 },
+      { codigo: "IQ0334",  nombre: "Termodinámica I",                                    creditos: 3, nivel: 5, requisitos: ["IQ0332", "MA1005", "QU0260"],          estado: 0 },
+      { codigo: "QU0212",  nombre: "Química Orgánica General I",                         creditos: 4, nivel: 5, requisitos: ["QU0102", "QU0103"],                    estado: 0 },
+      { codigo: "QU0213",  nombre: "Lab. Química Orgánica General I",                    creditos: 1, nivel: 5, requisitos: ["QU0102", "QU0103"],                    estado: 0 },
+      { codigo: "XS0217",  nombre: "Probabilidades e Inferencia Estadística",            creditos: 4, nivel: 5, requisitos: ["MA1004||MA1005"],                      estado: 0 },
+
+      // ============ VI CICLO ============
+      { codigo: "IE0303",  nombre: "Electrotecnia I",                                    creditos: 3, nivel: 6, requisitos: ["FS0310", "FS0311", "MA1003"],          estado: 0 },
+      { codigo: "IQ0313",  nombre: "Fenómenos de Transferencia",                         creditos: 4, nivel: 6, requisitos: ["IQ0333", "IQ0334"],                    estado: 0 },
+      { codigo: "IQ0331",  nombre: "Medición y Tratamiento de Datos Exp.",               creditos: 3, nivel: 6, requisitos: ["FS0410", "IQ0332", "XS0217"],          estado: 0 },
+      { codigo: "IQ0335",  nombre: "Termodinámica II",                                   creditos: 3, nivel: 6, requisitos: ["CI0202", "IQ0334", "MA1003", "QU0212"], estado: 0 },
+      { codigo: "QU0214",  nombre: "Química Orgánica General II",                        creditos: 4, nivel: 6, requisitos: ["QU0212", "QU0213"],                    estado: 0 },
+      { codigo: "QU0215",  nombre: "Lab. Química Orgánica General II",                   creditos: 1, nivel: 6, requisitos: ["QU0212", "QU0213"],                    estado: 0 },
+
+      // ============ VII CICLO ============
+      { codigo: "IQ0415",  nombre: "Ingeniería de los Materiales",                       creditos: 3, nivel: 7, requisitos: ["IQ0312", "IQ0335"],                    estado: 0 },
+      { codigo: "IQ0423",  nombre: "Operac. Transferencia Fluidos y Calor",              creditos: 3, nivel: 7, requisitos: ["IQ0313"],                              estado: 0 },
+      { codigo: "IQ0432",  nombre: "Lab. Operac. Transferencia Fluidos y Calor",         creditos: 3, nivel: 7, requisitos: ["IQ0313"],                              estado: 0 },
+      { codigo: "IQ0451",  nombre: "Planeamiento de la Producción",                      creditos: 3, nivel: 7, requisitos: ["XS0217"],                              estado: 0 },
+      { codigo: "SR-I",    nombre: "Seminario de Realidad Nacional I",                   creditos: 2, nivel: 7, requisitos: ["EG-II"],                               estado: 0 },
+
+      // ============ VIII CICLO ============
+      { codigo: "IQ0416",  nombre: "Cinética y Reactores Químicos",                      creditos: 3, nivel: 8, requisitos: ["IQ0415", "IQ0423", "QU0214"],          estado: 0 },
+      { codigo: "IQ0424",  nombre: "Operaciones por Separación de Fases",                creditos: 3, nivel: 8, requisitos: ["IQ0335", "IQ0423"],                    estado: 0 },
+      { codigo: "IQ0433",  nombre: "Lab. Operaciones por Separación de Fases",           creditos: 2, nivel: 8, requisitos: ["IQ0335"],                              estado: 0 },
+      { codigo: "IQ0452",  nombre: "Control de la Producción",                           creditos: 3, nivel: 8, requisitos: ["IQ0451"],                              estado: 0 },
+      { codigo: "RP-1",    nombre: "Repertorio",                                         creditos: 3, nivel: 8, requisitos: [],                                      estado: 0 },
+      { codigo: "SR-II",   nombre: "Seminario de Realidad Nacional II",                  creditos: 2, nivel: 8, requisitos: ["SR-I"],                                estado: 0 },
+
+      // ============ IX CICLO ============
+      { codigo: "IQ0517",  nombre: "Control e Instrumentación de Procesos",              creditos: 3, nivel: 9, requisitos: ["IE0303", "IQ0416", "IQ0424"],          estado: 0 },
+      { codigo: "IQ0525",  nombre: "Operac. Separación Métodos Difusionales",            creditos: 3, nivel: 9, requisitos: ["IQ0424"],                              estado: 0 },
+      { codigo: "IQ0534",  nombre: "Lab. Operac. Separación Métodos Difus.",             creditos: 2, nivel: 9, requisitos: ["IQ0424"],                              estado: 0 },
+      { codigo: "IQ0553",  nombre: "Evaluación de Proyectos",                            creditos: 3, nivel: 9, requisitos: ["IQ0424", "IQ0452"],                    estado: 0 },
+      { codigo: "IQ0590",  nombre: "Seminario para Proyectos de Graduación",             creditos: 2, nivel: 9, requisitos: ["IQ0424", "IQ0452"],                    estado: 0 },
+
+      // ============ X CICLO ============
+      { codigo: "IQ0526",  nombre: "Procesos y Operaciones Integradas",                  creditos: 3, nivel: 10, requisitos: ["IQ0525", "IQ0553"],                   estado: 0 },
+      { codigo: "IQ0551",  nombre: "Diseño de Procesos Químicos",                        creditos: 3, nivel: 10, requisitos: ["IQ0416", "IQ0525", "IQ0553"],         estado: 0 },
+      { codigo: "IQ0556",  nombre: "Principios de Administración Industrial",            creditos: 3, nivel: 10, requisitos: ["IQ0525", "IQ0553"],                   estado: 0 },
+      { codigo: "IQ9500",  nombre: "Investigación Dirigida I",                           creditos: 0, nivel: 10, requisitos: ["IQ0590"],                             estado: 0 },
+      { codigo: "IQ9700",  nombre: "Práctica Dirigida I",                                creditos: 0, nivel: 10, requisitos: [],                                     estado: 0 },
+      { codigo: "IQ9800",  nombre: "Proyecto de Graduación I",                           creditos: 0, nivel: 10, requisitos: [],                                     estado: 0 }
+    ]
+  },
+
+  economia: {
+    nombre: "Economía",
+    codigo: "EC",
+    descripcion: "Bachillerato en Economía — Plan 2 · Escuela de Economía, UCR",
+    cursos: [
+      // ============ I CICLO ============
+      { codigo: "EC1100",  nombre: "Introducción a la Economía",                         creditos: 4, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "EC4101",  nombre: "Datos Económicos",                                   creditos: 3, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "MA1001",  nombre: "Cálculo I",                                          creditos: 3, nivel: 1, requisitos: ["MA0001"],                              estado: 0 },
+      { codigo: "EG-I",    nombre: "Curso Integrado de Humanidades I",                   creditos: 6, nivel: 1, requisitos: [],                                      estado: 0 },
+
+      // ============ II CICLO ============
+      { codigo: "EC2100",  nombre: "Teoría Microeconómica I",                            creditos: 4, nivel: 2, requisitos: ["EC1100", "MA1001"],                    estado: 0 },
+      { codigo: "MA1004",  nombre: "Álgebra Lineal",                                     creditos: 3, nivel: 2, requisitos: [],                                      estado: 0 },
+      { codigo: "MA1023",  nombre: "Cálculo con Optimización",                           creditos: 4, nivel: 2, requisitos: ["MA1001"],                              estado: 0 },
+      { codigo: "EG-II",   nombre: "Curso Integrado de Humanidades II",                  creditos: 6, nivel: 2, requisitos: ["EG-I"],                                estado: 0 },
+
+      // ============ III CICLO ============
+      { codigo: "EC2200",  nombre: "Teoría Microeconómica II",                           creditos: 4, nivel: 3, requisitos: ["EC2100", "MA1023"],                    estado: 0 },
+      { codigo: "EC3200",  nombre: "Teoría Macroeconómica I",                            creditos: 4, nivel: 3, requisitos: ["EC2100", "MA1023"],                    estado: 0 },
+      { codigo: "MA1005",  nombre: "Ecuaciones Diferenciales",                           creditos: 4, nivel: 3, requisitos: ["MA1002", "MA1004"],                    estado: 0 },
+      { codigo: "MA1030",  nombre: "Introducción a la Probabilidad",                     creditos: 4, nivel: 3, requisitos: ["MA1023"],                              estado: 0 },
+      { codigo: "LM0303",  nombre: "Inglés para Economía I",                             creditos: 3, nivel: 3, requisitos: ["EC2100"],                              estado: 0 },
+
+      // ============ IV CICLO ============
+      { codigo: "EC2201",  nombre: "Teoría de Juegos e Información",                     creditos: 3, nivel: 4, requisitos: ["EC2200", "MA1030"],                    estado: 0 },
+      { codigo: "EC3201",  nombre: "Teoría Macroeconómica II",                           creditos: 4, nivel: 4, requisitos: ["EC2200", "EC3200", "MA1005"],          estado: 0 },
+      { codigo: "XS0100",  nombre: "Fundamentos de Teoría Estadística",                  creditos: 3, nivel: 4, requisitos: ["EC4101", "MA1030"],                    estado: 0 },
+      { codigo: "CI0108",  nombre: "Computación para Economistas",                       creditos: 4, nivel: 4, requisitos: ["MA1001", "MA1004"],                    estado: 0 },
+
+      // ============ V CICLO ============
+      { codigo: "EC4200",  nombre: "Econometría",                                        creditos: 3, nivel: 5, requisitos: ["MA1004", "XS0100"],                    estado: 0 },
+      { codigo: "EC2300",  nombre: "Comercio Internacional",                             creditos: 3, nivel: 5, requisitos: ["EC2201"],                              estado: 0 },
+      { codigo: "EC3300",  nombre: "Crecimiento y Ciclos",                               creditos: 3, nivel: 5, requisitos: ["EC3201"],                              estado: 0 },
+      { codigo: "FL2076",  nombre: "Redacción para Economía",                            creditos: 3, nivel: 5, requisitos: ["EC2201", "EC3201"],                    estado: 0 },
+
+      // ============ VI CICLO ============
+      { codigo: "EC2301",  nombre: "Economía Financiera",                                creditos: 3, nivel: 6, requisitos: ["EC2201", "EC4200"],                    estado: 0 },
+      { codigo: "EC4300",  nombre: "Microeconometría",                                   creditos: 3, nivel: 6, requisitos: ["CI0108", "EC2200", "EC4200"],          estado: 0 },
+      { codigo: "EC4301",  nombre: "Macroeconometría",                                   creditos: 3, nivel: 6, requisitos: ["CI0108", "EC3201", "EC4200"],          estado: 0 },
+      { codigo: "EC3302",  nombre: "Economía Monetaria",                                 creditos: 3, nivel: 6, requisitos: ["EC3300", "EC4200"],                    estado: 0 },
+
+      // ============ VII CICLO ============
+      { codigo: "EC1300",  nombre: "Historia del Pensamiento Económico",                 creditos: 3, nivel: 7, requisitos: ["EC3201", "HA1415"],                    estado: 0 },
+      { codigo: "EC1400",  nombre: "Seminario de Investigación Económica I",             creditos: 3, nivel: 7, requisitos: ["EC2301", "EC3300", "EC4300", "EC4301"], estado: 0 },
+
+      // ============ VIII CICLO ============
+      { codigo: "EC1401",  nombre: "Seminario de Investigación Económica II",            creditos: 3, nivel: 8, requisitos: ["EC1400"],                              estado: 0 },
+
+      // ============ CURSOS OPTATIVOS ============
+      { codigo: "EC1001",  nombre: "Economía Urbana y Regional",                         creditos: 3, nivel: 8, requisitos: ["EC2201", "EC3300", "EC4200"],          estado: 0 },
+      { codigo: "EC1005",  nombre: "Economía Ambiental y de Recursos Naturales",         creditos: 3, nivel: 8, requisitos: ["EC2201", "EC3300", "EC4200"],          estado: 0 },
+      { codigo: "EC2003",  nombre: "Derivados Financieros",                              creditos: 3, nivel: 8, requisitos: ["EC2301", "EC3300", "EC4200"],          estado: 0 },
+      { codigo: "EC2011",  nombre: "Microeconomía Avanzada",                             creditos: 3, nivel: 8, requisitos: ["EC2201", "EC3300", "EC4200"],          estado: 0 }
     ]
   }
 };
@@ -893,110 +812,260 @@ function siguienteEstado(estadoActual) {
  * Al cambiar el estado de cualquiera de ellos, se sincroniza en todos los demás.
  */
 const CURSOS_COMPARTIDOS = {
-  // ── Compartidos entre las 3 carreras ──
-  'EG-I': [{ carreraId: 'ingenieriaIndustrial', codigo: 'EG-I' },
-  { carreraId: 'contaduriaPublica', codigo: 'EG-I' },
-  { carreraId: 'direccionEmpresas', codigo: 'EG-I' }],
-
-  'EG-II': [{ carreraId: 'ingenieriaIndustrial', codigo: 'EG-II' },
-  { carreraId: 'contaduriaPublica', codigo: 'EG-II' },
-  { carreraId: 'direccionEmpresas', codigo: 'EG-II' }],
-
-  'EG-': [{ carreraId: 'ingenieriaIndustrial', codigo: 'EG-' },
-  { carreraId: 'contaduriaPublica', codigo: 'EG-' },
-  { carreraId: 'direccionEmpresas', codigo: 'EG-' }],
-
-  'EF-': [{ carreraId: 'ingenieriaIndustrial', codigo: 'EF-' },
-  { carreraId: 'contaduriaPublica', codigo: 'EF-' },
-  { carreraId: 'direccionEmpresas', codigo: 'EF-' }],
-
-  'SR-I': [{ carreraId: 'ingenieriaIndustrial', codigo: 'SR-I' },
-  { carreraId: 'contaduriaPublica', codigo: 'SR-I' },
-  { carreraId: 'direccionEmpresas', codigo: 'SR-I' }],
-
-  'SR-II': [{ carreraId: 'ingenieriaIndustrial', codigo: 'SR-II' },
-  { carreraId: 'contaduriaPublica', codigo: 'SR-II' },
-  { carreraId: 'direccionEmpresas', codigo: 'SR-II' }],
-
-  'MA0001': [{ carreraId: 'ingenieriaIndustrial', codigo: 'MA0001' },
-  { carreraId: 'contaduriaPublica', codigo: 'MA0001' },
-  { carreraId: 'direccionEmpresas', codigo: 'MA0001' }],
-
-  'RP-': [{ carreraId: 'ingenieriaIndustrial', codigo: 'RP-' },
-  { carreraId: 'contaduriaPublica', codigo: 'RP-' },
-  { carreraId: 'direccionEmpresas', codigo: 'RP-' }],
-
-  // ── Compartidos entre Contaduría Pública y Dirección de Empresas ──
-  'MA-1021': [{ carreraId: 'contaduriaPublica', codigo: 'MA-1021' },
-  { carreraId: 'direccionEmpresas', codigo: 'MA-1021' }],
-
-  'MA-1022': [{ carreraId: 'contaduriaPublica', codigo: 'MA-1022' },
-  { carreraId: 'direccionEmpresas', codigo: 'MA-1022' }],
-
-  'XS-0276': [{ carreraId: 'contaduriaPublica', codigo: 'XS-0276' },
-  { carreraId: 'direccionEmpresas', codigo: 'XS-0276' }],
-
-  'XS-0277': [{ carreraId: 'contaduriaPublica', codigo: 'XS-0277' },
-  { carreraId: 'direccionEmpresas', codigo: 'XS-0277' }],
-
-  'DN-0101': [{ carreraId: 'contaduriaPublica', codigo: 'DN-0101' },
-  { carreraId: 'direccionEmpresas', codigo: 'DN-0101' }],
-
-  'DN-0102': [{ carreraId: 'contaduriaPublica', codigo: 'DN-0102' },
-  { carreraId: 'direccionEmpresas', codigo: 'DN-0102' }],
-
-  'DN-0103': [{ carreraId: 'contaduriaPublica', codigo: 'DN-0103' },
-  { carreraId: 'direccionEmpresas', codigo: 'DN-0103' }],
-
-  'DN-0104': [{ carreraId: 'contaduriaPublica', codigo: 'DN-0104' },
-  { carreraId: 'direccionEmpresas', codigo: 'DN-0104' }],
-
-  'DN-0123': [{ carreraId: 'contaduriaPublica', codigo: 'DN-0123' },
-  { carreraId: 'direccionEmpresas', codigo: 'DN-0123' }],
-
-  'DN-0340': [{ carreraId: 'contaduriaPublica', codigo: 'DN-0340' },
-  { carreraId: 'direccionEmpresas', codigo: 'DN-0340' }],
-
-  'DN-0341': [{ carreraId: 'contaduriaPublica', codigo: 'DN-0341' },
-  { carreraId: 'direccionEmpresas', codigo: 'DN-0341' }],
-
-  'DN-0105': [{ carreraId: 'contaduriaPublica', codigo: 'DN-0105' },
-  { carreraId: 'direccionEmpresas', codigo: 'DN-0105' }],
-
-  'DN-0110': [{ carreraId: 'contaduriaPublica', codigo: 'DN-0110' },
-  { carreraId: 'direccionEmpresas', codigo: 'DN-0110' }],
-
-  'DN-0320': [{ carreraId: 'contaduriaPublica', codigo: 'DN-0320' },
-  { carreraId: 'direccionEmpresas', codigo: 'DN-0320' }],
-
-  'PC-0200': [{ carreraId: 'contaduriaPublica', codigo: 'PC-0200' },
-  { carreraId: 'direccionEmpresas', codigo: 'PC-0200' }],
-
-  'PC-0202': [{ carreraId: 'contaduriaPublica', codigo: 'PC-0202' },
-  { carreraId: 'direccionEmpresas', codigo: 'PC-0202' }],
-
-  'PC-0240': [{ carreraId: 'contaduriaPublica', codigo: 'PC-0240' },
-  { carreraId: 'direccionEmpresas', codigo: 'PC-0240' }],
-
-  'PC-0261': [{ carreraId: 'contaduriaPublica', codigo: 'PC-0261' },
-  { carreraId: 'direccionEmpresas', codigo: 'PC-0261' }],
-
-  'PC-0260': [{ carreraId: 'contaduriaPublica', codigo: 'PC-0260' },
-  { carreraId: 'direccionEmpresas', codigo: 'PC-0260' }],
-
-  'PC-0304': [{ carreraId: 'contaduriaPublica', codigo: 'PC-0304' },
-  { carreraId: 'direccionEmpresas', codigo: 'PC-0304' }],
-
-  'PC-0344': [{ carreraId: 'contaduriaPublica', codigo: 'PC-0344' },
-  { carreraId: 'direccionEmpresas', codigo: 'PC-0344' }],
-
-  'PC-0462': [{ carreraId: 'contaduriaPublica', codigo: 'PC-0462' },
-  { carreraId: 'direccionEmpresas', codigo: 'PC-0462' }],
-
-  'OPT-ING': [{ carreraId: 'contaduriaPublica', codigo: 'OPT-ING' },
-  { carreraId: 'direccionEmpresas', codigo: 'OPT-ING' }]
-  // EXCLUIDOS: Taller de Investigación (DN-0114/DN-0115), Comunicación Intercultural,
-  //            Optativas (OPT-2, OPT-3, DN-OPTxx) — son distintas por carrera.
+  'SR-I': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'SR-I' },
+    { carreraId: 'contaduriaPublica', codigo: 'SR-I' },
+    { carreraId: 'direccionEmpresas', codigo: 'SR-I' },
+    { carreraId: 'cienciasActuariales', codigo: 'SR-I' },
+    { carreraId: 'farmacia', codigo: 'SR-I' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'SR-I' }
+  ],
+  'MA1002': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'MA1002' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'MA1002' }
+  ],
+  'MA1005': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'MA1005' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'MA1005' },
+    { carreraId: 'economia', codigo: 'MA1005' }
+  ],
+  'MA1001': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'MA1001' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'MA1001' },
+    { carreraId: 'economia', codigo: 'MA1001' }
+  ],
+  'MA0001': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'MA0001' },
+    { carreraId: 'contaduriaPublica', codigo: 'MA0001' },
+    { carreraId: 'direccionEmpresas', codigo: 'MA0001' },
+    { carreraId: 'cienciasActuariales', codigo: 'MA0001' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'MA0001' }
+  ],
+  'SR-II': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'SR-II' },
+    { carreraId: 'contaduriaPublica', codigo: 'SR-II' },
+    { carreraId: 'direccionEmpresas', codigo: 'SR-II' },
+    { carreraId: 'cienciasActuariales', codigo: 'SR-II' },
+    { carreraId: 'farmacia', codigo: 'SR-II' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'SR-II' }
+  ],
+  'FS0310': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'FS0310' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'FS0310' }
+  ],
+  'FS0311': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'FS0311' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'FS0311' }
+  ],
+  'FS0210': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'FS0210' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'FS0210' }
+  ],
+  'EG-': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'EG-' },
+    { carreraId: 'contaduriaPublica', codigo: 'EG-' },
+    { carreraId: 'direccionEmpresas', codigo: 'EG-' },
+    { carreraId: 'cienciasActuariales', codigo: 'EG-' },
+    { carreraId: 'farmacia', codigo: 'EG-' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'EG-' }
+  ],
+  'RP-': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'RP-' },
+    { carreraId: 'contaduriaPublica', codigo: 'RP-' },
+    { carreraId: 'direccionEmpresas', codigo: 'RP-' }
+  ],
+  'MA1003': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'MA1003' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'MA1003' }
+  ],
+  'FS0211': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'FS0211' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'FS0211' }
+  ],
+  'EG-I': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'EG-I' },
+    { carreraId: 'contaduriaPublica', codigo: 'EG-I' },
+    { carreraId: 'direccionEmpresas', codigo: 'EG-I' },
+    { carreraId: 'cienciasActuariales', codigo: 'EG-I' },
+    { carreraId: 'farmacia', codigo: 'EG-I' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'EG-I' },
+    { carreraId: 'economia', codigo: 'EG-I' }
+  ],
+  'MA1004': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'MA1004' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'MA1004' },
+    { carreraId: 'economia', codigo: 'MA1004' }
+  ],
+  'EF-': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'EF-' },
+    { carreraId: 'contaduriaPublica', codigo: 'EF-' },
+    { carreraId: 'direccionEmpresas', codigo: 'EF-' },
+    { carreraId: 'cienciasActuariales', codigo: 'EF-' },
+    { carreraId: 'farmacia', codigo: 'EF-' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'EF-' }
+  ],
+  'EG-II': [
+    { carreraId: 'ingenieriaIndustrial', codigo: 'EG-II' },
+    { carreraId: 'contaduriaPublica', codigo: 'EG-II' },
+    { carreraId: 'direccionEmpresas', codigo: 'EG-II' },
+    { carreraId: 'cienciasActuariales', codigo: 'EG-II' },
+    { carreraId: 'farmacia', codigo: 'EG-II' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'EG-II' },
+    { carreraId: 'economia', codigo: 'EG-II' }
+  ],
+  'XS-0277': [
+    { carreraId: 'contaduriaPublica', codigo: 'XS-0277' },
+    { carreraId: 'direccionEmpresas', codigo: 'XS-0277' }
+  ],
+  'PC-0462': [
+    { carreraId: 'contaduriaPublica', codigo: 'PC-0462' },
+    { carreraId: 'direccionEmpresas', codigo: 'PC-0462' }
+  ],
+  'DN-0110': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0110' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0110' }
+  ],
+  'DN-0102': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0102' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0102' }
+  ],
+  'MA-1021': [
+    { carreraId: 'contaduriaPublica', codigo: 'MA-1021' },
+    { carreraId: 'direccionEmpresas', codigo: 'MA-1021' }
+  ],
+  'DN-0101': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0101' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0101' }
+  ],
+  'PC-0344': [
+    { carreraId: 'contaduriaPublica', codigo: 'PC-0344' },
+    { carreraId: 'direccionEmpresas', codigo: 'PC-0344' }
+  ],
+  'DN-0123': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0123' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0123' }
+  ],
+  'DN-0341': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0341' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0341' }
+  ],
+  'DN-0320': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0320' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0320' }
+  ],
+  'DN-0115': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0115' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0115' }
+  ],
+  'PC-0261': [
+    { carreraId: 'contaduriaPublica', codigo: 'PC-0261' },
+    { carreraId: 'direccionEmpresas', codigo: 'PC-0261' }
+  ],
+  'DN-0103': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0103' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0103' }
+  ],
+  'OPT-ING': [
+    { carreraId: 'contaduriaPublica', codigo: 'OPT-ING' },
+    { carreraId: 'direccionEmpresas', codigo: 'OPT-ING' }
+  ],
+  'PC-0304': [
+    { carreraId: 'contaduriaPublica', codigo: 'PC-0304' },
+    { carreraId: 'direccionEmpresas', codigo: 'PC-0304' }
+  ],
+  'PC-0202': [
+    { carreraId: 'contaduriaPublica', codigo: 'PC-0202' },
+    { carreraId: 'direccionEmpresas', codigo: 'PC-0202' }
+  ],
+  'PC-0260': [
+    { carreraId: 'contaduriaPublica', codigo: 'PC-0260' },
+    { carreraId: 'direccionEmpresas', codigo: 'PC-0260' }
+  ],
+  'DN-0105': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0105' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0105' }
+  ],
+  'DN-0104': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0104' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0104' }
+  ],
+  'DN-0114': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0114' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0114' }
+  ],
+  'PC-0240': [
+    { carreraId: 'contaduriaPublica', codigo: 'PC-0240' },
+    { carreraId: 'direccionEmpresas', codigo: 'PC-0240' }
+  ],
+  'XS-0276': [
+    { carreraId: 'contaduriaPublica', codigo: 'XS-0276' },
+    { carreraId: 'direccionEmpresas', codigo: 'XS-0276' }
+  ],
+  'DN-0340': [
+    { carreraId: 'contaduriaPublica', codigo: 'DN-0340' },
+    { carreraId: 'direccionEmpresas', codigo: 'DN-0340' }
+  ],
+  'MA-1022': [
+    { carreraId: 'contaduriaPublica', codigo: 'MA-1022' },
+    { carreraId: 'direccionEmpresas', codigo: 'MA-1022' }
+  ],
+  'PC-0200': [
+    { carreraId: 'contaduriaPublica', codigo: 'PC-0200' },
+    { carreraId: 'direccionEmpresas', codigo: 'PC-0200' }
+  ],
+  'EC1100': [
+    { carreraId: 'cienciasActuariales', codigo: 'EC1100' },
+    { carreraId: 'economia', codigo: 'EC1100' }
+  ],
+  'LM1030': [
+    { carreraId: 'cienciasActuariales', codigo: 'LM1030' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'LM1030' }
+  ],
+  'RP-1': [
+    { carreraId: 'cienciasActuariales', codigo: 'RP-1' },
+    { carreraId: 'farmacia', codigo: 'RP-1' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'RP-1' }
+  ],
+  'EC2100': [
+    { carreraId: 'cienciasActuariales', codigo: 'EC2100' },
+    { carreraId: 'economia', codigo: 'EC2100' }
+  ],
+  'EC3200': [
+    { carreraId: 'cienciasActuariales', codigo: 'EC3200' },
+    { carreraId: 'economia', codigo: 'EC3200' }
+  ],
+  'QU0101': [
+    { carreraId: 'farmacia', codigo: 'QU0101' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'QU0101' }
+  ],
+  'QU0102': [
+    { carreraId: 'farmacia', codigo: 'QU0102' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'QU0102' }
+  ],
+  'QU0212': [
+    { carreraId: 'farmacia', codigo: 'QU0212' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'QU0212' }
+  ],
+  'QU0100': [
+    { carreraId: 'farmacia', codigo: 'QU0100' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'QU0100' }
+  ],
+  'QU0103': [
+    { carreraId: 'farmacia', codigo: 'QU0103' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'QU0103' }
+  ],
+  'QU0213': [
+    { carreraId: 'farmacia', codigo: 'QU0213' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'QU0213' }
+  ],
+  'QU0214': [
+    { carreraId: 'farmacia', codigo: 'QU0214' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'QU0214' }
+  ],
+  'QU0215': [
+    { carreraId: 'farmacia', codigo: 'QU0215' },
+    { carreraId: 'ingenieriaQuimica', codigo: 'QU0215' }
+  ],
 };
 
 /**

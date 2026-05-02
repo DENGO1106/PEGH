@@ -421,3 +421,28 @@ CREATE TRIGGER trigger_delete_feedback_on_x
 BEFORE UPDATE ON public.user_feedback
 FOR EACH ROW
 EXECUTE FUNCTION public.delete_feedback_on_x();
+
+-- ============================================================
+-- 9. TABLA: user_semesters (Historial de Promedios Ponderados)
+-- ============================================================
+CREATE TABLE public.user_semesters (
+  id              uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id         uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  semester_name   text NOT NULL, -- Ej: "I Ciclo"
+  semester_year   text NOT NULL, -- Ej: "2026"
+  gpa             numeric(4,2) NOT NULL DEFAULT 0.00,
+  total_credits   integer NOT NULL DEFAULT 0,
+  courses_json    jsonb NOT NULL DEFAULT '[]'::jsonb, -- Array de {name, credits, grade}
+  created_at      timestamptz DEFAULT now() NOT NULL
+);
+
+ALTER TABLE public.user_semesters ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "user_semesters_select" ON public.user_semesters 
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "user_semesters_insert" ON public.user_semesters 
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "user_semesters_delete" ON public.user_semesters 
+  FOR DELETE USING (auth.uid() = user_id);

@@ -203,7 +203,7 @@ function selectCourseFromPicker(carreraId, codigo) {
                     day: 'Lunes',
                     startTime: startH,
                     endTime: Math.min(22, startH + 2),
-                    building: 'Ingeniería',
+                    building: 'Ingeniería (IN)',
                     room: ''
                 }
             ]
@@ -256,7 +256,7 @@ function addSession(courseId) {
     if (!curso) return;
 
     const lastSession = curso.sessions[curso.sessions.length - 1];
-    let buildingBase = lastSession ? lastSession.building : 'Aulas';
+    let buildingBase = lastSession ? lastSession.building : 'Aulas (AU)';
 
     curso.sessions.push({
         id: Date.now() + Math.random(),
@@ -302,6 +302,43 @@ function changeCourseColor(courseId) {
     guardarHorarios();
 }
 
+function showConflictBanner(conflicts) {
+    const banner = document.getElementById('conflict-banner');
+    if (!banner) return;
+
+    if (conflicts.length === 0) {
+        // Ocultar con transición suave
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(-6px)';
+        setTimeout(() => banner.classList.add('hidden'), 300);
+        return;
+    }
+
+    // Nombres únicos de cursos en conflicto
+    const allSessions = [];
+    selectedCourses.forEach(c => c.sessions.forEach(s => allSessions.push({ ...s, courseId: c.id, courseName: c.nombre })));
+    const names = new Set();
+    conflicts.forEach(conf => {
+        const session = allSessions.find(s => s.courseId === conf.courseId && s.id === conf.sessionId);
+        if (session) names.add(session.courseName);
+        names.add(conf.conflictWith);
+    });
+
+    const list = [...names].map(n => `<span class="inline-block bg-red-500/20 border border-red-500/30 text-red-300 text-[10px] font-black px-2 py-0.5 rounded-full">${n}</span>`).join(' ');
+    const bannerMsg = document.getElementById('conflict-banner-msg');
+    if (bannerMsg) bannerMsg.innerHTML = list;
+
+    // Mostrar con transición suave
+    banner.classList.remove('hidden');
+    banner.style.opacity = '0';
+    banner.style.transform = 'translateY(-6px)';
+    // Forzar reflow para que la transición funcione
+    banner.offsetHeight;
+    banner.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+    banner.style.opacity = '1';
+    banner.style.transform = 'translateY(0)';
+}
+
 function renderSelectedCourses() {
     // Vaciar contenedores
     const activeCareers = typeof CARRERAS !== 'undefined' ? Object.keys(CARRERAS) : [];
@@ -315,6 +352,7 @@ function renderSelectedCourses() {
     const startRad = document.querySelector('input[name="sched-start"]:checked');
     const startH_config = startRad ? parseInt(startRad.value) : 7;
     const conflicts = findConflicts();
+    // El banner solo se muestra al presionar Generar Horario, no aquí
 
     selectedCourses.forEach(curso => {
         const container = document.getElementById(`list-${curso.category}`);
@@ -348,7 +386,50 @@ function renderSelectedCourses() {
                     
                     <div class="grid grid-cols-12 gap-2 mt-2">
                         <select onchange="updateSessionField(${curso.id}, ${session.id}, 'building', this.value)" class="col-span-6 bg-zinc-900 text-xs text-gray-300 rounded-lg p-2 border border-white/5 outline-none">
-                            ${['Aulas', 'Ingeniería', 'Ciencias Económicas', 'Generales', 'Educación', 'Casa/Otro'].map(b => `<option value="${b}" ${session.building === b ? 'selected' : ''}>${b}</option>`).join('')}
+                            <optgroup label="── Finca 1 (Campus Central)">
+                            ${[
+                                'Aulas (AU)',
+                                'Estudios Generales (EG)',
+                                'Ciencias Económicas (CE)',
+                                'Derecho (DE)',
+                                'Educación (ED)',
+                                'Letras (LE)',
+                                'Física y Matemática (FM)',
+                                'Química (QU)',
+                                'Biología (BI)',
+                                'Geología (GE)',
+                                'Farmacia (FA)',
+                                'Medicina (ME)',
+                                'Microbiología (MI)',
+                                'Bibliotecología (BL)',
+                                'Arquitectura (AQ)',
+                                'Informática (IF)',
+                                'Artes Dramáticas (AD)',
+                                'Artes Musicales (AM)',
+                                'Artes Plásticas (AP)',
+                                'Bellas Artes (BA)',
+                                'Agroalimentarias (AG)',
+                                'Edificio Saprissa (ES)'
+                            ].map(b => `<option value="${b}" ${session.building === b ? 'selected' : ''}>${b}</option>`).join('')}
+                            </optgroup>
+                            <optgroup label="── Finca 2 (Ciudad de la Investigación)">
+                            ${[
+                                'Ingeniería (IN)',
+                                'Ingeniería Eléctrica (IE)',
+                                'Ciencias Sociales (CS)',
+                                'Facultad de Ciencias (FC)',
+                                'Enfermería (EE)',
+                                'Nutrición (NU)',
+                                'Salud Pública (SA)',
+                                'Tecnologías de la Salud (TS)'
+                            ].map(b => `<option value="${b}" ${session.building === b ? 'selected' : ''}>${b}</option>`).join('')}
+                            </optgroup>
+                            <optgroup label="── Otro">
+                            ${[
+                                'Finca 3 / Educación Física',
+                                'Casa/Otro'
+                            ].map(b => `<option value="${b}" ${session.building === b ? 'selected' : ''}>${b}</option>`).join('')}
+                            </optgroup>
                         </select>
                         <input type="text" placeholder="Aula" value="${session.room}" onchange="updateSessionField(${curso.id}, ${session.id}, 'room', this.value)" 
                                class="col-span-6 bg-zinc-900 text-xs p-2 rounded-lg border border-white/5 outline-none placeholder-gray-700 text-white">
@@ -458,11 +539,16 @@ function removeCourse(id) {
 function generateSchedule() {
     const conflicts = findConflicts();
     if (conflicts.length > 0) {
-        alert('❌ No se puede generar el horario visual porque existen CHOQUES DE HORARIO.\n\nPor favor, revisa las alertas en rojo en tu lista de materias y ajusta las horas antes de continuar.');
-        const firstConflict = document.querySelector('.border-red-500\\/50');
-        if (firstConflict) firstConflict.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Mostrar el banner con animación suave y hacer scroll hasta él
+        showConflictBanner(conflicts);
+        setTimeout(() => {
+            const banner = document.getElementById('conflict-banner');
+            if (banner) banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
         return;
     }
+    // Sin conflictos: ocultar el banner si estaba visible
+    showConflictBanner([]);
 
     const startRad = document.querySelector('input[name="sched-start"]:checked');
     const startHourVal = startRad ? parseInt(startRad.value) : 7;

@@ -51,6 +51,17 @@ window.navigateTo = (target) => {
         document.querySelector('.controls-container').classList.add('hidden');
         if (appNav) appNav.classList.remove('hidden');
         if (typeof initScheduler === 'function') initScheduler();
+    } else if (target === 'calculator') {
+        const calcSection = document.getElementById('calculator-section');
+        if (calcSection) calcSection.classList.remove('hidden');
+        document.querySelector('.controls-container')?.classList.add('hidden');
+        if (appNav) appNav.classList.add('hidden'); // Calculadora tiene su propia navegación
+        if (typeof calcLoadAuto === 'function') {
+            // Dar un pequeño tiempo por si los datos no han cargado aún
+            setTimeout(() => {
+                if (calcAutoCourses.length === 0) calcLoadAuto();
+            }, 100);
+        }
     } else {
         // HOME default para usuarios autenticados
         document.getElementById('home-section').classList.remove('hidden');
@@ -855,99 +866,25 @@ async function submitFeedback() {
 }
 
 // ===================================
-// SISTEMA DE NOTIFICACIONES Y ADMIN
-// ===================================
-const ADMIN_EMAIL = 'diegodengosoto@gmail.com';
-
-function initNotificationsAndAdmin() {
-    const session = window.supaAuth?.getCurrentSession();
-    if (!session) return;
-    
-    // Verificar si es Admin
-    const userEmail = session.user.email;
-    if (userEmail === ADMIN_EMAIL) {
-        const adminBtn = document.getElementById('btn-admin-panel');
-        if (adminBtn) adminBtn.classList.remove('hidden');
-    }
-    
-    // Cargar bandeja de entrada del usuario
-    fetchUserInbox();
-}
-
-async function fetchUserInbox() {
-    const session = window.supaAuth?.getCurrentSession();
-    if (!session || !window.supaAuth?.supabase) return;
-    
-    try {
-        const { data, error } = await window.supaAuth.supabase
-            .from('user_messages')
-            .select('*')
-            .eq('receiver_id', session.user.id)
-            .order('created_at', { ascending: false });
-            
-        if (error) throw error;
-        
-        const inboxList = document.getElementById('inbox-list');
-        const badge = document.getElementById('unread-badge');
-        
-        if (!inboxList || !badge) return;
-        
-        const unreadCount = data.filter(m => !m.is_read).length;
-        if (unreadCount > 0) {
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
-        }
-        
-        if (data.length === 0) {
-            inboxList.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No tienes mensajes nuevos.</p>';
-            return;
-        }
-        
-        inboxList.innerHTML = data.map(msg => `
-            <div class="bg-black/40 border border-${msg.is_read ? 'white/5' : 'yellow-500/30'} p-4 rounded-xl">
-                <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs font-bold ${msg.is_read ? 'text-gray-500' : 'text-yellow-500'}">Soporte UCR</span>
-                    <span class="text-[10px] text-gray-500">${new Date(msg.created_at).toLocaleDateString()}</span>
-                </div>
-                <p class="text-sm text-gray-300">${msg.message}</p>
-            </div>
-        `).join('');
-        
-    } catch (err) {
-        console.error("Error fetching inbox:", err);
-    }
-}
-
-async function openInboxPanel() {
-    document.getElementById('inbox-modal').classList.remove('hidden');
-    
-    // Marcar como leídos
-    const session = window.supaAuth?.getCurrentSession();
-    if (!session || !window.supaAuth?.supabase) return;
-    
-    try {
-        await window.supaAuth.supabase
-            .from('user_messages')
-            .update({ is_read: true })
-            .eq('receiver_id', session.user.id)
-            .eq('is_read', false);
-            
-        document.getElementById('unread-badge').classList.add('hidden');
-    } catch (err) {
-        console.error("Error marking messages as read:", err);
-    }
-}
-
-// ===================================
 // PANEL DE ADMIN — TABS Y ESTADO
 // ===================================
 let _adminFeedbackAll = [];
 let _adminCurrentTab = 'pending';
 
+function esAdmin() {
+    return window.supaAuth?.getStoredUsername()?.toUpperCase() === 'DENGO1106';
+}
+
+function initAdminBtn() {
+    if (esAdmin()) {
+        const adminBtn = document.getElementById('btn-admin-panel');
+        if (adminBtn) adminBtn.classList.remove('hidden');
+    }
+}
+
 async function openAdminPanel() {
     const session = window.supaAuth?.getCurrentSession();
-    if (!session || session.user.email !== ADMIN_EMAIL || !window.supaAuth?.supabase) return;
+    if (!session || !esAdmin() || !window.supaAuth?.supabase) return;
 
     document.getElementById('admin-modal').classList.remove('hidden');
     const listEl = document.getElementById('admin-feedback-list');
@@ -1078,18 +1015,17 @@ function renderAdminFeedback(tab) {
 
                 <!-- Acciones -->
                 <div class="flex gap-2 justify-end">
-                    ${f.user_id ? `
-                    <button onclick="openReplyModal('${f.user_id}')"
-                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 transition-all">
-                        <i data-lucide="reply" class="w-3 h-3"></i> Responder
-                    </button>
-                    ` : ''}
                     ${isPending ? `
                     <button onclick="markFeedbackAsReviewed('${f.id}')"
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-500/15 hover:bg-green-500/25 text-green-400 rounded-lg border border-green-500/25 transition-all">
                         <i data-lucide="check" class="w-3 h-3"></i> Marcar como Visto
                     </button>
-                    ` : ''}
+                    ` : `
+                    <button onclick="deleteFeedback('${f.id}')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-red-500/15 hover:bg-red-500/25 text-red-400 rounded-lg border border-red-500/25 transition-all">
+                        <i data-lucide="trash-2" class="w-3 h-3"></i> Eliminar
+                    </button>
+                    `}
                 </div>
             </div>
         `;
@@ -1100,7 +1036,7 @@ function renderAdminFeedback(tab) {
 
 async function markFeedbackAsReviewed(feedbackId) {
     const session = window.supaAuth?.getCurrentSession();
-    if (!session || session.user.email !== ADMIN_EMAIL || !window.supaAuth?.supabase) return;
+    if (!session || !esAdmin() || !window.supaAuth?.supabase) return;
 
     // Feedback visual inmediato: deshabilitar el botón
     const card = document.getElementById(`feedback-card-${feedbackId}`);
@@ -1134,49 +1070,76 @@ async function markFeedbackAsReviewed(feedbackId) {
     }
 }
 
-function openReplyModal(userId) {
-    document.getElementById('reply-user-id').value = userId;
-    document.getElementById('reply-message').value = '';
-    document.getElementById('reply-modal').classList.remove('hidden');
-}
-
-async function sendAdminReply() {
+async function deleteFeedback(feedbackId) {
     const session = window.supaAuth?.getCurrentSession();
-    if (!session || session.user.email !== ADMIN_EMAIL || !window.supaAuth?.supabase) return;
-    
-    const userId = document.getElementById('reply-user-id').value;
-    const message = document.getElementById('reply-message').value.trim();
-    const btn = document.getElementById('btn-send-reply');
-    
-    if (!message) return alert("Escribe un mensaje.");
-    
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Enviando...';
-    btn.disabled = true;
-    
+    if (!session || !esAdmin() || !window.supaAuth?.supabase) return;
+
+    if (!confirm('¿Estás seguro de que querés eliminar este feedback permanentemente?')) return;
+
+    // Feedback visual inmediato
+    const card = document.getElementById(`feedback-card-${feedbackId}`);
+    if (card) {
+        card.style.opacity = '0.5';
+        card.style.pointerEvents = 'none';
+    }
+
     try {
         const { error } = await window.supaAuth.supabase
-            .from('user_messages')
-            .insert([{
-                sender_id: session.user.id,
-                receiver_id: userId,
-                message: message
-            }]);
-            
+            .from('user_feedback')
+            .delete()
+            .eq('id', feedbackId);
+
         if (error) throw error;
-        
-        document.getElementById('reply-modal').classList.add('hidden');
-        alert("Mensaje enviado exitosamente al usuario.");
-        
+
+        // Actualizar estado local
+        _adminFeedbackAll = _adminFeedbackAll.filter(f => f.id !== feedbackId);
+        _actualizarContadoresAdmin();
+        renderAdminFeedback(_adminCurrentTab);
+
     } catch (err) {
-        console.error("Error sending reply:", err);
-        alert("Error al enviar mensaje: " + err.message);
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        console.error("Error al eliminar feedback:", err);
+        alert("Error al eliminar el feedback: " + err.message);
+        // Restaurar si falló
+        renderAdminFeedback(_adminCurrentTab);
     }
 }
 
+// ===================================
+// GESTOS MÓVILES (SWIPE TO GO BACK)
+// ===================================
+let touchstartX = 0;
+let touchendX = 0;
+let touchstartY = 0;
+let touchendY = 0;
+
+document.addEventListener('touchstart', e => {
+    touchstartX = e.changedTouches[0].screenX;
+    touchstartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+    touchendX = e.changedTouches[0].screenX;
+    touchendY = e.changedTouches[0].screenY;
+    handleSwipeGesture();
+}, { passive: true });
+
+function handleSwipeGesture() {
+    // Si no estamos en una subpantalla, no hacer nada
+    const homeEl = document.getElementById('home-section');
+    if (homeEl && !homeEl.classList.contains('hidden')) return;
+
+    // Calcular diferencias
+    const diffX = touchendX - touchstartX;
+    const diffY = Math.abs(touchendY - touchstartY);
+
+    // Si el swipe empezó muy cerca del borde izquierdo (ej: < 40px)
+    // Y el swipe fue predominantemente horizontal hacia la derecha
+    if (touchstartX < 40 && diffX > 60 && diffY < 50) {
+        if (typeof navigateTo === 'function') {
+            navigateTo('home');
+        }
+    }
+}
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', inicializar);
 } else {
