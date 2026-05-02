@@ -1,0 +1,1038 @@
+// ===================================
+// GESTIÓN DE ESTADO Y PERSISTENCIA
+// ===================================
+
+let carreraActual = 'ingenieriaIndustrial';
+const APP_STORAGE_KEY = 'ucr_planes_estudio_v3';
+
+const APP_ESTADOS = {
+    0: { etiqueta: 'Pendiente', clase: 'estado-0' },
+    1: { etiqueta: 'Aprobado', clase: 'estado-1' },
+    2: { etiqueta: 'Cursando', clase: 'estado-2' },
+    3: { etiqueta: 'Próximo Semestre', clase: 'estado-3' },
+    4: { etiqueta: 'Año +1', clase: 'estado-4' },
+    5: { etiqueta: 'Año +2', clase: 'estado-5' },
+    6: { etiqueta: 'Año +3', clase: 'estado-6' },
+    7: { etiqueta: 'Meta Largo Plazo', clase: 'estado-7' }
+};
+
+// Función de navegación global simplificada
+window.navigateTo = (target) => {
+    // 🔒 Control de Acceso: Redirigir a login si no hay sesión
+    const isAuthenticated = window.supaAuth && window.supaAuth.getCurrentSession();
+    if (!isAuthenticated && target !== 'login') {
+        console.warn("Acceso denegado: redirigiendo a login.");
+        target = 'login';
+    }
+
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+    const appNav = document.getElementById('app-nav');
+
+    if (target === 'login') {
+        document.getElementById('login-section')?.classList.remove('hidden');
+        if (appNav) appNav.classList.add('hidden');
+    } else if (target === 'plan') {
+        document.getElementById('plan-section').classList.remove('hidden');
+        document.getElementById('export-area').classList.remove('hidden');
+        const planBtn = document.querySelector('[data-tab="plan"]');
+        if (planBtn) planBtn.classList.add('active');
+        document.querySelector('.controls-container').classList.remove('hidden');
+        if (appNav) appNav.classList.remove('hidden');
+        // Aplicar filtro de carreras del perfil del usuario
+        const _perfil = window.supaAuth?.getCurrentProfile?.();
+        if (_perfil?.selected_carreras?.length > 0) filtrarCarrerasPorPerfil(_perfil.selected_carreras);
+    } else if (target === 'horario') {
+        const hSection = document.getElementById('horarios-section');
+        if (hSection) hSection.classList.remove('hidden');
+        const horarioBtn = document.querySelector('[data-tab="horario"]');
+        if (horarioBtn) horarioBtn.classList.add('active');
+        document.querySelector('.controls-container').classList.add('hidden');
+        if (appNav) appNav.classList.remove('hidden');
+        if (typeof initScheduler === 'function') initScheduler();
+    } else {
+        // HOME default para usuarios autenticados
+        document.getElementById('home-section').classList.remove('hidden');
+        if (appNav) appNav.classList.add('hidden'); // Home tiene su propio layout
+    }
+
+    if (window.lucide) lucide.createIcons();
+};
+
+/**
+ * Guarda el estado actual en localStorage y en Supabase
+ */
+async function guardarEstado() {
+    try {
+        const session = window.supaAuth?.getCurrentSession();
+        // Clave única por usuario — evita que los datos se mezclen entre cuentas
+        const storageKey = session ? `ucr_estado_${session.user.id}` : APP_STORAGE_KEY;
+
+        const estado = {
+            ingenieriaIndustrial: CARRERAS.ingenieriaIndustrial.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
+            contaduriaPublica: CARRERAS.contaduriaPublica.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
+            direccionEmpresas: CARRERAS.direccionEmpresas.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
+            carreraActual: carreraActual,
+            ultimaActualizacion: new Date().toISOString()
+        };
+
+        localStorage.setItem(storageKey, JSON.stringify(estado));
+
+        // Sincronizar a Supabase si el usuario está autenticado
+        if (session) {
+            const user = session.user;
+            const coursesToUpsert = [];
+            ['ingenieriaIndustrial', 'contaduriaPublica', 'direccionEmpresas'].forEach(carreraId => {
+                if (Array.isArray(estado[carreraId])) {
+                    estado[carreraId].forEach(c => {
+                        coursesToUpsert.push({
+                            user_id: user.id,
+                            carrera_id: carreraId,
+                            course_id: c.codigo,
+                            status: typeof c.estado === 'number' ? c.estado : parseInt(c.estado) || 0
+                        });
+                    });
+                }
+            });
+
+            if (coursesToUpsert.length > 0) {
+                const { error } = await window.supaAuth.supabase
+                    .from('user_courses')
+                    .upsert(coursesToUpsert, { onConflict: 'user_id,carrera_id,course_id' });
+                if (error) console.error('Error Supabase al guardar:', error);
+                else console.log(`✅ Progreso sincronizado: ${coursesToUpsert.length} cursos`);
+            }
+        }
+    } catch (error) {
+        console.error('Error al guardar estado:', error);
+    }
+}
+
+/**
+ * Mapa de retrocompatibilidad: códigos viejos → códigos nuevos.
+ * Necesario porque renombramos REPO→RP-, MA-0001→MA0001, OPT-1→OPT-ING, OPT-S3→OPT-ING.
+ */
+const _COMPAT_CODIGOS = {
+    'REPO': 'RP-',
+    'MA-0001': 'MA0001',
+    'OPT-1': 'OPT-ING',
+    'OPT-S3': 'OPT-ING'
+};
+
+/**
+ * Carga el estado local y asíncronamente desde Supabase si aplica.
+ */
+async function cargarEstado() {
+    const session = window.supaAuth?.getCurrentSession();
+    const storageKey = session ? `ucr_estado_${session.user.id}` : APP_STORAGE_KEY;
+
+    // SIEMPRE resetear todos los cursos a 0 antes de cargar
+    // Esto evita que el progreso de otro usuario quede visible
+    Object.keys(CARRERAS).forEach(carreraId => {
+        CARRERAS[carreraId].cursos.forEach(curso => { curso.estado = 0; });
+    });
+
+    // 1. Carga rápida desde localStorage del usuario actual
+    const estadoGuardado = localStorage.getItem(storageKey);
+    if (estadoGuardado) {
+        try {
+            const estado = JSON.parse(estadoGuardado);
+            Object.keys(CARRERAS).forEach(carreraId => {
+                const cursos = CARRERAS[carreraId].cursos;
+                const estadoCarrera = estado[carreraId];
+                if (estadoCarrera) {
+                    cursos.forEach(curso => {
+                        const guardado = estadoCarrera.find(c => c.codigo === curso.codigo || _COMPAT_CODIGOS[c.codigo] === curso.codigo);
+                        if (guardado !== undefined) {
+                            const val = guardado.estado;
+                            curso.estado = typeof val === 'number' ? val : (val === 'aprobado' ? 1 : (val === 'cursando' ? 2 : 0));
+                        }
+                    });
+                }
+            });
+            if (estado.carreraActual) carreraActual = estado.carreraActual;
+        } catch (error) {
+            console.error('Error al cargar estado local:', error);
+            localStorage.removeItem(storageKey);
+        }
+    }
+
+    // 2. Supabase SIEMPRE sobreescribe el estado local (fuente de verdad)
+    if (session) {
+        try {
+            const { data, error } = await window.supaAuth.supabase
+                .from('user_courses')
+                .select('carrera_id, course_id, status')
+                .eq('user_id', session.user.id);
+
+            if (!error && data && data.length > 0) {
+                const remoteMap = {};
+                data.forEach(row => {
+                    if (!remoteMap[row.carrera_id]) remoteMap[row.carrera_id] = {};
+                    remoteMap[row.carrera_id][row.course_id] = parseInt(row.status);
+                });
+
+                // Resetear de nuevo y aplicar solo lo de Supabase
+                Object.keys(CARRERAS).forEach(carreraId => {
+                    const carreraMap = remoteMap[carreraId] || {};
+                    CARRERAS[carreraId].cursos.forEach(curso => {
+                        curso.estado = carreraMap[curso.codigo] ?? 0;
+                    });
+                });
+
+                console.log('✅ Plan cargado desde Supabase');
+                // Actualizar localStorage del usuario con los datos de Supabase
+                localStorage.setItem(storageKey, JSON.stringify({
+                    ingenieriaIndustrial: CARRERAS.ingenieriaIndustrial.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
+                    contaduriaPublica: CARRERAS.contaduriaPublica.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
+                    direccionEmpresas: CARRERAS.direccionEmpresas.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
+                    carreraActual
+                }));
+
+                if (typeof renderizarCarrera === 'function') renderizarCarrera();
+            } else if (error) {
+                console.error('Error al cargar desde Supabase:', error);
+            }
+        } catch(err) {
+            console.error('Error al sincronizar con Supabase:', err);
+        }
+    }
+}
+
+// Escuchar cambios de autenticación para recargar el plan (Definido globalmente)
+window.addEventListener('supabase_auth_changed', () => {
+    cargarEstado();
+});
+
+/**
+ * Resetea los datos únicamente de la carrera actual (con confirmación)
+ */
+function resetearDatos() {
+    const nombreCarrera = getNombreCarrera(carreraActual);
+    if (confirm(`¿Estás seguro de que querés borrar todo el progreso de ${nombreCarrera}? Esta acción no se puede deshacer.`)) {
+        // Limpiamos solo los cursos de la carrera activa
+        CARRERAS[carreraActual].cursos.forEach(curso => {
+            curso.estado = 0;
+        });
+
+        guardarEstado();
+        renderizarPlan();
+
+        // Opcional: Notificación visual suave en lugar de recarga total
+        console.log(`Plan de ${nombreCarrera} reseteado.`);
+    }
+}
+
+// ===================================
+// LÓGICA DE CAMBIO DE ESTADO
+// ===================================
+
+// Picker de estado activo
+let pickerCerrandose = false;
+
+/**
+ * Al hacer clic en una tarjeta, muestra un picker para seleccionar el estado directamente.
+ */
+function clickCurso(event, carreraId, codigoCurso) {
+    event.stopPropagation();
+
+    const curso = getCursoByCodigo(carreraId, codigoCurso);
+    if (!curso) return;
+
+    // Cerrar picker existente
+    cerrarPicker();
+
+    // Crear picker
+    const picker = document.createElement('div');
+    picker.className = 'estado-picker';
+    picker.id = 'estado-picker-activo';
+
+    Object.entries(APP_ESTADOS).forEach(([num, info]) => {
+        const numInt = parseInt(num);
+        // Si el curso tiene requisitos pendientes, no mostrar estados > 0 como disponibles
+        // (pero sí pueden volver a 0)
+        const opcion = document.createElement('button');
+        opcion.className = 'picker-opcion' + (curso.estado === numInt ? ' picker-activo' : '');
+        opcion.style.setProperty('--opcion-color', `var(--color-estado-${num})`);
+        opcion.innerHTML = `<span class="picker-dot"></span>${info.etiqueta}`;
+
+        // Deshabilitar opciones de estado si no se cumplen los requisitos para ese estado específico
+        const habilitado = puedeEstarEnEstado(carreraId, codigoCurso, numInt);
+        if (!habilitado) {
+            opcion.disabled = true;
+            opcion.title = '🔒 Requiere cumplir requisitos en un semestre anterior';
+        }
+
+        opcion.addEventListener('click', (e) => {
+            e.stopPropagation();
+            curso.estado = numInt;
+            // Propagar automáticamente a cursos equivalentes en otras carreras
+            propagarEstadoCurso(carreraId, codigoCurso, numInt);
+            guardarEstado();
+            renderizarCarrera();
+
+            // Si el panel de convalidaciones está abierto, refrescarlo
+            const panel = document.getElementById('panel-convalidaciones');
+            if (panel && panel.classList.contains('active')) {
+                renderizarTablaConvalidaciones();
+            }
+
+            cerrarPicker();
+        });
+        picker.appendChild(opcion);
+    });
+
+    // Posicionar junto a la tarjeta usando coordenadas globales
+    const card = document.querySelector(`.curso-card[data-codigo="${codigoCurso}"]`);
+    if (card) {
+        const rect = card.getBoundingClientRect();
+        picker.style.position = 'fixed';
+        picker.style.top = `${rect.bottom + 5}px`;
+        picker.style.left = `${rect.left}px`;
+        document.body.appendChild(picker);
+
+        // Ajustar si se sale por abajo
+        const pickerRect = picker.getBoundingClientRect();
+        if (pickerRect.bottom > window.innerHeight) {
+            picker.style.top = `${rect.top - pickerRect.height - 5}px`;
+        }
+    }
+
+    // Cerrar al hacer clic fuera
+    setTimeout(() => {
+        document.addEventListener('click', function (e) {
+            if (!picker.contains(e.target)) {
+                cerrarPicker();
+            }
+        }, { once: true });
+    }, 10);
+}
+
+function cerrarPicker() {
+    const existente = document.getElementById('estado-picker-activo');
+    if (existente) existente.remove();
+}
+
+// ===================================
+// RENDERIZADO DE UI
+// ===================================
+
+/**
+ * Renderiza la malla curricular de la carrera actual
+ */
+function renderizarCarrera() {
+    const container = document.getElementById('malla-container');
+    const carrera = CARRERAS[carreraActual];
+
+    if (!carrera) {
+        container.innerHTML = '<p>Carrera no encontrada</p>';
+        return;
+    }
+
+    const niveles = getNiveles(carreraActual);
+
+    let html = '';
+    niveles.forEach((nivel, index) => {
+        const cursos = getCursosPorNivel(carreraActual, nivel);
+        const creditosTotalesNivel = cursos.reduce((sum, c) => sum + c.creditos, 0);
+        const creditosAprobadosNivel = cursos.filter(c => c.estado === 1).reduce((sum, c) => sum + c.creditos, 0);
+        const cursosAprobadosNivel = cursos.filter(c => c.estado === 1).length;
+        const progresoNivel = Math.round((creditosAprobadosNivel / creditosTotalesNivel) * 100) || 0;
+
+        // Conteos por estado (2-7)
+        let proyeccionHtml = '';
+        const estadosProyectados = [2, 3, 4, 5, 6, 7];
+        estadosProyectados.forEach(e => {
+            const count = cursos.filter(c => c.estado === e).length;
+            if (count > 0) {
+                proyeccionHtml += `
+                    <div class="nivel-stat-proy-item state-${e}" title="${APP_ESTADOS[e].etiqueta}">
+                        <div class="proy-dot"></div>
+                        <span>${count}</span>
+                    </div>
+                `;
+            }
+        });
+
+        html += `
+      <div class="nivel-grupo" style="animation-delay: ${index * 0.1}s">
+        <div class="nivel-header">
+          <div class="nivel-header-main">
+            <div class="nivel-header-left">
+              <span>📅</span>
+              <span class="nivel-titulo">Semestre ${nivel} <span class="nivel-año-badge">(Año ${Math.ceil(nivel / 2)})</span></span>
+            </div>
+            
+            <div class="nivel-stats-horizontal">
+                <div class="nivel-stat-item">
+                    <span class="nivel-stat-label">Créditos:</span>
+                    <span class="nivel-stat-value">${creditosAprobadosNivel}/${creditosTotalesNivel}</span>
+                </div>
+                <div class="nivel-stat-item">
+                    <span class="nivel-stat-label">Cursos:</span>
+                    <span class="nivel-stat-value">${cursosAprobadosNivel}/${cursos.length}</span>
+                </div>
+                
+                <div class="nivel-stat-divider"></div>
+                
+                <div class="nivel-proyeccion-mini-grid">
+                    ${proyeccionHtml || '<span class="sin-proy">Sin planificar</span>'}
+                </div>
+
+                <div class="nivel-stat-divider"></div>
+
+                <div class="nivel-stat-progress-wrap">
+                    <div class="nivel-stat-progress">
+                        <div class="nivel-stat-progress-bar" style="width: ${progresoNivel}%"></div>
+                    </div>
+                    <span class="nivel-stat-progress-text">${progresoNivel}%</span>
+                </div>
+            </div>
+
+            <div class="nivel-creditos-badge">${creditosTotalesNivel} CR</div>
+          </div>
+        </div>
+        <div class="cursos-grid">
+    `;
+
+        cursos.forEach(curso => {
+            const requisitosCumplidos = puedeSerCursado(carreraActual, curso.codigo);
+            const estadoNum = curso.estado;
+            const tieneRequisitos = curso.requisitos.length > 0;
+
+            // Un curso se muestra bloqueado si su estado actual (si es > 0) no es válido según sus requisitos.
+            // Si está en estado 0, mostramos bloqueado si ni siquiera puede ser "Cursado" (Estado 2).
+            const estadoActualValido = estadoNum === 0 ? puedeSerCursado(carreraActual, curso.codigo) : puedeEstarEnEstado(carreraActual, curso.codigo, estadoNum);
+            const esBloqueado = !estadoActualValido && tieneRequisitos;
+
+            const infoEstado = APP_ESTADOS[estadoNum];
+            const requisitosTexto = getNombresRequisitos(carreraActual, curso.requisitos);
+
+            // Clase principal de la tarjeta: siempre incluimos infoEstado.clase para ver el color
+            const claseCard = infoEstado.clase + (esBloqueado ? ' bloqueado' : '');
+
+            // Tooltip de bloqueo
+            const tooltipBloqueado = esBloqueado
+                ? `title="🔒 Bloqueado para aprobación — Requisitos pendientes: ${requisitosTexto}"`
+                : '';
+
+            const compartido = typeof esCompartido === 'function' && esCompartido(carreraActual, curso.codigo);
+
+            html += `
+        <div class="curso-card ${claseCard}" 
+             data-codigo="${curso.codigo}"
+             ${tooltipBloqueado}
+             onclick="clickCurso(event, '${carreraActual}', '${curso.codigo}')">
+          <div class="curso-header">
+            <div class="curso-codigo">${curso.codigo}</div>
+            <div class="curso-creditos">${curso.creditos} CR${compartido ? ' <span class="badge-compartido" title="Curso compartido — el estado se sincroniza en todas las carreras">\uD83D\uDD17</span>' : ''}</div>
+          </div>
+          <div class="curso-nombre">${curso.nombre}</div>
+          <div class="curso-requisitos">
+            ${curso.requisitos.length > 0 ? '📋 ' + requisitosTexto : '✅ Sin requisitos'}
+          </div>
+          <div class="curso-estado-badge">
+            ${esBloqueado ? '🔒 Bloqueado' : infoEstado.etiqueta}
+          </div>
+        </div>
+      `;
+        });
+
+        html += `
+        </div>
+      </div>
+    `;
+    });
+
+    container.innerHTML = html;
+    actualizarProgreso();
+}
+
+/**
+ * Actualiza los indicadores de progreso y la carga proyectada
+ */
+function actualizarProgreso() {
+    const totalCreditos = getTotalCreditos(carreraActual);
+    const creditosAprobados = getCreditosAprobados(carreraActual);
+    const progreso = getProgreso(carreraActual);
+
+    const cursos = getCursosCarrera(carreraActual);
+    const cursosAprobados = cursos.filter(c => c.estado === 1).length;
+    const cursosCursando = cursos.filter(c => c.estado === 2).length;
+
+    document.getElementById('creditos-aprobados').textContent = creditosAprobados;
+    document.getElementById('creditos-totales').textContent = totalCreditos;
+    document.getElementById('cursos-aprobados').textContent = cursosAprobados;
+    document.getElementById('cursos-totales').textContent = cursos.length;
+    document.getElementById('cursos-cursando').textContent = cursosCursando;
+    document.getElementById('progreso-porcentaje').textContent = `${progreso}%`;
+
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.style.width = `${progreso}%`;
+
+    if (!progressBar.style.width || progressBar.style.width === '0%') {
+        progressBar.classList.add('progress-initial');
+    } else {
+        progressBar.classList.remove('progress-initial');
+    }
+
+    // Actualizar carga proyectada (estados 2-7)
+    for (let e = 2; e <= 7; e++) {
+        const creditosEl = document.getElementById(`carga-estado-${e}`);
+        const cursosEl = document.getElementById(`carga-curso-count-${e}`);
+
+        if (creditosEl && cursosEl) {
+            const cursosEstado = cursos.filter(c => c.estado === e);
+            const totalCreditosEstado = cursosEstado.reduce((sum, c) => sum + c.creditos, 0);
+
+            creditosEl.textContent = totalCreditosEstado;
+            cursosEl.textContent = cursosEstado.length;
+        }
+    }
+}
+
+/**
+ * Cambia entre carreras
+ */
+function cambiarCarrera(carreraId) {
+    carreraActual = carreraId;
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-carrera="${carreraId}"]`).classList.add('active');
+
+    document.getElementById('nombre-carrera').textContent = getNombreCarrera(carreraId);
+
+    // Actualizar visibilidad del botón de convalidaciones
+    const btnContainer = document.getElementById('btn-convalidaciones-container');
+    const panel = document.getElementById('panel-convalidaciones');
+    
+    // Solo mostrar si tiene AMBAS carreras seleccionadas en su perfil
+    let activeCareers = window.supaAuth?.getCurrentProfile()?.selected_carreras || [];
+    if (activeCareers.length === 0 && typeof CARRERAS !== 'undefined') activeCareers = Object.keys(CARRERAS); // Fallback dev
+    
+    const hasBothNegocios = activeCareers.includes('contaduriaPublica') && activeCareers.includes('direccionEmpresas');
+
+    if (hasBothNegocios && (carreraId === 'contaduriaPublica' || carreraId === 'direccionEmpresas')) {
+        btnContainer.classList.remove('hidden');
+    } else {
+        btnContainer.classList.add('hidden');
+        if (panel) panel.classList.remove('active');
+    }
+
+    guardarEstado();
+    renderizarCarrera();
+
+    // Si el panel de convalidaciones está abierto, refrescarlo
+    if (panel && panel.classList.contains('active')) {
+        renderizarTablaConvalidaciones();
+    }
+}
+
+// ===================================
+// ANIMACIONES Y EFECTOS
+// ===================================
+
+// ===================================
+// LÓGICA DE CONVALIDACIONES
+// ===================================
+
+/**
+ * Abre o cierra el panel de convalidaciones
+ */
+function togglePanelConvalidaciones() {
+    const panel = document.getElementById('panel-convalidaciones');
+    if (!panel) return;
+
+    if (panel.classList.contains('active')) {
+        panel.classList.remove('active');
+    } else {
+        renderizarTablaConvalidaciones();
+        panel.classList.add('active');
+    }
+}
+
+/**
+ * Renderiza la tabla de convalidaciones basada en la carrera actual
+ */
+function renderizarTablaConvalidaciones() {
+    const content = document.getElementById('conv-content');
+    if (!content || !TABLA_CONVALIDACIONES[carreraActual]) {
+        content.innerHTML = '<p class="conv-nota">No hay convalidaciones específicas configuradas para esta carrera.</p>';
+        return;
+    }
+
+    const convalidaciones = TABLA_CONVALIDACIONES[carreraActual];
+    // Determinar carrera destino
+    const carreraDestinoId = carreraActual === 'contaduriaPublica' ? 'direccionEmpresas' : 'contaduriaPublica';
+    const nombreDestino = getNombreCarrera(carreraDestinoId);
+
+    let html = `
+        <table class="tabla-conv">
+            <thead>
+                <tr>
+                    <th>Si ya aprobaste en ${nombreDestino}</th>
+                    <th>Estado</th>
+                    <th>Se te convalida en ${getNombreCarrera(carreraActual)}</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    convalidaciones.forEach(conv => {
+        // Normalizar origen para que siempre sea un array de objetos {codigo, nombre}
+        const origenNormalizado = conv.origen.map(o => typeof o === 'string' ? { codigo: o, nombre: '' } : o);
+        const destinoNormalizado = conv.destino.map(d => typeof d === 'string' ? { codigo: d, nombre: '' } : d);
+
+        // Verificar estado de los cursos origen (Vienen de la carrera destino)
+        const cursosOrigenInfo = origenNormalizado.map(o => {
+            const cursoEnPlan = getCursoByCodigo(carreraDestinoId, o.codigo);
+            return {
+                codigo: o.codigo,
+                nombre: cursoEnPlan ? cursoEnPlan.nombre : o.nombre,
+                aprobado: cursoEnPlan ? cursoEnPlan.estado === 1 : false,
+                enPlan: !!cursoEnPlan
+            };
+        });
+
+        const todosAprobados = cursosOrigenInfo.every(c => c.aprobado);
+        const algunoAprobado = cursosOrigenInfo.some(c => c.aprobado);
+
+        // Determinar clase y texto de estado
+        let statusClass = 'status-pending';
+        let statusText = '❌ Pendiente';
+
+        if (todosAprobados) {
+            statusClass = 'status-ok';
+            statusText = '✅ Listo para tramitar';
+        } else if (algunoAprobado) {
+            statusClass = 'status-pending'; // Usamos la misma base pero podrías crear una nueva
+            statusText = '⚠️ Posible a completar';
+        }
+
+        html += `
+            <tr>
+                <td>
+                    <div class="conv-course-group">
+                        ${cursosOrigenInfo.map(c => {
+            const extLabel = c.enPlan ? '' : ' <small style="opacity:0.6">(Fuera de plan actual)</small>';
+            return `<div class="conv-course-item"><span class="conv-course-id">${c.codigo}</span> ${c.nombre}${extLabel}</div>`;
+        }).join('')}
+                    </div>
+                </td>
+                <td style="white-space: nowrap;">
+                    <span class="conv-status-badge ${statusClass}">${statusText}</span>
+                </td>
+                <td>
+                    <div class="conv-course-group">
+                        ${destinoNormalizado.map(d => {
+            const cEnPlan = getCursoByCodigo(carreraActual, d.codigo);
+            const nombreFinal = cEnPlan ? cEnPlan.nombre : d.nombre;
+            const compartido = typeof esCompartido === 'function' && esCompartido(carreraActual, d.codigo);
+            const extLabel = cEnPlan ? '' : ' <small style="opacity:0.6">(Fuera de plan actual)</small>';
+
+            return `
+                                <div class="conv-course-item">
+                                    <span class="conv-course-id">${d.codigo}</span> 
+                                    ${nombreFinal}${extLabel}
+                                    ${compartido ? '<span class="badge-compartido" title="Este curso es compartido, se sincroniza solo">🔗</span>' : ''}
+                                </div>`;
+        }).join('')}
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+        <p class="conv-nota" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+            ⚠️ <strong>Importante:</strong> Las convalidaciones que no tienen el ícono 🔗 requieren trámite de convalidación manual en la UCR. 
+            Esta tabla es informativa basada en la resolución EAN-269-2023.
+        </p>
+    `;
+
+    content.innerHTML = html;
+}
+
+// ===================================
+// INICIALIZACIÓN
+// ===================================
+
+function inicializar() {
+    console.log('Inicializando aplicación v2 (7 estados)...');
+
+    cargarEstado();
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => cambiarCarrera(btn.dataset.carrera));
+    });
+
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => navigateTo(tab.dataset.tab));
+    });
+
+    // Siempre iniciar en login — auth.js navega al home cuando resuelve la sesión
+    navigateTo('login');
+
+    document.querySelector(`[data-carrera="${carreraActual}"]`)?.classList.add('active');
+    document.getElementById('nombre-carrera').textContent = getNombreCarrera(carreraActual);
+    renderizarCarrera();
+    console.log('Aplicación inicializada correctamente');
+}
+
+// Filtra las pestañas de carrera según lo que el usuario eligió en su perfil
+function filtrarCarrerasPorPerfil(selectedCarreras) {
+    if (!selectedCarreras || selectedCarreras.length === 0) return;
+
+    document.querySelectorAll('.tab-btn[data-carrera]').forEach(btn => {
+        if (selectedCarreras.includes(btn.dataset.carrera)) {
+            btn.classList.remove('hidden');
+        } else {
+            btn.classList.add('hidden');
+        }
+    });
+
+    // Si la carrera activa no está en la selección, cambiar a la primera disponible
+    if (!selectedCarreras.includes(carreraActual)) {
+        cambiarCarrera(selectedCarreras[0]);
+    }
+}
+
+
+// ===================================
+// EXPORTACIÓN A IMAGEN Y PDF
+// ===================================
+
+/**
+ * Función auxiliar para unificar la preparación del área de captura
+ */
+async function capturarAreaComoCanvas(area) {
+    return await html2canvas(area, {
+        scale: 2, // Alta resolución
+        backgroundColor: '#000000', // Fondo negro sólido
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+        onclone: (clonedDoc) => {
+            const clonedArea = clonedDoc.getElementById('export-area');
+            if (clonedArea) {
+                // Forzar que todo sea visible y sin animaciones
+                clonedArea.style.height = 'auto';
+                clonedArea.style.overflow = 'visible';
+                clonedArea.style.padding = '30px';
+                clonedArea.style.backgroundColor = '#000000'; // Asegurar el color oscuro
+
+                // Eliminar animaciones y forzar opacidad en los grupos de niveles
+                const niveles = clonedArea.querySelectorAll('.nivel-grupo');
+                niveles.forEach(n => {
+                    n.style.animation = 'none';
+                    n.style.opacity = '1';
+                    n.style.transform = 'none';
+                    n.style.visibility = 'visible';
+                });
+
+                // Desactivar filtros backdrop-filter (no soportados por canvas)
+                const elements = clonedArea.querySelectorAll('.progress-container, .nivel-header, .curso-card, .leyenda');
+                elements.forEach(el => {
+                    el.style.backdropFilter = 'none';
+                    el.style.webkitBackdropFilter = 'none';
+                    el.style.backgroundColor = 'rgba(30, 30, 33, 1)'; // Opaco
+                });
+
+                // Forzar opacidad total en todo el texto y tarjetas
+                const allNodes = clonedArea.querySelectorAll('*');
+                allNodes.forEach(node => {
+                    const style = clonedDoc.defaultView.getComputedStyle(node);
+                    if (style.opacity === '0') node.style.opacity = '1';
+                });
+            }
+        }
+    });
+}
+
+/**
+ * Captura el área de planificación y la descarga como PNG
+ */
+async function descargarPlan() {
+    const area = document.getElementById('export-area');
+    if (!area) return;
+
+    const btn = document.querySelector('.btn-success');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '⌛ Generando...';
+    btn.disabled = true;
+
+    try {
+        const carrera = getNombreCarrera(carreraActual).replace(/\s+/g, '_');
+        const fecha = new Date().toISOString().split('T')[0];
+        const nombreArchivo = `Plan_Estudios_UCR_${carrera}_${fecha}.png`;
+
+        const canvas = await capturarAreaComoCanvas(area);
+
+        const link = document.createElement('a');
+        link.download = nombreArchivo;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+
+    } catch (error) {
+        console.error('Error al exportar imagen:', error);
+        alert('Hubo un error al generar la imagen.');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+// ===================================
+// SISTEMA DE FEEDBACK
+// ===================================
+async function submitFeedback() {
+    const messageEl = document.getElementById('feedback-message');
+    const errorEl = document.getElementById('feedback-error');
+    const successEl = document.getElementById('feedback-success');
+    const btnSubmit = document.getElementById('btn-submit-feedback');
+    
+    if (!messageEl || !errorEl || !successEl || !btnSubmit) return;
+    
+    const message = messageEl.value.trim();
+    
+    // Ocultar mensajes previos
+    errorEl.classList.add('hidden');
+    successEl.classList.add('hidden');
+    
+    if (!message) {
+        errorEl.textContent = 'Por favor escribe algo antes de enviar.';
+        errorEl.classList.remove('hidden');
+        return;
+    }
+    
+    const session = window.supaAuth?.getCurrentSession();
+    const userId = session ? session.user.id : null;
+    
+    // Preparar UI para envío
+    const originalText = btnSubmit.innerHTML;
+    btnSubmit.innerHTML = 'Enviando...';
+    btnSubmit.disabled = true;
+    messageEl.disabled = true;
+    
+    try {
+        if (!window.supaAuth?.supabase) {
+            throw new Error("No hay conexión con la base de datos.");
+        }
+        
+        const { error } = await window.supaAuth.supabase
+            .from('user_feedback')
+            .insert([
+                { user_id: userId, message: message }
+            ]);
+            
+        if (error) throw error;
+        
+        // Éxito
+        successEl.classList.remove('hidden');
+        messageEl.value = ''; // Limpiar textarea
+        
+        // Cerrar modal automáticamente después de 2 segundos
+        setTimeout(() => {
+            document.getElementById('feedback-modal').classList.add('hidden');
+            successEl.classList.add('hidden'); // Resetear para la próxima vez
+        }, 2000);
+        
+    } catch (err) {
+        console.error('[Feedback] Error:', err);
+        const errorMsg = err.message || JSON.stringify(err);
+        errorEl.textContent = 'Error: ' + errorMsg;
+        errorEl.classList.remove('hidden');
+    } finally {
+        btnSubmit.innerHTML = originalText;
+        btnSubmit.disabled = false;
+        messageEl.disabled = false;
+    }
+}
+
+// ===================================
+// SISTEMA DE NOTIFICACIONES Y ADMIN
+// ===================================
+const ADMIN_EMAIL = 'diegodengosoto@gmail.com';
+
+function initNotificationsAndAdmin() {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session) return;
+    
+    // Verificar si es Admin
+    const userEmail = session.user.email;
+    if (userEmail === ADMIN_EMAIL) {
+        const adminBtn = document.getElementById('btn-admin-panel');
+        if (adminBtn) adminBtn.classList.remove('hidden');
+    }
+    
+    // Cargar bandeja de entrada del usuario
+    fetchUserInbox();
+}
+
+async function fetchUserInbox() {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session || !window.supaAuth?.supabase) return;
+    
+    try {
+        const { data, error } = await window.supaAuth.supabase
+            .from('user_messages')
+            .select('*')
+            .eq('receiver_id', session.user.id)
+            .order('created_at', { ascending: false });
+            
+        if (error) throw error;
+        
+        const inboxList = document.getElementById('inbox-list');
+        const badge = document.getElementById('unread-badge');
+        
+        if (!inboxList || !badge) return;
+        
+        const unreadCount = data.filter(m => !m.is_read).length;
+        if (unreadCount > 0) {
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+        
+        if (data.length === 0) {
+            inboxList.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No tienes mensajes nuevos.</p>';
+            return;
+        }
+        
+        inboxList.innerHTML = data.map(msg => `
+            <div class="bg-black/40 border border-${msg.is_read ? 'white/5' : 'yellow-500/30'} p-4 rounded-xl">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-bold ${msg.is_read ? 'text-gray-500' : 'text-yellow-500'}">Soporte UCR</span>
+                    <span class="text-[10px] text-gray-500">${new Date(msg.created_at).toLocaleDateString()}</span>
+                </div>
+                <p class="text-sm text-gray-300">${msg.message}</p>
+            </div>
+        `).join('');
+        
+    } catch (err) {
+        console.error("Error fetching inbox:", err);
+    }
+}
+
+async function openInboxPanel() {
+    document.getElementById('inbox-modal').classList.remove('hidden');
+    
+    // Marcar como leídos
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session || !window.supaAuth?.supabase) return;
+    
+    try {
+        await window.supaAuth.supabase
+            .from('user_messages')
+            .update({ is_read: true })
+            .eq('receiver_id', session.user.id)
+            .eq('is_read', false);
+            
+        document.getElementById('unread-badge').classList.add('hidden');
+    } catch (err) {
+        console.error("Error marking messages as read:", err);
+    }
+}
+
+// PANEL DE ADMIN
+async function openAdminPanel() {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session || session.user.email !== ADMIN_EMAIL || !window.supaAuth?.supabase) return;
+    
+    document.getElementById('admin-modal').classList.remove('hidden');
+    const listEl = document.getElementById('admin-feedback-list');
+    listEl.innerHTML = '<p class="text-center text-gray-400">Cargando...</p>';
+    
+    try {
+        // Consultar la tabla de feedback
+        const { data, error } = await window.supaAuth.supabase
+            .from('user_feedback')
+            .select('id, user_id, message, status, created_at')
+            .order('created_at', { ascending: false });
+            
+        if (error) throw error;
+        
+        if (data.length === 0) {
+            listEl.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No hay feedback registrado.</p>';
+            return;
+        }
+        
+        listEl.innerHTML = data.map(f => `
+            <div class="bg-zinc-800 border border-white/10 p-4 rounded-xl flex justify-between items-start gap-4">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xs font-bold text-gray-400">${new Date(f.created_at).toLocaleString()}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full ${f.status === 'pending' ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-500'}">${f.status}</span>
+                        <span class="text-xs text-gray-500">ID Usuario: ${f.user_id ? f.user_id.substring(0,8) + '...' : 'Anónimo'}</span>
+                    </div>
+                    <p class="text-sm text-white">${f.message}</p>
+                </div>
+                ${f.user_id ? `
+                <button onclick="openReplyModal('${f.user_id}')" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-2 rounded-lg transition-all flex items-center gap-1">
+                    <i data-lucide="reply" class="w-3 h-3"></i> Responder
+                </button>
+                ` : ''}
+            </div>
+        `).join('');
+        
+        if (window.lucide) lucide.createIcons();
+        
+    } catch (err) {
+        console.error("Error fetching feedback para admin:", err);
+        listEl.innerHTML = '<p class="text-red-500 text-sm">Error cargando datos.</p>';
+    }
+}
+
+function openReplyModal(userId) {
+    document.getElementById('reply-user-id').value = userId;
+    document.getElementById('reply-message').value = '';
+    document.getElementById('reply-modal').classList.remove('hidden');
+}
+
+async function sendAdminReply() {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session || session.user.email !== ADMIN_EMAIL || !window.supaAuth?.supabase) return;
+    
+    const userId = document.getElementById('reply-user-id').value;
+    const message = document.getElementById('reply-message').value.trim();
+    const btn = document.getElementById('btn-send-reply');
+    
+    if (!message) return alert("Escribe un mensaje.");
+    
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Enviando...';
+    btn.disabled = true;
+    
+    try {
+        const { error } = await window.supaAuth.supabase
+            .from('user_messages')
+            .insert([{
+                sender_id: session.user.id,
+                receiver_id: userId,
+                message: message
+            }]);
+            
+        if (error) throw error;
+        
+        document.getElementById('reply-modal').classList.add('hidden');
+        alert("Mensaje enviado exitosamente al usuario.");
+        
+    } catch (err) {
+        console.error("Error sending reply:", err);
+        alert("Error al enviar mensaje: " + err.message);
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializar);
+} else {
+    inicializar();
+}

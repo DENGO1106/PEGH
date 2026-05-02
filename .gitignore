@@ -1,0 +1,27 @@
+# Dependencias
+node_modules/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Variables de entorno (¡NUNCA subir claves!)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editores
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Archivos temporales
+*.tmp
+*.temp
