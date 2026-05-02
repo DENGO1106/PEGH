@@ -686,8 +686,8 @@ function inicializar() {
         tab.addEventListener('click', () => navigateTo(tab.dataset.tab));
     });
 
-    // Siempre iniciar en login — auth.js navega al home cuando resuelve la sesión
-    navigateTo('login');
+    // Removido navigateTo('login') forzado para evitar parpadeos (FOUC).
+    // auth.js se encarga de llamar a navigateTo('login') o navigateTo('home') según el estado de la sesión.
 
     document.querySelector(`[data-carrera="${carreraActual}"]`)?.classList.add('active');
     document.getElementById('nombre-carrera').textContent = getNombreCarrera(carreraActual);
