@@ -700,17 +700,40 @@
   <!-- MODAL DE PANEL DE ADMINISTRADOR -->
   <div id="admin-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
     <div class="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[90vh]">
-      <div class="flex justify-between items-center p-6 border-b border-white/10">
-        <h3 class="text-xl font-bold flex items-center gap-2 text-yellow-400">
-          <span data-lucide="shield" class="w-5 h-5 inline-block"></span> 
-          Panel de Administrador - Feedback
-        </h3>
-        <button onclick="document.getElementById('admin-modal').classList.add('hidden')" class="text-gray-400 hover:text-white">
+
+      <!-- Header -->
+      <div class="flex justify-between items-start p-6 border-b border-white/10">
+        <div>
+          <h3 class="text-xl font-bold flex items-center gap-2 text-yellow-400">
+            <span data-lucide="shield" class="w-5 h-5 inline-block"></span>
+            Panel de Administrador — Feedback
+          </h3>
+          <p class="text-xs text-gray-500 mt-1" id="admin-feedback-count">Cargando...</p>
+        </div>
+        <button onclick="document.getElementById('admin-modal').classList.add('hidden')" class="text-gray-400 hover:text-white mt-1">
           <span data-lucide="x" class="w-5 h-5 inline-block"></span>
         </button>
       </div>
-      <div id="admin-feedback-list" class="p-6 overflow-y-auto space-y-4 bg-black/30 flex-1">
-        <!-- El feedback se cargará aquí -->
+
+      <!-- Tabs -->
+      <div class="flex gap-2 p-3 bg-black/30 border-b border-white/10">
+        <button id="admin-tab-pending" onclick="switchAdminTab('pending')"
+          class="flex-1 py-2.5 text-sm font-bold text-white bg-yellow-500/20 rounded-xl border border-yellow-500/30 transition-all flex items-center justify-center gap-2">
+          <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+          Pendientes
+          <span id="admin-pending-count" class="bg-yellow-500 text-black text-xs font-black px-2 py-0.5 rounded-full">0</span>
+        </button>
+        <button id="admin-tab-reviewed" onclick="switchAdminTab('reviewed')"
+          class="flex-1 py-2.5 text-sm font-bold text-gray-500 hover:text-white rounded-xl transition-all flex items-center justify-center gap-2">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+          Revisados
+          <span id="admin-reviewed-count" class="bg-white/10 text-gray-400 text-xs font-black px-2 py-0.5 rounded-full">0</span>
+        </button>
+      </div>
+
+      <!-- Lista de feedback -->
+      <div id="admin-feedback-list" class="p-5 overflow-y-auto space-y-3 flex-1 bg-black/20">
+        <!-- Se renderiza dinámicamente -->
       </div>
     </div>
   </div>

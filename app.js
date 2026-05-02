@@ -939,52 +939,198 @@ async function openInboxPanel() {
     }
 }
 
-// PANEL DE ADMIN
+// ===================================
+// PANEL DE ADMIN — TABS Y ESTADO
+// ===================================
+let _adminFeedbackAll = [];
+let _adminCurrentTab = 'pending';
+
 async function openAdminPanel() {
     const session = window.supaAuth?.getCurrentSession();
     if (!session || session.user.email !== ADMIN_EMAIL || !window.supaAuth?.supabase) return;
-    
+
     document.getElementById('admin-modal').classList.remove('hidden');
     const listEl = document.getElementById('admin-feedback-list');
-    listEl.innerHTML = '<p class="text-center text-gray-400">Cargando...</p>';
-    
+    listEl.innerHTML = '<div class="flex items-center justify-center py-12"><p class="text-gray-400 text-sm animate-pulse">Cargando feedback...</p></div>';
+
     try {
-        // Consultar la tabla de feedback
-        const { data, error } = await window.supaAuth.supabase
+        const supabase = window.supaAuth.supabase;
+
+        // 1. Obtener todos los feedbacks
+        const { data: feedbacks, error: fbError } = await supabase
             .from('user_feedback')
             .select('id, user_id, message, status, created_at')
             .order('created_at', { ascending: false });
-            
-        if (error) throw error;
-        
-        if (data.length === 0) {
-            listEl.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No hay feedback registrado.</p>';
-            return;
+
+        if (fbError) throw fbError;
+
+        // 2. Obtener perfiles de los usuarios únicos para mostrar nombres reales
+        const userIds = [...new Set(feedbacks.filter(f => f.user_id).map(f => f.user_id))];
+        let profilesMap = {};
+
+        if (userIds.length > 0) {
+            const { data: profiles } = await supabase
+                .from('profiles')
+                .select('id, full_name, student_id')
+                .in('id', userIds);
+
+            if (profiles) {
+                profiles.forEach(p => { profilesMap[p.id] = p; });
+            }
         }
-        
-        listEl.innerHTML = data.map(f => `
-            <div class="bg-zinc-800 border border-white/10 p-4 rounded-xl flex justify-between items-start gap-4">
-                <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="text-xs font-bold text-gray-400">${new Date(f.created_at).toLocaleString()}</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full ${f.status === 'pending' ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-500'}">${f.status}</span>
-                        <span class="text-xs text-gray-500">ID Usuario: ${f.user_id ? f.user_id.substring(0,8) + '...' : 'Anónimo'}</span>
-                    </div>
-                    <p class="text-sm text-white">${f.message}</p>
-                </div>
-                ${f.user_id ? `
-                <button onclick="openReplyModal('${f.user_id}')" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-2 rounded-lg transition-all flex items-center gap-1">
-                    <i data-lucide="reply" class="w-3 h-3"></i> Responder
-                </button>
-                ` : ''}
-            </div>
-        `).join('');
-        
+
+        // 3. Combinar datos
+        _adminFeedbackAll = feedbacks.map(f => ({
+            ...f,
+            profile: f.user_id ? (profilesMap[f.user_id] || null) : null
+        }));
+
+        // 4. Actualizar contadores en los tabs
+        _actualizarContadoresAdmin();
+
+        // 5. Renderizar la tab activa
+        renderAdminFeedback(_adminCurrentTab);
         if (window.lucide) lucide.createIcons();
-        
+
     } catch (err) {
         console.error("Error fetching feedback para admin:", err);
-        listEl.innerHTML = '<p class="text-red-500 text-sm">Error cargando datos.</p>';
+        listEl.innerHTML = `<p class="text-red-500 text-sm text-center py-4">Error cargando datos: ${err.message}</p>`;
+    }
+}
+
+function _actualizarContadoresAdmin() {
+    const pendingCount = _adminFeedbackAll.filter(f => f.status === 'pending').length;
+    const reviewedCount = _adminFeedbackAll.filter(f => f.status !== 'pending').length;
+
+    document.getElementById('admin-pending-count').textContent = pendingCount;
+    document.getElementById('admin-reviewed-count').textContent = reviewedCount;
+    document.getElementById('admin-feedback-count').textContent =
+        `${_adminFeedbackAll.length} mensajes en total · ${pendingCount} sin revisar`;
+}
+
+function switchAdminTab(tab) {
+    _adminCurrentTab = tab;
+
+    const pendingBtn = document.getElementById('admin-tab-pending');
+    const reviewedBtn = document.getElementById('admin-tab-reviewed');
+
+    if (tab === 'pending') {
+        pendingBtn.className = 'flex-1 py-2.5 text-sm font-bold text-white bg-yellow-500/20 rounded-xl border border-yellow-500/30 transition-all flex items-center justify-center gap-2';
+        reviewedBtn.className = 'flex-1 py-2.5 text-sm font-bold text-gray-500 hover:text-white rounded-xl transition-all flex items-center justify-center gap-2';
+    } else {
+        reviewedBtn.className = 'flex-1 py-2.5 text-sm font-bold text-white bg-green-500/20 rounded-xl border border-green-500/30 transition-all flex items-center justify-center gap-2';
+        pendingBtn.className = 'flex-1 py-2.5 text-sm font-bold text-gray-500 hover:text-white rounded-xl transition-all flex items-center justify-center gap-2';
+    }
+
+    renderAdminFeedback(tab);
+}
+
+function renderAdminFeedback(tab) {
+    const listEl = document.getElementById('admin-feedback-list');
+
+    const filtered = _adminFeedbackAll.filter(f =>
+        tab === 'pending' ? f.status === 'pending' : f.status !== 'pending'
+    );
+
+    if (filtered.length === 0) {
+        listEl.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-16 text-center">
+                <div class="text-5xl mb-4">${tab === 'pending' ? '🎉' : '📭'}</div>
+                <p class="text-white font-bold mb-1">${tab === 'pending' ? '¡Sin feedback pendiente!' : 'Sin mensajes revisados'}</p>
+                <p class="text-gray-500 text-sm">${tab === 'pending' ? 'Todo al día, no hay nada nuevo por revisar.' : 'Cuando marques mensajes como vistos aparecerán aquí.'}</p>
+            </div>
+        `;
+        return;
+    }
+
+    listEl.innerHTML = filtered.map(f => {
+        const nombre = f.profile?.full_name || 'Usuario Anónimo';
+        const inicial = nombre.charAt(0).toUpperCase();
+        const carnet = f.profile?.student_id ? `· Carné: ${f.profile.student_id}` : '';
+        const fecha = new Date(f.created_at).toLocaleString('es-CR', {
+            day: '2-digit', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+        const isPending = f.status === 'pending';
+
+        return `
+            <div class="bg-black/40 border border-${isPending ? 'yellow-500/15' : 'white/5'} rounded-2xl p-5 transition-all" id="feedback-card-${f.id}">
+                <!-- Cabecera: avatar + info usuario -->
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-zinc-700 rounded-xl flex items-center justify-center font-black text-white text-sm flex-shrink-0 border border-white/10">
+                            ${inicial}
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white">${nombre}</div>
+                            <div class="text-xs text-gray-500">${fecha} ${carnet}</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] px-2.5 py-1 rounded-full font-bold flex-shrink-0 ${isPending ? 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25' : 'bg-green-500/15 text-green-400 border border-green-500/25'}">
+                        ${isPending ? '⏳ Pendiente' : '✅ Revisado'}
+                    </span>
+                </div>
+
+                <!-- Mensaje -->
+                <div class="bg-black/30 rounded-xl p-4 mb-4 border border-white/5">
+                    <p class="text-sm text-gray-200 leading-relaxed">${f.message}</p>
+                </div>
+
+                <!-- Acciones -->
+                <div class="flex gap-2 justify-end">
+                    ${f.user_id ? `
+                    <button onclick="openReplyModal('${f.user_id}')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 transition-all">
+                        <i data-lucide="reply" class="w-3 h-3"></i> Responder
+                    </button>
+                    ` : ''}
+                    ${isPending ? `
+                    <button onclick="markFeedbackAsReviewed('${f.id}')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-500/15 hover:bg-green-500/25 text-green-400 rounded-lg border border-green-500/25 transition-all">
+                        <i data-lucide="check" class="w-3 h-3"></i> Marcar como Visto
+                    </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    if (window.lucide) lucide.createIcons();
+}
+
+async function markFeedbackAsReviewed(feedbackId) {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session || session.user.email !== ADMIN_EMAIL || !window.supaAuth?.supabase) return;
+
+    // Feedback visual inmediato: deshabilitar el botón
+    const card = document.getElementById(`feedback-card-${feedbackId}`);
+    if (card) {
+        const btn = card.querySelector('button[onclick*="markFeedbackAsReviewed"]');
+        if (btn) { btn.disabled = true; btn.innerHTML = 'Guardando...'; }
+    }
+
+    try {
+        const { error } = await window.supaAuth.supabase
+            .from('user_feedback')
+            .update({ status: 'reviewed' })
+            .eq('id', feedbackId);
+
+        if (error) throw error;
+
+        // Actualizar el dato local sin recargar todo
+        const item = _adminFeedbackAll.find(f => f.id === feedbackId);
+        if (item) item.status = 'reviewed';
+
+        // Refrescar contadores y lista
+        _actualizarContadoresAdmin();
+        renderAdminFeedback(_adminCurrentTab);
+        if (window.lucide) lucide.createIcons();
+
+    } catch (err) {
+        console.error("Error marking as reviewed:", err);
+        alert("Error al actualizar: " + err.message);
+        // Restaurar el botón si falló
+        renderAdminFeedback(_adminCurrentTab);
     }
 }
 
