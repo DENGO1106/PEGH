@@ -83,8 +83,18 @@ function calcLoadAuto() {
 
     calcAutoCourses = [];
 
-    // Iterar sobre todas las carreras y buscar cursos en estado 2 (Cursando / Amarillo)
-    Object.keys(CARRERAS).forEach(carreraId => {
+    // Obtener carreras activas del perfil, si no hay usar todas
+    let activeCareers = [];
+    const profile = window.supaAuth?.getCurrentProfile();
+    if (profile && profile.selected_carreras && profile.selected_carreras.length > 0) {
+        activeCareers = profile.selected_carreras;
+    } else {
+        activeCareers = Object.keys(CARRERAS);
+    }
+
+    // Iterar sobre las carreras activas y buscar cursos en estado 2 (Cursando / Amarillo)
+    activeCareers.forEach(carreraId => {
+        if (!CARRERAS[carreraId]) return;
         CARRERAS[carreraId].cursos.forEach(curso => {
             if (curso.estado === 2) {
                 // Evitar duplicados si un curso (ej. Humanidades) está en múltiples carreras
