@@ -593,6 +593,182 @@ const CARRERAS = {
       { codigo: "EC2003",  nombre: "Derivados Financieros",                              creditos: 3, nivel: 8, requisitos: ["EC2301", "EC3300", "EC4200"],          estado: 0 },
       { codigo: "EC2011",  nombre: "Microeconomía Avanzada",                             creditos: 3, nivel: 8, requisitos: ["EC2201", "EC3300", "EC4200"],          estado: 0 }
     ]
+  },
+
+  medicina: {
+    nombre: "Medicina",
+    codigo: "ME",
+    descripcion: "Licenciatura en Medicina y Cirugía · Escuela de Medicina, UCR",
+    cursos: [
+      // ============ I CICLO ============
+      { codigo: "EG-I",    nombre: "Curso Integrado de Humanidades I",                   creditos: 6, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "QU0114",  nombre: "Química General Intensiva",                          creditos: 4, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "QU0115",  nombre: "Lab. Química General Intensiva",                     creditos: 1, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "EG-",     nombre: "Curso de Arte",                                      creditos: 2, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "EF-",     nombre: "Actividad Deportiva",                                creditos: 0, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "MA1210",  nombre: "Cálculo I",                                          creditos: 3, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "LM1030",  nombre: "Estrategias de Lectura en Inglés I",                 creditos: 4, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "HA1009",  nombre: "Historia de la Medicina",                            creditos: 2, nivel: 1, requisitos: [],                                      estado: 0 },
+
+      // ============ II CICLO ============
+      { codigo: "EG-II",   nombre: "Curso Integrado de Humanidades II",                  creditos: 6, nivel: 2, requisitos: ["EG-I"],                                estado: 0 },
+      { codigo: "FS0208",  nombre: "Física para Ciencias Médicas",                       creditos: 3, nivel: 2, requisitos: ["MA1210||MA1001"],                      estado: 0 },
+      { codigo: "FS0204",  nombre: "Lab. Física para Ciencias Médicas",                  creditos: 1, nivel: 2, requisitos: [],                                      estado: 0 },
+      { codigo: "QU0210",  nombre: "Fundamentos de Química Orgánica",                    creditos: 4, nivel: 2, requisitos: ["QU0114", "QU0115"],                    estado: 0 },
+      { codigo: "QU0211",  nombre: "Lab. Fundamentos de Química Orgánica",               creditos: 1, nivel: 2, requisitos: ["QU0114", "QU0115"],                    estado: 0 },
+      { codigo: "B0106",   nombre: "Biología General",                                   creditos: 3, nivel: 2, requisitos: [],                                      estado: 0 },
+      { codigo: "B0107",   nombre: "Lab. Biología General",                              creditos: 1, nivel: 2, requisitos: [],                                      estado: 0 },
+
+      // ============ III CICLO ============
+      { codigo: "ME0410",  nombre: "Fundamentos de Psiquiatría",                         creditos: 2, nivel: 3, requisitos: ["B0106", "B0107"],                      estado: 0 },
+      { codigo: "ME0411",  nombre: "Histología",                                         creditos: 5, nivel: 3, requisitos: ["QU0210", "QU0211"],                    estado: 0 },
+      { codigo: "ME0412",  nombre: "Anatomía Descriptiva",                               creditos: 5, nivel: 3, requisitos: ["B0106", "B0107", "FS0204", "FS0208", "LM1030"], estado: 0 },
+      { codigo: "ME0421",  nombre: "Embriología",                                        creditos: 2, nivel: 3, requisitos: ["B0106", "B0107"],                      estado: 0 },
+      { codigo: "ME0117",  nombre: "Bioquímica para Medicina",                           creditos: 6, nivel: 3, requisitos: ["LM1030", "QU0210"],                    estado: 0 },
+      { codigo: "ME0113",  nombre: "Lab. Bioquímica para Medicina",                      creditos: 2, nivel: 3, requisitos: ["LM1030", "QU0210", "QU0211"],          estado: 0 },
+      { codigo: "SR-I",    nombre: "Seminario de Realidad Nacional I",                   creditos: 2, nivel: 3, requisitos: ["EG-II"],                               estado: 0 },
+
+      // ============ IV CICLO ============
+      { codigo: "ME2012",  nombre: "Fisiología",                                         creditos: 10, nivel: 4, requisitos: ["ME0411", "ME0412", "ME0421", "ME0113", "ME0117"], estado: 0 },
+      { codigo: "ME0422",  nombre: "Neuroanatomía",                                      creditos: 3, nivel: 4, requisitos: ["ME0421", "ME0113", "ME0117"],          estado: 0 },
+      { codigo: "SR-II",   nombre: "Seminario de Realidad Nacional II",                  creditos: 2, nivel: 4, requisitos: ["SR-I"],                                estado: 0 },
+      { codigo: "RP-",     nombre: "Repertorio",                                         creditos: 3, nivel: 4, requisitos: [],                                      estado: 0 },
+      { codigo: "ME0414",  nombre: "Anatomía Topográfica Radiológica y Quirúrgica",      creditos: 5, nivel: 4, requisitos: ["ME0411", "ME0412", "ME0421", "ME0113", "ME0117"], estado: 0 },
+      { codigo: "OPT-MED1",nombre: "Optativo Bloque I",                                  creditos: 1, nivel: 4, requisitos: [],                                      estado: 0 },
+
+      // ============ V CICLO ============
+      { codigo: "F0008",   nombre: "Seminario Ética, Medicina y Sociedad",               creditos: 0, nivel: 5, requisitos: ["ME2012", "ME0414"],                    estado: 0 },
+      { codigo: "XS0215",  nombre: "Estadística para Biociencias",                       creditos: 4, nivel: 5, requisitos: ["MA1210||MA1001"],                      estado: 0 },
+      { codigo: "ME0109",  nombre: "Patología Humana I",                                 creditos: 5, nivel: 5, requisitos: ["ME2012", "ME0414", "ME0422"],          estado: 0 },
+      { codigo: "ME3103",  nombre: "Fisiopatología y Semiología",                        creditos: 10, nivel: 5, requisitos: ["ME2012", "ME0414", "ME0422"],         estado: 0 },
+      { codigo: "ME0104",  nombre: "Enfermedades Infecciosas I",                         creditos: 4, nivel: 5, requisitos: ["ME2012", "ME0414"],                    estado: 0 },
+
+      // ============ VI CICLO ============
+      { codigo: "ME0108",  nombre: "Patología Humana II",                                creditos: 5, nivel: 6, requisitos: ["ME0109", "ME3103", "ME0104"],          estado: 0 },
+      { codigo: "ME3005",  nombre: "Medicina Interna I",                                 creditos: 10, nivel: 6, requisitos: ["ME0109", "ME0104", "ME3103"],         estado: 0 },
+      { codigo: "ME0107",  nombre: "Enfermedades Infecciosas II",                        creditos: 4, nivel: 6, requisitos: ["ME0104", "ME0109", "ME3103"],          estado: 0 },
+      { codigo: "ME2200",  nombre: "Propedéutica Psiquiátrica",                          creditos: 2, nivel: 6, requisitos: ["ME0410", "ME2012", "ME0422"],          estado: 0 },
+
+      // ============ VII CICLO ============
+      { codigo: "ME0313",  nombre: "Medicina Integral y Comunitaria I",                  creditos: 2, nivel: 7, requisitos: ["ME3005", "ME0107"],                    estado: 0 },
+      { codigo: "ME0306",  nombre: "Farmacología Básica I",                              creditos: 3, nivel: 7, requisitos: ["ME0108", "ME3005", "ME0107"],          estado: 0 },
+      { codigo: "ME4012",  nombre: "Obstetricia",                                        creditos: 6, nivel: 7, requisitos: ["ME0108", "ME3005", "ME0107"],          estado: 0 },
+      { codigo: "ME4013",  nombre: "Ginecología",                                        creditos: 6, nivel: 7, requisitos: ["ME0108", "ME3005", "ME0107"],          estado: 0 },
+      { codigo: "ME4014",  nombre: "Medicina Legal",                                     creditos: 4, nivel: 7, requisitos: ["ME0108", "ME3005", "ME0107"],          estado: 0 },
+
+      // ============ VIII CICLO ============
+      { codigo: "ME1007",  nombre: "Introducción a la Investigación en Medicina",        creditos: 2, nivel: 8, requisitos: ["XS0215"],                              estado: 0 },
+      { codigo: "ME0310",  nombre: "Farmacología Básica II",                             creditos: 3, nivel: 8, requisitos: ["ME0306"],                              estado: 0 },
+      { codigo: "ME4015",  nombre: "Pediatría",                                          creditos: 10, nivel: 8, requisitos: ["ME0108", "ME3005", "ME0107"],         estado: 0 },
+      { codigo: "ME4016",  nombre: "Psiquiatría",                                        creditos: 4, nivel: 8, requisitos: ["ME2200", "ME3005", "ME0107", "ME0108"],estado: 0 },
+      { codigo: "ME1009",  nombre: "Genética Médica",                                    creditos: 2, nivel: 8, requisitos: ["ME3005", "ME0108", "ME0107"],          estado: 0 },
+
+      // ============ IX CICLO ============
+      { codigo: "ME0314",  nombre: "Medicina Integral y Comunitaria II",                 creditos: 2, nivel: 9, requisitos: ["ME0313", "ME0310", "ME1007"],          estado: 0 },
+      { codigo: "ME0315",  nombre: "Geriatría y Gerontología I",                         creditos: 2, nivel: 9, requisitos: ["ME0310", "ME4013"],                    estado: 0 },
+      { codigo: "ME5000",  nombre: "Medicina Interna II",                                creditos: 10, nivel: 9, requisitos: ["ME0310", "ME4012", "ME4013", "ME4015"], estado: 0 },
+      { codigo: "ME0308",  nombre: "Farmacología Clínica I",                             creditos: 2, nivel: 9, requisitos: ["ME0310", "ME4012", "ME4013", "ME4015"], estado: 0 },
+      { codigo: "ME0420",  nombre: "Toxicología Clínica",                                creditos: 2, nivel: 9, requisitos: ["ME0310", "ME4012", "ME4013", "ME4015"], estado: 0 },
+
+      // ============ X CICLO ============
+      { codigo: "ME0316",  nombre: "Geriatría y Gerontología II",                        creditos: 2, nivel: 10, requisitos: ["ME0315", "ME5000"],                   estado: 0 },
+      { codigo: "ME5001",  nombre: "Cirugía",                                            creditos: 10, nivel: 10, requisitos: ["ME5000"],                            estado: 0 },
+      { codigo: "ME0311",  nombre: "Radiología",                                         creditos: 2, nivel: 10, requisitos: ["ME4012", "ME4013", "ME4015"],         estado: 0 },
+      { codigo: "ME0309",  nombre: "Farmacología Clínica II",                            creditos: 2, nivel: 10, requisitos: ["ME0308"],                             estado: 0 },
+      { codigo: "OPT-MED2",nombre: "Optativo Bloque II",                                 creditos: 1, nivel: 10, requisitos: [],                                     estado: 0 },
+
+      // ============ XI y XII CICLOS (Internado) ============
+      { codigo: "ME6001",  nombre: "Internado de Cirugía",                               creditos: 10, nivel: 11, requisitos: ["ME5001"],                            estado: 0 },
+      { codigo: "ME6002",  nombre: "Internado de Pediatría",                             creditos: 10, nivel: 11, requisitos: ["ME5001"],                            estado: 0 },
+      { codigo: "ME6003",  nombre: "Internado Gineco-Obstetricia",                       creditos: 10, nivel: 11, requisitos: ["ME5001"],                            estado: 0 },
+      { codigo: "ME6004",  nombre: "Internado de Medicina Interna",                      creditos: 10, nivel: 12, requisitos: ["ME5001"],                            estado: 0 },
+      { codigo: "ME6005",  nombre: "Salud Comunitaria y Familiar",                       creditos: 8, nivel: 12, requisitos: ["ME5001"],                             estado: 0 }
+    ]
+  },
+
+  microbiologia: {
+    nombre: "Microbiología",
+    codigo: "MQ",
+    descripcion: "Licenciatura en Microbiología y Química Clínica · Facultad de Microbiología, UCR",
+    cursos: [
+      // ============ I CICLO ============
+      { codigo: "B0103",   nombre: "Biología General",                                   creditos: 3, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "B0104",   nombre: "Laboratorio de Biología General",                    creditos: 1, nivel: 1, requisitos: ["B0103"],                               estado: 0 },
+      { codigo: "MA1001",  nombre: "Cálculo I",                                          creditos: 4, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "QU0100",  nombre: "Química General I",                                  creditos: 3, nivel: 1, requisitos: [],                                      estado: 0 },
+      { codigo: "QU0101",  nombre: "Laboratorio de Química General I",                   creditos: 1, nivel: 1, requisitos: ["QU0100"],                              estado: 0 },
+      { codigo: "EG-I",    nombre: "Curso Integrado de Humanidades I",                   creditos: 6, nivel: 1, requisitos: [],                                      estado: 0 },
+
+      // ============ II CICLO ============
+      { codigo: "B0105",   nombre: "Laboratorio de Biología Sistemática",                creditos: 1, nivel: 2, requisitos: ["B0103", "B0104"],                      estado: 0 },
+      { codigo: "FS0210",  nombre: "Física para Ciencias de la Vida I",                  creditos: 3, nivel: 2, requisitos: ["MA1001"],                              estado: 0 },
+      { codigo: "FS0211",  nombre: "Lab. Física para Ciencias de la Vida I",             creditos: 1, nivel: 2, requisitos: ["MA1001", "FS0210"],                    estado: 0 },
+      { codigo: "QU0102",  nombre: "Química General II",                                 creditos: 3, nivel: 2, requisitos: ["QU0100"],                              estado: 0 },
+      { codigo: "QU0103",  nombre: "Laboratorio de Química General II",                  creditos: 1, nivel: 2, requisitos: ["QU0101", "QU0102"],                    estado: 0 },
+      { codigo: "EG-II",   nombre: "Curso Integrado de Humanidades II",                  creditos: 6, nivel: 2, requisitos: ["EG-I"],                                estado: 0 },
+
+      // ============ III CICLO ============
+      { codigo: "FS0310",  nombre: "Física para Ciencias de la Vida II",                 creditos: 3, nivel: 3, requisitos: ["FS0210"],                              estado: 0 },
+      { codigo: "FS0311",  nombre: "Lab. Física para Ciencias de la Vida II",            creditos: 1, nivel: 3, requisitos: ["FS0211", "FS0310"],                    estado: 0 },
+      { codigo: "QU0200",  nombre: "Química Orgánica I",                                 creditos: 3, nivel: 3, requisitos: ["QU0102"],                              estado: 0 },
+      { codigo: "QU0201",  nombre: "Laboratorio de Química Orgánica I",                  creditos: 1, nivel: 3, requisitos: ["QU0103", "QU0200"],                    estado: 0 },
+      { codigo: "QU0250",  nombre: "Química Analítica Cuantitativa",                     creditos: 3, nivel: 3, requisitos: ["QU0102"],                              estado: 0 },
+      { codigo: "QU0251",  nombre: "Lab. Química Analítica Cuantitativa",                creditos: 1, nivel: 3, requisitos: ["QU0103", "QU0250"],                    estado: 0 },
+      { codigo: "SR-I",    nombre: "Seminario de Realidad Nacional I",                   creditos: 2, nivel: 3, requisitos: ["EG-II"],                               estado: 0 },
+
+      // ============ IV CICLO ============
+      { codigo: "MQ0201",  nombre: "Anatomía y Fisiología Humanas I",                    creditos: 4, nivel: 4, requisitos: ["B0105", "QU0200"],                     estado: 0 },
+      { codigo: "QU0202",  nombre: "Química Orgánica II",                                creditos: 3, nivel: 4, requisitos: ["QU0200"],                              estado: 0 },
+      { codigo: "QU0203",  nombre: "Laboratorio de Química Orgánica II",                 creditos: 1, nivel: 4, requisitos: ["QU0201", "QU0202"],                    estado: 0 },
+      { codigo: "QU0252",  nombre: "Análisis Instrumental",                              creditos: 3, nivel: 4, requisitos: ["QU0250"],                              estado: 0 },
+      { codigo: "QU0253",  nombre: "Laboratorio de Análisis Instrumental",               creditos: 1, nivel: 4, requisitos: ["QU0251", "QU0252"],                    estado: 0 },
+      { codigo: "SR-II",   nombre: "Seminario de Realidad Nacional II",                  creditos: 2, nivel: 4, requisitos: ["SR-I"],                                estado: 0 },
+      { codigo: "RP-",     nombre: "Repertorio",                                         creditos: 3, nivel: 4, requisitos: [],                                      estado: 0 },
+
+      // ============ V CICLO ============
+      { codigo: "BC0210",  nombre: "Bioquímica para Microbiología",                      creditos: 4, nivel: 5, requisitos: ["QU0202"],                              estado: 0 },
+      { codigo: "MQ0301",  nombre: "Anatomía y Fisiología Humanas II",                   creditos: 4, nivel: 5, requisitos: ["MQ0201"],                              estado: 0 },
+      { codigo: "MQ0314",  nombre: "Parasitología General",                              creditos: 4, nivel: 5, requisitos: ["B0105"],                               estado: 0 },
+      { codigo: "MQ0318",  nombre: "Micología",                                          creditos: 3, nivel: 5, requisitos: ["B0105"],                               estado: 0 },
+      { codigo: "MQ0319",  nombre: "Histología Humana",                                  creditos: 3, nivel: 5, requisitos: ["MQ0201"],                              estado: 0 },
+
+      // ============ VI CICLO ============
+      { codigo: "MQ0414",  nombre: "Microbiología General",                              creditos: 5, nivel: 6, requisitos: ["BC0210", "MQ0314", "MQ0318"],          estado: 0 },
+      { codigo: "MQ0415",  nombre: "Inmunología General",                                creditos: 4, nivel: 6, requisitos: ["BC0210", "MQ0319"],                    estado: 0 },
+      { codigo: "MQ0416",  nombre: "Virología General",                                  creditos: 3, nivel: 6, requisitos: ["BC0210", "MQ0319"],                    estado: 0 },
+      { codigo: "MQ0417",  nombre: "Genética Bacteriana",                                creditos: 3, nivel: 6, requisitos: ["BC0210"],                              estado: 0 },
+      { codigo: "EF-",     nombre: "Actividad Deportiva",                                creditos: 0, nivel: 6, requisitos: [],                                      estado: 0 },
+
+      // ============ VII CICLO ============
+      { codigo: "MQ0511",  nombre: "Hematología I",                                      creditos: 4, nivel: 7, requisitos: ["MQ0415", "MQ0414"],                    estado: 0 },
+      { codigo: "MQ0513",  nombre: "Bacteriología Médica I",                             creditos: 4, nivel: 7, requisitos: ["MQ0414", "MQ0415"],                    estado: 0 },
+      { codigo: "MQ0515",  nombre: "Inmunología Clínica",                                creditos: 4, nivel: 7, requisitos: ["MQ0415"],                              estado: 0 },
+      { codigo: "MQ0517",  nombre: "Protozoología Médica",                               creditos: 4, nivel: 7, requisitos: ["MQ0414", "MQ0415"],                    estado: 0 },
+
+      // ============ VIII CICLO ============
+      { codigo: "MQ0512",  nombre: "Hematología II",                                     creditos: 4, nivel: 8, requisitos: ["MQ0511"],                              estado: 0 },
+      { codigo: "MQ0514",  nombre: "Bacteriología Médica II",                            creditos: 4, nivel: 8, requisitos: ["MQ0513"],                              estado: 0 },
+      { codigo: "MQ0516",  nombre: "Química Clínica I",                                  creditos: 4, nivel: 8, requisitos: ["MQ0414", "MQ0415"],                    estado: 0 },
+      { codigo: "MQ0518",  nombre: "Helmintología Médica",                               creditos: 4, nivel: 8, requisitos: ["MQ0517"],                              estado: 0 },
+
+      // ============ IX CICLO ============
+      { codigo: "MQ0611",  nombre: "Banco de Sangre",                                    creditos: 3, nivel: 9, requisitos: ["MQ0512", "MQ0515"],                    estado: 0 },
+      { codigo: "MQ0613",  nombre: "Química Clínica II",                                 creditos: 4, nivel: 9, requisitos: ["MQ0516"],                              estado: 0 },
+      { codigo: "MQ0614",  nombre: "Endocrinología Clínica",                             creditos: 3, nivel: 9, requisitos: ["MQ0516"],                              estado: 0 },
+      { codigo: "MQ0615",  nombre: "Situación de Salud Nacional",                        creditos: 3, nivel: 9, requisitos: ["MQ0513", "MQ0517"],                    estado: 0 },
+      { codigo: "MQ0616",  nombre: "Virología Clínica",                                  creditos: 3, nivel: 9, requisitos: ["MQ0416", "MQ0513", "MQ0515"],          estado: 0 },
+      { codigo: "MQ0617",  nombre: "Gestión de la Calidad",                              creditos: 3, nivel: 9, requisitos: ["MQ0513", "MQ0516", "MQ0517"],          estado: 0 },
+
+      // ============ X CICLO ============
+      { codigo: "MQ0612",  nombre: "Administración de Laboratorios",                     creditos: 3, nivel: 10, requisitos: ["MQ0617"],                             estado: 0 },
+      { codigo: "MQ0618",  nombre: "Métodos de Investigación",                           creditos: 3, nivel: 10, requisitos: ["MQ0615"],                             estado: 0 },
+      { codigo: "MQ0619",  nombre: "Toxicología y Análisis de Drogas",                   creditos: 3, nivel: 10, requisitos: ["MQ0613"],                             estado: 0 },
+      { codigo: "MQ0620",  nombre: "Microbiología de Alimentos y Aguas",                 creditos: 4, nivel: 10, requisitos: ["MQ0514", "MQ0613"],                   estado: 0 },
+      { codigo: "MQ0621",  nombre: "Ética y Deontología",                                creditos: 2, nivel: 10, requisitos: [],                                     estado: 0 },
+
+      // ============ XI CICLO ============
+      { codigo: "MQ0701",  nombre: "Internado Clínico",                                  creditos: 15, nivel: 11, requisitos: ["MQ0612", "MQ0618", "MQ0619", "MQ0620", "MQ0621", "MQ0611", "MQ0614", "MQ0616"], estado: 0 }
+    ]
   }
 };
 
@@ -812,260 +988,69 @@ function siguienteEstado(estadoActual) {
  * Al cambiar el estado de cualquiera de ellos, se sincroniza en todos los demás.
  */
 const CURSOS_COMPARTIDOS = {
-  'SR-I': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'SR-I' },
-    { carreraId: 'contaduriaPublica', codigo: 'SR-I' },
-    { carreraId: 'direccionEmpresas', codigo: 'SR-I' },
-    { carreraId: 'cienciasActuariales', codigo: 'SR-I' },
-    { carreraId: 'farmacia', codigo: 'SR-I' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'SR-I' }
-  ],
-  'MA1002': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'MA1002' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'MA1002' }
-  ],
-  'MA1005': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'MA1005' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'MA1005' },
-    { carreraId: 'economia', codigo: 'MA1005' }
-  ],
-  'MA1001': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'MA1001' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'MA1001' },
-    { carreraId: 'economia', codigo: 'MA1001' }
-  ],
-  'MA0001': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'MA0001' },
-    { carreraId: 'contaduriaPublica', codigo: 'MA0001' },
-    { carreraId: 'direccionEmpresas', codigo: 'MA0001' },
-    { carreraId: 'cienciasActuariales', codigo: 'MA0001' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'MA0001' }
-  ],
-  'SR-II': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'SR-II' },
-    { carreraId: 'contaduriaPublica', codigo: 'SR-II' },
-    { carreraId: 'direccionEmpresas', codigo: 'SR-II' },
-    { carreraId: 'cienciasActuariales', codigo: 'SR-II' },
-    { carreraId: 'farmacia', codigo: 'SR-II' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'SR-II' }
-  ],
-  'FS0310': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'FS0310' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'FS0310' }
-  ],
-  'FS0311': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'FS0311' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'FS0311' }
-  ],
-  'FS0210': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'FS0210' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'FS0210' }
-  ],
-  'EG-': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'EG-' },
-    { carreraId: 'contaduriaPublica', codigo: 'EG-' },
-    { carreraId: 'direccionEmpresas', codigo: 'EG-' },
-    { carreraId: 'cienciasActuariales', codigo: 'EG-' },
-    { carreraId: 'farmacia', codigo: 'EG-' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'EG-' }
-  ],
-  'RP-': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'RP-' },
-    { carreraId: 'contaduriaPublica', codigo: 'RP-' },
-    { carreraId: 'direccionEmpresas', codigo: 'RP-' }
-  ],
-  'MA1003': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'MA1003' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'MA1003' }
-  ],
-  'FS0211': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'FS0211' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'FS0211' }
-  ],
-  'EG-I': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'EG-I' },
-    { carreraId: 'contaduriaPublica', codigo: 'EG-I' },
-    { carreraId: 'direccionEmpresas', codigo: 'EG-I' },
-    { carreraId: 'cienciasActuariales', codigo: 'EG-I' },
-    { carreraId: 'farmacia', codigo: 'EG-I' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'EG-I' },
-    { carreraId: 'economia', codigo: 'EG-I' }
-  ],
-  'MA1004': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'MA1004' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'MA1004' },
-    { carreraId: 'economia', codigo: 'MA1004' }
-  ],
-  'EF-': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'EF-' },
-    { carreraId: 'contaduriaPublica', codigo: 'EF-' },
-    { carreraId: 'direccionEmpresas', codigo: 'EF-' },
-    { carreraId: 'cienciasActuariales', codigo: 'EF-' },
-    { carreraId: 'farmacia', codigo: 'EF-' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'EF-' }
-  ],
-  'EG-II': [
-    { carreraId: 'ingenieriaIndustrial', codigo: 'EG-II' },
-    { carreraId: 'contaduriaPublica', codigo: 'EG-II' },
-    { carreraId: 'direccionEmpresas', codigo: 'EG-II' },
-    { carreraId: 'cienciasActuariales', codigo: 'EG-II' },
-    { carreraId: 'farmacia', codigo: 'EG-II' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'EG-II' },
-    { carreraId: 'economia', codigo: 'EG-II' }
-  ],
-  'XS-0277': [
-    { carreraId: 'contaduriaPublica', codigo: 'XS-0277' },
-    { carreraId: 'direccionEmpresas', codigo: 'XS-0277' }
-  ],
-  'PC-0462': [
-    { carreraId: 'contaduriaPublica', codigo: 'PC-0462' },
-    { carreraId: 'direccionEmpresas', codigo: 'PC-0462' }
-  ],
-  'DN-0110': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0110' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0110' }
-  ],
-  'DN-0102': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0102' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0102' }
-  ],
-  'MA-1021': [
-    { carreraId: 'contaduriaPublica', codigo: 'MA-1021' },
-    { carreraId: 'direccionEmpresas', codigo: 'MA-1021' }
-  ],
-  'DN-0101': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0101' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0101' }
-  ],
-  'PC-0344': [
-    { carreraId: 'contaduriaPublica', codigo: 'PC-0344' },
-    { carreraId: 'direccionEmpresas', codigo: 'PC-0344' }
-  ],
-  'DN-0123': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0123' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0123' }
-  ],
-  'DN-0341': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0341' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0341' }
-  ],
-  'DN-0320': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0320' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0320' }
-  ],
-  'DN-0115': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0115' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0115' }
-  ],
-  'PC-0261': [
-    { carreraId: 'contaduriaPublica', codigo: 'PC-0261' },
-    { carreraId: 'direccionEmpresas', codigo: 'PC-0261' }
-  ],
-  'DN-0103': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0103' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0103' }
-  ],
-  'OPT-ING': [
-    { carreraId: 'contaduriaPublica', codigo: 'OPT-ING' },
-    { carreraId: 'direccionEmpresas', codigo: 'OPT-ING' }
-  ],
-  'PC-0304': [
-    { carreraId: 'contaduriaPublica', codigo: 'PC-0304' },
-    { carreraId: 'direccionEmpresas', codigo: 'PC-0304' }
-  ],
-  'PC-0202': [
-    { carreraId: 'contaduriaPublica', codigo: 'PC-0202' },
-    { carreraId: 'direccionEmpresas', codigo: 'PC-0202' }
-  ],
-  'PC-0260': [
-    { carreraId: 'contaduriaPublica', codigo: 'PC-0260' },
-    { carreraId: 'direccionEmpresas', codigo: 'PC-0260' }
-  ],
-  'DN-0105': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0105' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0105' }
-  ],
-  'DN-0104': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0104' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0104' }
-  ],
-  'DN-0114': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0114' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0114' }
-  ],
-  'PC-0240': [
-    { carreraId: 'contaduriaPublica', codigo: 'PC-0240' },
-    { carreraId: 'direccionEmpresas', codigo: 'PC-0240' }
-  ],
-  'XS-0276': [
-    { carreraId: 'contaduriaPublica', codigo: 'XS-0276' },
-    { carreraId: 'direccionEmpresas', codigo: 'XS-0276' }
-  ],
-  'DN-0340': [
-    { carreraId: 'contaduriaPublica', codigo: 'DN-0340' },
-    { carreraId: 'direccionEmpresas', codigo: 'DN-0340' }
-  ],
-  'MA-1022': [
-    { carreraId: 'contaduriaPublica', codigo: 'MA-1022' },
-    { carreraId: 'direccionEmpresas', codigo: 'MA-1022' }
-  ],
-  'PC-0200': [
-    { carreraId: 'contaduriaPublica', codigo: 'PC-0200' },
-    { carreraId: 'direccionEmpresas', codigo: 'PC-0200' }
-  ],
-  'EC1100': [
-    { carreraId: 'cienciasActuariales', codigo: 'EC1100' },
-    { carreraId: 'economia', codigo: 'EC1100' }
-  ],
-  'LM1030': [
-    { carreraId: 'cienciasActuariales', codigo: 'LM1030' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'LM1030' }
-  ],
-  'RP-1': [
-    { carreraId: 'cienciasActuariales', codigo: 'RP-1' },
-    { carreraId: 'farmacia', codigo: 'RP-1' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'RP-1' }
-  ],
-  'EC2100': [
-    { carreraId: 'cienciasActuariales', codigo: 'EC2100' },
-    { carreraId: 'economia', codigo: 'EC2100' }
-  ],
-  'EC3200': [
-    { carreraId: 'cienciasActuariales', codigo: 'EC3200' },
-    { carreraId: 'economia', codigo: 'EC3200' }
-  ],
-  'QU0101': [
-    { carreraId: 'farmacia', codigo: 'QU0101' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'QU0101' }
-  ],
-  'QU0102': [
-    { carreraId: 'farmacia', codigo: 'QU0102' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'QU0102' }
-  ],
-  'QU0212': [
-    { carreraId: 'farmacia', codigo: 'QU0212' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'QU0212' }
-  ],
-  'QU0100': [
-    { carreraId: 'farmacia', codigo: 'QU0100' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'QU0100' }
-  ],
-  'QU0103': [
-    { carreraId: 'farmacia', codigo: 'QU0103' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'QU0103' }
-  ],
-  'QU0213': [
-    { carreraId: 'farmacia', codigo: 'QU0213' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'QU0213' }
-  ],
-  'QU0214': [
-    { carreraId: 'farmacia', codigo: 'QU0214' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'QU0214' }
-  ],
-  'QU0215': [
-    { carreraId: 'farmacia', codigo: 'QU0215' },
-    { carreraId: 'ingenieriaQuimica', codigo: 'QU0215' }
-  ],
+  "EG-I": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "economia", "medicina", "microbiologia"],
+  "EG-": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "medicina"],
+  "EF-": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "medicina", "microbiologia"],
+  "MA0001": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "ingenieriaQuimica"],
+  "MA1004": ["ingenieriaIndustrial", "ingenieriaQuimica", "economia"],
+  "QU0114": ["ingenieriaIndustrial", "medicina"],
+  "QU0115": ["ingenieriaIndustrial", "medicina"],
+  "EG-II": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "economia", "medicina", "microbiologia"],
+  "MA1001": ["ingenieriaIndustrial", "ingenieriaQuimica", "economia", "microbiologia"],
+  "FS0210": ["ingenieriaIndustrial", "ingenieriaQuimica", "microbiologia"],
+  "FS0211": ["ingenieriaIndustrial", "ingenieriaQuimica", "microbiologia"],
+  "MA1002": ["ingenieriaIndustrial", "ingenieriaQuimica"],
+  "SR-I": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "medicina", "microbiologia"],
+  "FS0310": ["ingenieriaIndustrial", "ingenieriaQuimica", "microbiologia"],
+  "FS0311": ["ingenieriaIndustrial", "ingenieriaQuimica", "microbiologia"],
+  "MA1003": ["ingenieriaIndustrial", "ingenieriaQuimica"],
+  "MA1005": ["ingenieriaIndustrial", "ingenieriaQuimica", "economia"],
+  "SR-II": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "medicina", "microbiologia"],
+  "RP-": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "medicina", "microbiologia"],
+  "DN-0101": ["contaduriaPublica", "direccionEmpresas"],
+  "DN-0102": ["contaduriaPublica", "direccionEmpresas"],
+  "DN-0104": ["contaduriaPublica", "direccionEmpresas"],
+  "DN-0103": ["contaduriaPublica", "direccionEmpresas"],
+  "MA-1021": ["contaduriaPublica", "direccionEmpresas"],
+  "PC-0200": ["contaduriaPublica", "direccionEmpresas"],
+  "PC-0240": ["contaduriaPublica", "direccionEmpresas"],
+  "PC-0261": ["contaduriaPublica", "direccionEmpresas"],
+  "XS-0276": ["contaduriaPublica", "direccionEmpresas"],
+  "MA-1022": ["contaduriaPublica", "direccionEmpresas"],
+  "OPT-ING": ["contaduriaPublica", "direccionEmpresas"],
+  "PC-0260": ["contaduriaPublica", "direccionEmpresas"],
+  "PC-0202": ["contaduriaPublica", "direccionEmpresas"],
+  "DN-0123": ["contaduriaPublica", "direccionEmpresas"],
+  "XS-0277": ["contaduriaPublica", "direccionEmpresas"],
+  "DN-0340": ["contaduriaPublica", "direccionEmpresas"],
+  "PC-0304": ["contaduriaPublica", "direccionEmpresas"],
+  "DN-0341": ["contaduriaPublica", "direccionEmpresas"],
+  "DN-0105": ["contaduriaPublica", "direccionEmpresas"],
+  "DN-0320": ["contaduriaPublica", "direccionEmpresas"],
+  "PC-0462": ["contaduriaPublica", "direccionEmpresas"],
+  "PC-0344": ["contaduriaPublica", "direccionEmpresas"],
+  "DN-0110": ["contaduriaPublica", "direccionEmpresas"],
+  "DN-0114": ["contaduriaPublica", "direccionEmpresas"],
+  "DN-0115": ["contaduriaPublica", "direccionEmpresas"],
+  "EC1100": ["cienciasActuariales", "economia"],
+  "RP-1": ["cienciasActuariales", "farmacia", "ingenieriaQuimica"],
+  "LM1030": ["cienciasActuariales", "ingenieriaQuimica", "medicina"],
+  "EC2100": ["cienciasActuariales", "economia"],
+  "EC3200": ["cienciasActuariales", "economia"],
+  "MA1210": ["farmacia", "medicina"],
+  "QU0100": ["farmacia", "ingenieriaQuimica", "microbiologia"],
+  "QU0101": ["farmacia", "ingenieriaQuimica", "microbiologia"],
+  "B0106": ["farmacia", "medicina"],
+  "B0107": ["farmacia", "medicina"],
+  "QU0102": ["farmacia", "ingenieriaQuimica", "microbiologia"],
+  "QU0103": ["farmacia", "ingenieriaQuimica", "microbiologia"],
+  "QU0212": ["farmacia", "ingenieriaQuimica"],
+  "QU0213": ["farmacia", "ingenieriaQuimica"],
+  "XS0215": ["farmacia", "medicina"],
+  "QU0214": ["farmacia", "ingenieriaQuimica"],
+  "QU0215": ["farmacia", "ingenieriaQuimica"],
+  "QU0200": ["ingenieriaQuimica", "microbiologia"],
+  "QU0201": ["ingenieriaQuimica", "microbiologia"],
 };
 
 /**

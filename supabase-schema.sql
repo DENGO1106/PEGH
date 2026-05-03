@@ -354,7 +354,7 @@ USING (auth.uid() = user_id);
 -- 6. VISTAS ÚTILES (Views)
 -- ============================================================
 -- Vista para que el administrador pueda leer el feedback junto con el nombre y correo del usuario
-CREATE OR REPLACE VIEW public.vista_feedback_usuarios AS
+CREATE OR REPLACE VIEW public.vista_feedback_usuarios WITH (security_invoker = true) AS
 SELECT 
   f.id AS feedback_id,
   p.full_name AS nombre_usuario,

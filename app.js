@@ -17,12 +17,17 @@ const APP_ESTADOS = {
 };
 
 // Función de navegación global simplificada
-window.navigateTo = (target) => {
+window.navigateTo = (target, pushToHistory = true) => {
     // 🔒 Control de Acceso: Redirigir a login si no hay sesión
     const isAuthenticated = window.supaAuth && window.supaAuth.getCurrentSession();
     if (!isAuthenticated && target !== 'login') {
         console.warn("Acceso denegado: redirigiendo a login.");
         target = 'login';
+    }
+
+    // Historial de navegación para botón "Atrás" en móviles
+    if (pushToHistory && target !== 'login') {
+        history.pushState({ page: target }, '', '#' + target);
     }
 
     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
@@ -1145,3 +1150,18 @@ if (document.readyState === 'loading') {
 } else {
     inicializar();
 }
+
+// Manejar el botón "Atrás" del navegador/móvil
+window.addEventListener('popstate', (e) => {
+    if (e.state && e.state.page) {
+        window.navigateTo(e.state.page, false);
+    } else {
+        // Si no hay estado, asume que es home o sale
+        const isAuthenticated = window.supaAuth && window.supaAuth.getCurrentSession();
+        if (isAuthenticated) {
+            window.navigateTo('home', false);
+        } else {
+            window.navigateTo('login', false);
+        }
+    }
+});

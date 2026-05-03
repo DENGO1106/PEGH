@@ -96,11 +96,16 @@ function _actualizarNombreHome() {
     // Header en Mi Plan
     const planNameEl = document.getElementById('plan-user-name');
     const planCarnetEl = document.getElementById('plan-user-carnet');
+    const scheduleNameEl = document.getElementById('schedule-user-name');
+    
     if (planNameEl && currentProfile) {
         planNameEl.textContent = currentProfile.full_name || 'Estudiante';
     }
     if (planCarnetEl && currentProfile) {
         planCarnetEl.textContent = currentProfile.student_id ? `${currentProfile.student_id}` : '';
+    }
+    if (scheduleNameEl && currentProfile) {
+        scheduleNameEl.textContent = currentProfile.full_name || 'Estudiante Universitario';
     }
     
     // Mostrar botón admin si corresponde
