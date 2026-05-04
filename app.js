@@ -16,6 +16,9 @@ const APP_ESTADOS = {
     7: { etiqueta: 'Meta Largo Plazo', clase: 'estado-7' }
 };
 
+// Clave de localStorage para recordar la última página visitada
+const UCR_LAST_PAGE_KEY = 'ucr_last_page';
+
 // Función de navegación global simplificada
 window.navigateTo = (target, pushToHistory = true) => {
     // 🔒 Control de Acceso: Redirigir a login si no hay sesión
@@ -23,6 +26,11 @@ window.navigateTo = (target, pushToHistory = true) => {
     if (!isAuthenticated && target !== 'login') {
         console.warn("Acceso denegado: redirigiendo a login.");
         target = 'login';
+    }
+
+    // Guardar la página actual en localStorage (excepto login)
+    if (target !== 'login') {
+        localStorage.setItem(UCR_LAST_PAGE_KEY, target);
     }
 
     // Historial de navegación para botón "Atrás" en móviles
@@ -232,10 +240,8 @@ function resetearDatos() {
         });
 
         guardarEstado();
-        renderizarPlan();
-
-        // Opcional: Notificación visual suave en lugar de recarga total
-        console.log(`Plan de ${nombreCarrera} reseteado.`);
+        // Recargar la página para que la UI quede completamente limpia
+        location.reload();
     }
 }
 

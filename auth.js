@@ -267,7 +267,12 @@ async function fetchUserProfile(userId) {
             if (typeof window.navigateTo === 'function') {
                 const isLoginVisible = !document.getElementById('login-section')?.classList.contains('hidden');
                 if (isLoginVisible) {
-                    window.navigateTo(window.location.hash ? window.location.hash.substring(1) : 'home');
+                    // Recuperar la última página visitada; si no hay, ir a home
+                    const UCR_LAST_PAGE_KEY = 'ucr_last_page';
+                    const paginasValidas = ['home', 'plan', 'horario', 'calculator'];
+                    const ultimaPagina = localStorage.getItem(UCR_LAST_PAGE_KEY);
+                    const destino = (ultimaPagina && paginasValidas.includes(ultimaPagina)) ? ultimaPagina : 'home';
+                    window.navigateTo(destino);
                 }
             }
             if (typeof cargarEstado === 'function') cargarEstado();
