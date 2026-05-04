@@ -64,6 +64,8 @@ window.navigateTo = (target, pushToHistory = true) => {
         document.querySelector('.controls-container').classList.add('hidden');
         if (appNav) appNav.classList.remove('hidden');
         if (typeof initScheduler === 'function') initScheduler();
+        // Generar horario automáticamente al entrar a la sección
+        if (typeof generateSchedule === 'function') setTimeout(generateSchedule, 50);
     } else if (target === 'calculator') {
         const calcSection = document.getElementById('calculator-section');
         if (calcSection) calcSection.classList.remove('hidden');
@@ -220,6 +222,9 @@ async function cargarEstado() {
         } catch(err) {
             console.error('Error al sincronizar con Supabase:', err);
         }
+    } else {
+        // Si no hay sesión (se cargó de localStorage), forzamos renderización
+        if (typeof renderizarCarrera === 'function') renderizarCarrera();
     }
 }
 
