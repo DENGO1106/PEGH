@@ -265,15 +265,12 @@ async function fetchUserProfile(userId) {
         } else {
             if (typeof filtrarCarrerasPorPerfil === 'function') filtrarCarrerasPorPerfil(selected);
             if (typeof window.navigateTo === 'function') {
-                const isLoginVisible = !document.getElementById('login-section')?.classList.contains('hidden');
-                if (isLoginVisible) {
-                    // Recuperar la última página visitada; si no hay, ir a home
-                    const UCR_LAST_PAGE_KEY = 'ucr_last_page';
-                    const paginasValidas = ['home', 'plan', 'horario', 'calculator'];
-                    const ultimaPagina = localStorage.getItem(UCR_LAST_PAGE_KEY);
-                    const destino = (ultimaPagina && paginasValidas.includes(ultimaPagina)) ? ultimaPagina : 'home';
-                    window.navigateTo(destino);
-                }
+                // Siempre restauramos la última página visitada al cargar el perfil
+                const UCR_LAST_PAGE_KEY = 'ucr_last_page';
+                const paginasValidas = ['home', 'plan', 'horario', 'calculator'];
+                const ultimaPagina = localStorage.getItem(UCR_LAST_PAGE_KEY);
+                const destino = (ultimaPagina && paginasValidas.includes(ultimaPagina)) ? ultimaPagina : 'home';
+                window.navigateTo(destino);
             }
             if (typeof cargarEstado === 'function') cargarEstado();
         }
