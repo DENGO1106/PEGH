@@ -226,6 +226,9 @@ async function cargarEstado() {
         // Si no hay sesión (se cargó de localStorage), forzamos renderización
         if (typeof renderizarCarrera === 'function') renderizarCarrera();
     }
+    
+    // También cargar horarios sincronizados
+    if (typeof cargarHorarios === 'function') cargarHorarios();
 }
 
 // Escuchar cambios de autenticación para recargar el plan (Definido globalmente)

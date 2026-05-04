@@ -382,6 +382,46 @@ async function actualizarPerfilData(fullName, studentId) {
 }
 
 // ==========================================
+// SINCRONIZACIÓN DE HORARIOS (GENERADOR)
+// ==========================================
+async function saveScheduleData(data) {
+    if (!currentSession || !_db) return false;
+    try {
+        const { error } = await _db
+            .from('user_schedules')
+            .upsert({
+                user_id: currentSession.user.id,
+                data: data,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+        
+        if (error) throw error;
+        return true;
+    } catch (error) {
+        console.error('[Auth] Error guardando horario:', error);
+        return false;
+    }
+}
+
+async function loadScheduleData() {
+    if (!currentSession || !_db) return null;
+    try {
+        const { data, error } = await _db
+            .from('user_schedules')
+            .select('data')
+            .eq('user_id', currentSession.user.id)
+            .single();
+        
+        // PGRST116 es "No rows found", lo ignoramos si el usuario aún no tiene horario
+        if (error && error.code !== 'PGRST116') throw error; 
+        return data ? data.data : null;
+    } catch (error) {
+        console.error('[Auth] Error cargando horario:', error);
+        return null;
+    }
+}
+
+// ==========================================
 // EXPONER GLOBALMENTE
 // ==========================================
 window.supaAuth = {
@@ -395,7 +435,9 @@ window.supaAuth = {
     showProfileMenu: showProfileMenu,
     getCurrentSession: function() { return currentSession; },
     getCurrentProfile: function() { return currentProfile; },
-    getStoredUsername: _getStoredUsername
+    getStoredUsername: _getStoredUsername,
+    saveScheduleData: saveScheduleData,
+    loadScheduleData: loadScheduleData
 };
 // Acceso directo desde HTML onclick
 window.guardarSeleccionCarreras = guardarSeleccionCarreras;

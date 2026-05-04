@@ -712,29 +712,58 @@ function guardarHorarios() {
     const session = window.supaAuth?.getCurrentSession();
     const key = session ? `${SCHED_STORAGE_KEY}_${session.user.id}` : SCHED_STORAGE_KEY;
     localStorage.setItem(key, JSON.stringify(data));
+
+    // Sincronizar con Supabase en segundo plano
+    if (session && window.supaAuth && typeof window.supaAuth.saveScheduleData === 'function') {
+        window.supaAuth.saveScheduleData(data).catch(e => console.error("Error sync horario:", e));
+    }
 }
 
-function cargarHorarios() {
+async function cargarHorarios() {
     const session = window.supaAuth?.getCurrentSession();
     const key = session ? `${SCHED_STORAGE_KEY}_${session.user.id}` : SCHED_STORAGE_KEY;
-    const saved = localStorage.getItem(key);
     
-    if (!saved) return;
-    try {
-        const data = JSON.parse(saved);
-        selectedCourses = data.courses || [];
-        categoryColorOverrides = data.colorOverrides || {};
-        
-        const cycleEl = document.getElementById('scheduler-cycle');
-        if(cycleEl) cycleEl.value = data.cycle || '';
-        
-        if (data.config) {
-            const radio = document.querySelector(`input[name="sched-start"][value="${data.config.start}"]`);
-            if (radio) radio.checked = true;
-            const weekendEl = document.getElementById('sched-weekend');
-            if (weekendEl) weekendEl.checked = data.config.weekend;
+    // 1. Cargar local primero (rápido)
+    const saved = localStorage.getItem(key);
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            _aplicarDataHorario(data);
+        } catch (e) {
+            console.error('Error cargando horarios locales:', e);
         }
-    } catch (e) {
-        console.error('Error cargando horarios:', e);
+    }
+
+    // 2. Cargar de Supabase si hay sesión (sobrescribe la fuente de verdad)
+    if (session && window.supaAuth && typeof window.supaAuth.loadScheduleData === 'function') {
+        try {
+            const remoteData = await window.supaAuth.loadScheduleData();
+            if (remoteData) {
+                console.log('✅ Horario cargado desde Supabase');
+                _aplicarDataHorario(remoteData);
+                localStorage.setItem(key, JSON.stringify(remoteData));
+                
+                // Forzar actualización de UI si los datos llegaron tarde
+                if (typeof renderSchedulerCategories === 'function') renderSchedulerCategories();
+                if (typeof generateSchedule === 'function' && selectedCourses.length > 0) generateSchedule();
+            }
+        } catch (e) {
+            console.error("Error cargando horario desde Supabase:", e);
+        }
+    }
+}
+
+function _aplicarDataHorario(data) {
+    selectedCourses = data.courses || [];
+    categoryColorOverrides = data.colorOverrides || {};
+    
+    const cycleEl = document.getElementById('scheduler-cycle');
+    if(cycleEl) cycleEl.value = data.cycle || '';
+    
+    if (data.config) {
+        const radio = document.querySelector(`input[name="sched-start"][value="${data.config.start}"]`);
+        if (radio) radio.checked = true;
+        const weekendEl = document.getElementById('sched-weekend');
+        if (weekendEl) weekendEl.checked = data.config.weekend;
     }
 }
