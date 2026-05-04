@@ -746,6 +746,11 @@ async function cargarHorarios() {
                 // Forzar actualización de UI si los datos llegaron tarde
                 if (typeof renderSchedulerCategories === 'function') renderSchedulerCategories();
                 if (typeof generateSchedule === 'function' && selectedCourses.length > 0) generateSchedule();
+            } else if (saved) {
+                // No hay datos en Supabase, pero SÍ hay datos locales (usuario legacy)
+                // Subimos los datos locales a Supabase para sincronizar el otro dispositivo
+                console.log('☁️ Subiendo horario local a Supabase por primera vez');
+                guardarHorarios();
             }
         } catch (e) {
             console.error("Error cargando horario desde Supabase:", e);
