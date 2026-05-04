@@ -90,6 +90,26 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
 
 
 -- ============================================================
+-- 4.5. RPC: Función para que un usuario pueda eliminar su propia cuenta
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.delete_user()
+RETURNS void AS $$
+BEGIN
+  -- Verificar que el usuario que llama a la función está autenticado
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'No autorizado';
+  END IF;
+
+  -- Borrar el usuario de auth.users (la base de datos principal de Supabase Auth)
+  -- NOTA: Como la tabla profiles tiene ON DELETE CASCADE, también se borrará el perfil
+  -- y se liberará el nombre de usuario (username).
+  DELETE FROM auth.users WHERE id = auth.uid();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+
+-- ============================================================
 -- 5. SEED: INGENIERÍA INDUSTRIAL
 -- ============================================================
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) VALUES
@@ -333,8 +353,18 @@ CREATE TABLE IF NOT EXISTS public.user_feedback (
   user_id     uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   message     text NOT NULL,
   status      text DEFAULT 'pending', -- pending, reviewed, implemented
+  conversation jsonb DEFAULT '[]'::jsonb,
+  has_unread_reply boolean DEFAULT false,
   created_at  timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- ============================================================
+-- SCRIPT DE MIGRACIÓN PARA ACTUALIZAR TABLA EXISTENTE
+-- (Correr en el editor SQL de Supabase si la tabla ya existe)
+-- ALTER TABLE public.user_feedback 
+-- ADD COLUMN IF NOT EXISTS conversation jsonb DEFAULT '[]'::jsonb,
+-- ADD COLUMN IF NOT EXISTS has_unread_reply boolean DEFAULT false;
+-- ============================================================
 
 -- Habilitar RLS (Seguridad a Nivel de Fila)
 ALTER TABLE public.user_feedback ENABLE ROW LEVEL SECURITY;
@@ -361,6 +391,8 @@ SELECT
   p.email AS correo,
   f.message AS mensaje,
   f.status AS estado,
+  f.conversation AS conversation,
+  f.has_unread_reply AS has_unread_reply,
   f.created_at AS fecha
 FROM 
   public.user_feedback f

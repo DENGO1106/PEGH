@@ -983,109 +983,27 @@ function siguienteEstado(estadoActual) {
 // ===================================
 
 /**
- * Grupos de cursos que son 100% equivalentes entre carreras.
- * Formato: codigo_canonico → [ { carreraId, codigo } ]
- * Al cambiar el estado de cualquiera de ellos, se sincroniza en todos los demás.
- */
-const CURSOS_COMPARTIDOS = {
-  "EG-I": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "economia", "medicina", "microbiologia"],
-  "EG-": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "medicina"],
-  "EF-": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "medicina", "microbiologia"],
-  "MA0001": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "ingenieriaQuimica"],
-  "MA1004": ["ingenieriaIndustrial", "ingenieriaQuimica", "economia"],
-  "QU0114": ["ingenieriaIndustrial", "medicina"],
-  "QU0115": ["ingenieriaIndustrial", "medicina"],
-  "EG-II": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "economia", "medicina", "microbiologia"],
-  "MA1001": ["ingenieriaIndustrial", "ingenieriaQuimica", "economia", "microbiologia"],
-  "FS0210": ["ingenieriaIndustrial", "ingenieriaQuimica", "microbiologia"],
-  "FS0211": ["ingenieriaIndustrial", "ingenieriaQuimica", "microbiologia"],
-  "MA1002": ["ingenieriaIndustrial", "ingenieriaQuimica"],
-  "SR-I": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "medicina", "microbiologia"],
-  "FS0310": ["ingenieriaIndustrial", "ingenieriaQuimica", "microbiologia"],
-  "FS0311": ["ingenieriaIndustrial", "ingenieriaQuimica", "microbiologia"],
-  "MA1003": ["ingenieriaIndustrial", "ingenieriaQuimica"],
-  "MA1005": ["ingenieriaIndustrial", "ingenieriaQuimica", "economia"],
-  "SR-II": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "cienciasActuariales", "farmacia", "ingenieriaQuimica", "medicina", "microbiologia"],
-  "RP-": ["ingenieriaIndustrial", "contaduriaPublica", "direccionEmpresas", "medicina", "microbiologia"],
-  "DN-0101": ["contaduriaPublica", "direccionEmpresas"],
-  "DN-0102": ["contaduriaPublica", "direccionEmpresas"],
-  "DN-0104": ["contaduriaPublica", "direccionEmpresas"],
-  "DN-0103": ["contaduriaPublica", "direccionEmpresas"],
-  "MA-1021": ["contaduriaPublica", "direccionEmpresas"],
-  "PC-0200": ["contaduriaPublica", "direccionEmpresas"],
-  "PC-0240": ["contaduriaPublica", "direccionEmpresas"],
-  "PC-0261": ["contaduriaPublica", "direccionEmpresas"],
-  "XS-0276": ["contaduriaPublica", "direccionEmpresas"],
-  "MA-1022": ["contaduriaPublica", "direccionEmpresas"],
-  "OPT-ING": ["contaduriaPublica", "direccionEmpresas"],
-  "PC-0260": ["contaduriaPublica", "direccionEmpresas"],
-  "PC-0202": ["contaduriaPublica", "direccionEmpresas"],
-  "DN-0123": ["contaduriaPublica", "direccionEmpresas"],
-  "XS-0277": ["contaduriaPublica", "direccionEmpresas"],
-  "DN-0340": ["contaduriaPublica", "direccionEmpresas"],
-  "PC-0304": ["contaduriaPublica", "direccionEmpresas"],
-  "DN-0341": ["contaduriaPublica", "direccionEmpresas"],
-  "DN-0105": ["contaduriaPublica", "direccionEmpresas"],
-  "DN-0320": ["contaduriaPublica", "direccionEmpresas"],
-  "PC-0462": ["contaduriaPublica", "direccionEmpresas"],
-  "PC-0344": ["contaduriaPublica", "direccionEmpresas"],
-  "DN-0110": ["contaduriaPublica", "direccionEmpresas"],
-  "DN-0114": ["contaduriaPublica", "direccionEmpresas"],
-  "DN-0115": ["contaduriaPublica", "direccionEmpresas"],
-  "EC1100": ["cienciasActuariales", "economia"],
-  "RP-1": ["cienciasActuariales", "farmacia", "ingenieriaQuimica"],
-  "LM1030": ["cienciasActuariales", "ingenieriaQuimica", "medicina"],
-  "EC2100": ["cienciasActuariales", "economia"],
-  "EC3200": ["cienciasActuariales", "economia"],
-  "MA1210": ["farmacia", "medicina"],
-  "QU0100": ["farmacia", "ingenieriaQuimica", "microbiologia"],
-  "QU0101": ["farmacia", "ingenieriaQuimica", "microbiologia"],
-  "B0106": ["farmacia", "medicina"],
-  "B0107": ["farmacia", "medicina"],
-  "QU0102": ["farmacia", "ingenieriaQuimica", "microbiologia"],
-  "QU0103": ["farmacia", "ingenieriaQuimica", "microbiologia"],
-  "QU0212": ["farmacia", "ingenieriaQuimica"],
-  "QU0213": ["farmacia", "ingenieriaQuimica"],
-  "XS0215": ["farmacia", "medicina"],
-  "QU0214": ["farmacia", "ingenieriaQuimica"],
-  "QU0215": ["farmacia", "ingenieriaQuimica"],
-  "QU0200": ["ingenieriaQuimica", "microbiologia"],
-  "QU0201": ["ingenieriaQuimica", "microbiologia"],
-};
-
-/**
- * Índice inverso: dado un (carreraId, codigo) → clave canónica del grupo.
- * Se construye una sola vez al cargarse el módulo.
- */
-const _INDICE_COMPARTIDOS = (() => {
-  const idx = {};
-  Object.entries(CURSOS_COMPARTIDOS).forEach(([clave, grupo]) => {
-    grupo.forEach(({ carreraId, codigo }) => {
-      idx[`${carreraId}::${codigo}`] = clave;
-    });
-  });
-  return idx;
-})();
-
-/**
  * Devuelve true si el curso pertenece a un grupo de sincronización.
+ * (Dinámico: revisa si el mismo código existe en otras carreras)
  */
 function esCompartido(carreraId, codigo) {
-  return !!_INDICE_COMPARTIDOS[`${carreraId}::${codigo}`];
+  let compartidos = 0;
+  Object.keys(CARRERAS).forEach(cId => {
+    if (getCursoByCodigo(cId, codigo)) {
+      compartidos++;
+    }
+  });
+  return compartidos > 1;
 }
 
 /**
- * Propaga el nuevo estado a todos los cursos hermanos del mismo grupo.
- * No modifica el curso origen (ya fue actualizado por el llamador).
+ * Propaga el nuevo estado a todos los cursos hermanos (mismo código) en otras carreras.
+ * No modifica el curso origen.
  */
 function propagarEstadoCurso(sourceCarreraId, codigoCurso, nuevoEstado) {
-  const clave = _INDICE_COMPARTIDOS[`${sourceCarreraId}::${codigoCurso}`];
-  if (!clave) return; // No es un curso compartido
-
-  const grupo = CURSOS_COMPARTIDOS[clave];
-  grupo.forEach(({ carreraId, codigo }) => {
-    if (carreraId === sourceCarreraId && codigo === codigoCurso) return; // Saltamos el origen
-    const cursoHermano = getCursoByCodigo(carreraId, codigo);
+  Object.keys(CARRERAS).forEach(carreraId => {
+    if (carreraId === sourceCarreraId) return; // Saltamos el origen
+    const cursoHermano = getCursoByCodigo(carreraId, codigoCurso);
     if (cursoHermano) {
       cursoHermano.estado = nuevoEstado;
     }
@@ -1093,7 +1011,7 @@ function propagarEstadoCurso(sourceCarreraId, codigoCurso, nuevoEstado) {
 }
 
 // ===================================
-// TABLA DE CONVALIDACIONES UCR (CP ↔ DN)
+// TABLA DE CONVALIDACIONES (EQUIVALENCIAS)
 // ===================================
 
 /**

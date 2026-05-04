@@ -43,16 +43,16 @@
   <nav class="main-nav hidden" id="app-nav">
     <div class="nav-container !justify-between px-6">
       <button onclick="navigateTo('home')"
-        class="flex items-center gap-3 text-gray-300 hover:text-white transition-all font-black group bg-white/5 hover:bg-white/10 px-4 py-2.5 rounded-xl border border-white/10 active:scale-95">
-        <i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i>
-        <span class="text-sm md:text-base hidden sm:inline">Regresar al Inicio</span>
-        <span class="text-sm md:text-base sm:hidden">Regresar</span>
+        class="flex items-center gap-3 text-gray-300 hover:text-white transition-all font-black group bg-white/5 hover:bg-white/10 px-6 py-3.5 rounded-xl border border-white/10 active:scale-95">
+        <i data-lucide="arrow-left" class="w-6 h-6 group-hover:-translate-x-1 transition-transform"></i>
+        <span class="text-base md:text-lg hidden sm:inline">Regresar al Inicio</span>
+        <span class="text-base md:text-lg sm:hidden">Regresar</span>
       </button>
 
-      <!-- Logo / Título de la App -->
+      <!-- Logo / Título de la App (Clicable para ver T&C) -->
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center font-black text-white text-xs">UP
-        </div>
+        <button onclick="document.getElementById('terms-modal').classList.remove('hidden')" class="w-8 h-8 bg-zinc-800 hover:bg-zinc-700 rounded-lg flex items-center justify-center font-black text-white text-xs transition-all" title="Ver Términos y Condiciones">UP
+        </button>
         <span class="text-white font-bold tracking-tight text-sm">App Universitaria</span>
       </div>
 
@@ -104,6 +104,15 @@
                       <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Carné (Opcional)</label>
                       <input type="text" id="auth-studentid" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-red-500/50 focus:border-red-500/30 transition-all placeholder:text-gray-600" placeholder="C40001">
                   </div>
+                  <!-- Checkbox T&C - Solo visible en Registro -->
+                  <label class="flex items-start gap-3 cursor-pointer p-3 rounded-xl hover:bg-white/5 transition-all border border-white/5">
+                      <input type="checkbox" id="auth-terms-check" class="mt-1 w-4 h-4 accent-red-500 flex-shrink-0">
+                      <span class="text-xs text-gray-400 leading-relaxed">
+                          He leído y acepto los
+                          <button type="button" onclick="document.getElementById('terms-modal').classList.remove('hidden')" class="text-white font-bold underline underline-offset-2 hover:text-red-400 transition-colors">Términos y Condiciones</button>
+                          de Uplan. Entiendo que mis datos son utilizados únicamente para el funcionamiento del servicio y no son compartidos con terceros.
+                      </span>
+                  </label>
               </div>
 
               <div class="space-y-5">
@@ -123,7 +132,7 @@
               </button>
 
               <div class="mt-8 text-center text-xs text-gray-500 pb-8">
-                  <p>Al acceder, aceptás el uso responsable del sistema.</p>
+                  <p>Al crear una cuenta, aceptás nuestros <button onclick="document.getElementById('terms-modal').classList.remove('hidden')" class="text-gray-400 hover:text-white underline underline-offset-2 transition-colors">Términos y Condiciones</button>.</p>
               </div>
           </div>
       </div>
@@ -137,17 +146,17 @@
     <div class="flex items-center justify-between py-5 max-w-4xl w-full mx-auto flex-wrap gap-2">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 bg-zinc-800 rounded-xl flex items-center justify-center font-black text-white text-sm flex-shrink-0">UP</div>
-        <span class="text-gray-400 text-sm">Bienvenido, <span id="home-user-name" class="text-white font-semibold">Usuario</span></span>
+        <span class="text-gray-400 text-sm">Bienvenido, <span id="home-user-name" class="text-white font-semibold cursor-pointer hover:text-emerald-400 transition-colors" onclick="window.supaAuth?.showProfileMenu?.()">Usuario</span></span>
       </div>
       <div class="flex items-center gap-1.5 flex-wrap">
-        <button id="btn-admin-panel" onclick="openAdminPanel()" class="hidden items-center gap-1.5 px-2.5 py-1.5 text-xs text-yellow-400 font-bold hover:text-yellow-300 border border-yellow-500/30 hover:border-yellow-500/50 rounded-lg transition-all">
-          <i data-lucide="shield" class="w-3 h-3"></i> <span class="hidden sm:inline">Admin</span>
+        <button id="btn-admin-panel" onclick="openAdminPanel()" class="hidden items-center gap-2 px-4 py-2.5 text-sm md:text-base text-yellow-400 font-bold hover:text-yellow-300 border border-yellow-500/30 hover:border-yellow-500/50 rounded-lg transition-all">
+          <i data-lucide="shield" class="w-4 h-4"></i> <span class="hidden sm:inline">Admin</span>
         </button>
-        <button onclick="window.editarCarreras?.()" class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-gray-400 hover:text-white border border-white/10 hover:border-white/30 rounded-lg transition-all">
-          <i data-lucide="book-marked" class="w-3 h-3"></i> <span class="hidden sm:inline">Mis carreras</span>
+        <button onclick="window.editarCarreras?.()" class="flex items-center gap-2 px-4 py-2.5 text-sm md:text-base text-gray-400 hover:text-white border border-white/10 hover:border-white/30 rounded-lg transition-all">
+          <i data-lucide="book-marked" class="w-4 h-4"></i> <span class="hidden sm:inline">Mis carreras</span>
         </button>
-        <button onclick="window.supaAuth?.handleSignOut()" class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-red-400 hover:text-red-300 border border-red-500/20 hover:border-red-500/40 rounded-lg transition-all">
-          <i data-lucide="log-out" class="w-3 h-3"></i> <span class="hidden sm:inline">Salir</span>
+        <button onclick="window.supaAuth?.handleSignOut()" class="flex items-center gap-2 px-4 py-2.5 text-sm md:text-base text-red-400 hover:text-red-300 border border-red-500/20 hover:border-red-500/40 rounded-lg transition-all">
+          <i data-lucide="log-out" class="w-4 h-4"></i> <span class="hidden sm:inline">Salir</span>
         </button>
       </div>
     </div>
@@ -206,6 +215,12 @@
             </div>
           </div>
         </button>
+      </div>
+
+      <!-- Adsterra Native Banner (Home) -->
+      <div class="mt-16 w-full max-w-5xl flex justify-center bg-black/20 rounded-xl overflow-hidden p-4">
+        <script async="async" data-cfasync="false" src="https://pl29323230.profitablecpmratenetwork.com/171a961d65ffe44760617c323b2d258c/invoke.js"></script>
+        <div id="container-171a961d65ffe44760617c323b2d258c"></div>
       </div>
     </div>
   </section>
@@ -480,6 +495,20 @@
       <div class="malla-container" id="malla-container">
         <!-- Se renderiza dinámicamente con JavaScript -->
       </div>
+      
+      <!-- Adsterra 320x50 Banner (Plan de Estudios) -->
+      <div class="mt-8 flex justify-center bg-black/20 rounded-xl overflow-hidden p-2 max-w-md mx-auto">
+        <script>
+          atOptions = {
+            'key' : '67eed118ec002e67967e2f46020f2a8c',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+          };
+        </script>
+        <script src="https://www.highperformanceformat.com/67eed118ec002e67967e2f46020f2a8c/invoke.js"></script>
+      </div>
 
     </div> <!-- Cierre de leyenda -->
   </div> <!-- Cierre de export-area del Plan -->
@@ -575,6 +604,19 @@
 
             <div id="list-custom" class="space-y-2"></div>
           </div>
+
+          <!-- Adsterra 300x250 Banner (Sidebar Horarios) -->
+          <div class="mt-6 flex justify-center bg-black/20 rounded-xl overflow-hidden p-2">
+            <script>
+              atOptions = {
+                'key' : 'cb93aedcc51c12a1aef3bda854baa265',
+                'format' : 'iframe',
+                'height' : 250,
+                'width' : 300,
+                'params' : {}
+              };
+            </script>
+            <script src="https://www.highperformanceformat.com/cb93aedcc51c12a1aef3bda854baa265/invoke.js"></script>
           </div>
         </aside>
 
@@ -697,6 +739,7 @@
         const password = document.getElementById('auth-password').value;
         const name = document.getElementById('auth-name').value.trim();
         const studentid = document.getElementById('auth-studentid').value.trim();
+        const termsCheck = document.getElementById('auth-terms-check')?.checked;
 
         // Limpiar errores previos
         document.getElementById('auth-error').classList.add('hidden');
@@ -720,6 +763,9 @@
         if(isLoginMode) {
             window.supaAuth.handleSignIn(username, password);
         } else {
+            if(!termsCheck) {
+                return showAuthError('Debés aceptar los Términos y Condiciones para registrarte.');
+            }
             if(password.length < 6) return showAuthError('La contraseña debe tener mínimo 6 caracteres.');
             window.supaAuth.handleSignUp(username, password, name, studentid);
         }
@@ -748,6 +794,90 @@
     </div>
   </div>
 
+  <!-- MODAL DE EDICIÓN DE PERFIL -->
+  <div id="profile-edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-md shadow-2xl p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold flex items-center gap-2 text-white">
+          <i data-lucide="user" class="text-emerald-400 w-5 h-5"></i> Mi Perfil
+        </h3>
+        <button onclick="document.getElementById('profile-edit-modal').classList.add('hidden')" class="text-gray-400 hover:text-white transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="mb-6 flex flex-col items-center">
+        <div class="w-16 h-16 bg-zinc-800 border border-white/10 rounded-full flex items-center justify-center mb-3">
+          <i data-lucide="user" class="w-8 h-8 text-gray-500"></i>
+        </div>
+        <p class="text-sm text-gray-400 uppercase tracking-widest font-black" id="profile-edit-username">@usuario</p>
+        <p class="text-[10px] text-gray-500 mt-1">El nombre de usuario no puede modificarse.</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Nombre Completo</label>
+          <input type="text" id="profile-edit-name" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all placeholder:text-gray-600" placeholder="Tu nombre">
+        </div>
+        <div>
+          <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Carné Universitario</label>
+          <input type="text" id="profile-edit-carnet" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all placeholder:text-gray-600" placeholder="Ej: C40001">
+        </div>
+      </div>
+
+      <div class="mt-8 flex justify-end gap-3">
+        <button onclick="document.getElementById('profile-edit-modal').classList.add('hidden')" class="px-4 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white transition-colors">Cancelar</button>
+        <button onclick="saveProfileChanges()" id="btn-save-profile" class="bg-emerald-500 hover:bg-emerald-600 text-black px-6 py-2.5 rounded-xl text-sm font-black transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+          <i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios
+        </button>
+      </div>
+      
+      <div class="mt-6 pt-4 border-t border-white/5 space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">¿Deseás salir de tu cuenta?</span>
+          <button onclick="window.supaAuth?.handleSignOut()" class="text-xs font-bold text-red-500 hover:text-red-400 flex items-center gap-1 transition-colors">
+            <i data-lucide="log-out" class="w-3 h-3"></i> Cerrar Sesión
+          </button>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Leer Términos y Condiciones</span>
+          <button onclick="document.getElementById('terms-modal').classList.remove('hidden')" class="text-xs font-bold text-gray-400 hover:text-white flex items-center gap-1 transition-colors">
+            <i data-lucide="file-text" class="w-3 h-3"></i> Ver T&C
+          </button>
+        </div>
+        <div class="flex justify-between items-center pt-2 border-t border-white/5">
+          <span class="text-xs text-red-500/70">Zona de peligro</span>
+          <button onclick="window.supaAuth?.deleteAccount()" class="text-xs font-bold text-red-600 hover:text-red-400 flex items-center gap-1 transition-colors border border-red-600/20 hover:border-red-400/30 px-3 py-1.5 rounded-lg">
+            <i data-lucide="trash-2" class="w-3 h-3"></i> Eliminar Cuenta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    async function saveProfileChanges() {
+        const btn = document.getElementById('btn-save-profile');
+        const oldText = btn.innerHTML;
+        btn.innerHTML = '<span class="animate-pulse">Guardando...</span>';
+        btn.disabled = true;
+        
+        const fullName = document.getElementById('profile-edit-name').value.trim();
+        const studentId = document.getElementById('profile-edit-carnet').value.trim();
+        
+        if (window.supaAuth && window.supaAuth.actualizarPerfilData) {
+            const success = await window.supaAuth.actualizarPerfilData(fullName, studentId);
+            if (success) {
+                document.getElementById('profile-edit-modal').classList.add('hidden');
+            }
+        }
+        
+        btn.innerHTML = oldText;
+        btn.disabled = false;
+        if (window.lucide) lucide.createIcons();
+    }
+  </script>
+
   <!-- BOTÓN FLOTANTE DE FEEDBACK -->
   <button onclick="document.getElementById('feedback-modal').classList.remove('hidden')" 
           class="fixed bottom-6 right-6 z-[90] bg-zinc-800 hover:bg-zinc-700 text-white rounded-full p-4 shadow-2xl border border-white/10 transition-all hover:scale-105 group flex items-center gap-2">
@@ -757,27 +887,50 @@
 
   <!-- MODAL DE FEEDBACK -->
   <div id="feedback-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-    <div class="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold flex items-center gap-2">
-          <span data-lucide="lightbulb" class="text-yellow-400 w-5 h-5 inline-block"></span> 
-          Envianos tu idea
-        </h3>
-        <button onclick="document.getElementById('feedback-modal').classList.add('hidden')" class="text-gray-400 hover:text-white">
-          <span data-lucide="x" class="w-5 h-5 inline-block"></span>
-        </button>
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+      <div class="p-6 pb-4 border-b border-white/10">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold flex items-center gap-2">
+            <span data-lucide="lightbulb" class="text-yellow-400 w-5 h-5 inline-block"></span> 
+            Feedback y Mensajes
+          </h3>
+          <button onclick="document.getElementById('feedback-modal').classList.add('hidden')" class="text-gray-400 hover:text-white">
+            <span data-lucide="x" class="w-5 h-5 inline-block"></span>
+          </button>
+        </div>
+        
+        <!-- Pestañas de Feedback -->
+        <div class="flex gap-2 p-1 bg-black/40 rounded-xl">
+            <button onclick="switchFeedbackTab('new')" id="fb-tab-new" class="flex-1 py-2 text-sm font-bold bg-zinc-800 text-white rounded-lg transition-all">Nueva Idea</button>
+            <button onclick="switchFeedbackTab('messages')" id="fb-tab-messages" class="flex-1 py-2 text-sm font-bold text-gray-400 hover:text-white rounded-lg transition-all relative">
+                Mis Mensajes
+                <span id="fb-unread-badge" class="hidden absolute top-1 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            </button>
+        </div>
       </div>
-      <p class="text-sm text-gray-400 mb-4">¿Qué le falta a la aplicación? ¿Encontraste un error? Toda sugerencia es bienvenida.</p>
-      <textarea id="feedback-message" rows="4" 
-                class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-yellow-500/50 resize-none" 
-                placeholder="Escribe tu sugerencia aquí..."></textarea>
-      <div id="feedback-error" class="hidden mt-2 text-red-500 text-sm font-bold"></div>
-      <div id="feedback-success" class="hidden mt-2 text-green-500 text-sm font-bold flex items-center gap-1">
-        <i data-lucide="check-circle" class="w-4 h-4"></i> ¡Idea enviada! Gracias por tu aporte.
+
+      <!-- Contenido Nueva Idea -->
+      <div id="fb-content-new" class="p-6 overflow-y-auto">
+        <p class="text-sm text-gray-400 mb-4">¿Qué le falta a la aplicación? ¿Encontraste un error? Toda sugerencia es bienvenida.</p>
+        <textarea id="feedback-message" rows="4" 
+                  class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-yellow-500/50 resize-none" 
+                  placeholder="Escribe tu sugerencia aquí..."></textarea>
+        <div id="feedback-error" class="hidden mt-2 text-red-500 text-sm font-bold"></div>
+        <div id="feedback-success" class="hidden mt-2 text-green-500 text-sm font-bold flex items-center gap-1">
+          <i data-lucide="check-circle" class="w-4 h-4"></i> ¡Idea enviada! Gracias por tu aporte.
+        </div>
+        <div class="mt-4 flex justify-end gap-3">
+          <button onclick="document.getElementById('feedback-modal').classList.add('hidden')" class="px-4 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white transition-colors">Cancelar</button>
+          <button id="btn-submit-feedback" onclick="submitFeedback()" class="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2 rounded-lg text-sm font-black transition-all">Enviar Idea</button>
+        </div>
       </div>
-      <div class="mt-4 flex justify-end gap-3">
-        <button onclick="document.getElementById('feedback-modal').classList.add('hidden')" class="px-4 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white transition-colors">Cancelar</button>
-        <button id="btn-submit-feedback" onclick="submitFeedback()" class="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2 rounded-lg text-sm font-black transition-all">Enviar Idea</button>
+
+      <!-- Contenido Mis Mensajes -->
+      <div id="fb-content-messages" class="hidden flex-1 flex flex-col p-6 overflow-y-auto min-h-[300px] bg-black/20 space-y-4">
+        <div id="user-messages-list" class="space-y-4 flex-1">
+            <!-- Messages go here -->
+            <p class="text-gray-500 text-sm text-center py-8">Cargando tus mensajes...</p>
+        </div>
       </div>
     </div>
   </div>
@@ -862,10 +1015,17 @@
 
       <!-- Historial de Promedios (Nueva Sección) -->
       <div class="mt-12 pt-8 border-t border-white/10">
-        <h3 class="text-xl font-black text-white mb-4 flex items-center gap-2">
-          <i data-lucide="history" class="w-5 h-5 text-yellow-500"></i> Historial de Promedios
-        </h3>
-        <p class="text-sm text-gray-400 mb-6">Tus registros guardados oficialmente en la base de datos.</p>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h3 class="text-xl font-black text-white mb-2 flex items-center gap-2">
+              <i data-lucide="history" class="w-5 h-5 text-yellow-500"></i> Historial de Promedios
+            </h3>
+            <p class="text-sm text-gray-400">Tus registros guardados oficialmente en la base de datos.</p>
+          </div>
+          <button onclick="calcOpenCombineModal()" class="shrink-0 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 border border-yellow-500/20 px-4 py-2.5 rounded-xl font-bold transition-all text-sm flex items-center gap-2 shadow-sm">
+            <i data-lucide="layers" class="w-4 h-4"></i> Combinar Historiales
+          </button>
+        </div>
         
         <div id="calc-history-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="text-center p-6 text-sm text-gray-500 bg-black/30 border border-white/5 rounded-2xl md:col-span-2">
@@ -950,6 +1110,38 @@
     </div>
   </div>
 
+  <!-- MODAL COMBINAR HISTORIALES CALCULADORA -->
+  <div id="calc-combine-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh]">
+      <!-- Header -->
+      <div class="flex justify-between items-start p-6 border-b border-white/10 relative">
+        <div>
+          <h3 class="text-xl font-bold flex items-center gap-2 text-white">
+            <span data-lucide="layers" class="w-5 h-5 text-yellow-500 inline-block"></span>
+            Combinar Historiales
+          </h3>
+          <p class="text-sm text-gray-400 mt-1">Seleccioná los semestres que deseás unir para calcular un promedio anual o global.</p>
+        </div>
+        <button onclick="document.getElementById('calc-combine-modal').classList.add('hidden')" class="text-gray-400 hover:text-white mt-1">
+          <span data-lucide="x" class="w-5 h-5 inline-block"></span>
+        </button>
+      </div>
+
+      <!-- Lista Seleccionable -->
+      <div class="p-6 overflow-y-auto flex-1 space-y-3" id="calc-combine-list">
+        <!-- Dinámico -->
+      </div>
+      
+      <!-- Acciones -->
+      <div class="p-6 border-t border-white/10 bg-black/20 flex gap-3">
+        <button onclick="document.getElementById('calc-combine-modal').classList.add('hidden')" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-gray-400 bg-white/5 hover:bg-white/10 transition-colors">Cancelar</button>
+        <button id="calc-btn-confirm-combine" onclick="calcConfirmCombine()" class="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-3 rounded-xl text-sm font-black transition-all flex items-center justify-center gap-2">
+          Unir al Modo Manual
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL DE PANEL DE ADMINISTRADOR -->
   <div id="admin-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
     <div class="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[90vh]">
@@ -990,6 +1182,74 @@
       </div>
     </div>
   </div>
+
+  <!-- MODAL DE TÉRMINOS Y CONDICIONES -->
+  <div id="terms-modal" class="hidden fixed inset-0 z-[300] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm">
+    <div class="bg-zinc-950 border border-white/10 rounded-3xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+      <!-- Header -->
+      <div class="flex justify-between items-center p-6 border-b border-white/10 bg-zinc-900/50">
+        <div>
+          <h3 class="text-xl font-black text-white flex items-center gap-2">
+            <i data-lucide="scale" class="w-5 h-5 text-red-500"></i> Términos y Condiciones
+          </h3>
+          <p class="text-xs text-gray-500 mt-1">Campus Virtual UCR — Última actualización: Mayo 2026</p>
+        </div>
+        <button onclick="document.getElementById('terms-modal').classList.add('hidden')" class="text-gray-400 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-xl">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Body (Scrollable) -->
+      <div class="p-6 overflow-y-auto flex-1 text-sm text-gray-300 space-y-6 custom-scrollbar">
+        
+        <p>Al crear una cuenta o utilizar la plataforma <strong>Campus Virtual UCR</strong>, aceptás expresamente los presentes Términos y Condiciones, así como nuestra Política de Privacidad, de conformidad con la legislación vigente en Costa Rica.</p>
+        
+        <div>
+            <h4 class="text-white font-bold mb-2">1. Descripción del Servicio</h4>
+            <p>Campus Virtual UCR es una herramienta de gestión académica personal diseñada para estudiantes universitarios. La plataforma permite visualizar planes de estudio, generar horarios y calcular promedios ponderados.</p>
+            <div class="mt-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                <p class="text-red-400 text-xs font-bold flex gap-2">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i> 
+                    <span>Esta plataforma NO es un sistema oficial de la UCR. Es una herramienta independiente creada por un estudiante. La información mostrada es referencial y no sustituye los registros oficiales de la Universidad.</span>
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="text-white font-bold mb-2">2. Datos Personales y Privacidad (Ley N.° 8968, Costa Rica)</h4>
+            <p>De conformidad con la Ley de Protección de la Persona frente al Tratamiento de sus Datos Personales y su reglamento, te informamos lo siguiente:</p>
+            <ul class="list-disc pl-5 mt-2 space-y-1 text-gray-400">
+                <li><strong>Datos recolectados:</strong> Nombre de usuario (seudónimo), nombre completo (opcional) y carné estudiantil (opcional).</li>
+                <li><strong>Finalidad:</strong> Los datos se utilizan EXCLUSIVAMENTE para autenticar tu cuenta, sincronizar tu progreso en la nube y personalizar tu experiencia visual.</li>
+                <li><strong>No compartimos tus datos:</strong> Tu información NO se vende, transfiere ni comparte con terceros. Es de uso exclusivamente interno para el funcionamiento de la app.</li>
+                <li><strong>Tus derechos ARCO:</strong> Tenés derecho a Acceder, Rectificar, Cancelar u Oponerte al uso de tus datos. Podés eliminar tu cuenta y todos tus datos permanentemente desde el menú de Perfil, o contactarnos vía la sección de "Feedback".</li>
+            </ul>
+        </div>
+
+        <div>
+            <h4 class="text-white font-bold mb-2">3. Publicidad y Financiamiento</h4>
+            <p>Para financiar el mantenimiento de los servidores (Supabase), la plataforma podría mostrar anuncios de terceros (ej. Adsterra). Los anuncios son estáticos o nativos; NO usamos pop-ups ni formatos agresivos (jumpscares). Al usar la app sin bloqueador de anuncios, contribuís al sostenimiento del proyecto.</p>
+        </div>
+
+        <div>
+            <h4 class="text-white font-bold mb-2">4. Limitación de Responsabilidad</h4>
+            <p>La plataforma se ofrece "tal como está". No garantizamos la exactitud absoluta de los planes de estudio, ya que pueden variar según modificaciones oficiales de la UCR. El desarrollador ("Diego Alberto Dengo Soto" / equipo Uplan) no es responsable por decisiones académicas tomadas con base únicamente en la información aquí mostrada.</p>
+        </div>
+        
+      </div>
+      
+      <!-- Footer -->
+      <div class="p-6 border-t border-white/10 bg-zinc-900/50 flex justify-end">
+        <button onclick="document.getElementById('terms-modal').classList.add('hidden')" class="bg-white text-black font-bold px-6 py-3 rounded-xl hover:bg-gray-200 transition-colors">
+            Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR TOAST (NOTIFICACIONES) -->
+  <div id="adblock-toast-container" class="fixed bottom-6 left-6 z-[1000] flex flex-col gap-3"></div>
+
   <!-- Scripts -->
   <script src="auth.js"></script>
   <script src="data.js"></script>

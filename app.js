@@ -86,12 +86,12 @@ async function guardarEstado() {
         const storageKey = session ? `ucr_estado_${session.user.id}` : APP_STORAGE_KEY;
 
         const estado = {
-            ingenieriaIndustrial: CARRERAS.ingenieriaIndustrial.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
-            contaduriaPublica: CARRERAS.contaduriaPublica.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
-            direccionEmpresas: CARRERAS.direccionEmpresas.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
             carreraActual: carreraActual,
             ultimaActualizacion: new Date().toISOString()
         };
+        Object.keys(CARRERAS).forEach(carreraId => {
+            estado[carreraId] = CARRERAS[carreraId].cursos.map(c => ({ codigo: c.codigo, estado: c.estado }));
+        });
 
         localStorage.setItem(storageKey, JSON.stringify(estado));
 
@@ -99,7 +99,7 @@ async function guardarEstado() {
         if (session) {
             const user = session.user;
             const coursesToUpsert = [];
-            ['ingenieriaIndustrial', 'contaduriaPublica', 'direccionEmpresas'].forEach(carreraId => {
+            Object.keys(CARRERAS).forEach(carreraId => {
                 if (Array.isArray(estado[carreraId])) {
                     estado[carreraId].forEach(c => {
                         coursesToUpsert.push({
@@ -199,12 +199,11 @@ async function cargarEstado() {
 
                 console.log('✅ Plan cargado desde Supabase');
                 // Actualizar localStorage del usuario con los datos de Supabase
-                localStorage.setItem(storageKey, JSON.stringify({
-                    ingenieriaIndustrial: CARRERAS.ingenieriaIndustrial.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
-                    contaduriaPublica: CARRERAS.contaduriaPublica.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
-                    direccionEmpresas: CARRERAS.direccionEmpresas.cursos.map(c => ({ codigo: c.codigo, estado: c.estado })),
-                    carreraActual
-                }));
+                const newLocalState = { carreraActual };
+                Object.keys(CARRERAS).forEach(carreraId => {
+                    newLocalState[carreraId] = CARRERAS[carreraId].cursos.map(c => ({ codigo: c.codigo, estado: c.estado }));
+                });
+                localStorage.setItem(storageKey, JSON.stringify(newLocalState));
 
                 if (typeof renderizarCarrera === 'function') renderizarCarrera();
             } else if (error) {
@@ -342,7 +341,27 @@ function renderizarCarrera() {
     const carrera = CARRERAS[carreraActual];
 
     if (!carrera) {
-        container.innerHTML = '<p>Carrera no encontrada</p>';
+        container.innerHTML = '<p class="text-center text-red-500 py-10 font-bold">Carrera no encontrada</p>';
+        return;
+    }
+
+    if (!carrera.cursos || carrera.cursos.length === 0) {
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-24 text-center animate-fade-in">
+                <div class="w-20 h-20 bg-yellow-500/20 rounded-full flex items-center justify-center mb-6 border border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.2)]">
+                    <i data-lucide="hard-hat" class="w-10 h-10 text-yellow-400"></i>
+                </div>
+                <h3 class="text-3xl font-black text-white mb-3">Plan en Construcción</h3>
+                <p class="text-gray-400 max-w-md mx-auto text-sm leading-relaxed mb-6">
+                    Estamos trabajando arduamente en la recolección y validación de todos los cursos y requisitos para <strong class="text-white">${carrera.nombre}</strong>.
+                </p>
+                <div class="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 px-4 py-2 rounded-lg text-xs font-bold border border-blue-500/20">
+                    <i data-lucide="clock" class="w-4 h-4"></i> Estará disponible en la próxima actualización
+                </div>
+            </div>
+        `;
+        actualizarProgreso(); // Dejará todo en 0%
+        if (window.lucide) lucide.createIcons();
         return;
     }
 
@@ -512,14 +531,23 @@ function actualizarProgreso() {
  * Cambia entre carreras
  */
 function cambiarCarrera(carreraId) {
+    if (!carreraId || !CARRERAS[carreraId]) {
+        console.warn(`[App] Intento de cambiar a carrera inválida: ${carreraId}`);
+        return;
+    }
     carreraActual = carreraId;
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    document.querySelector(`[data-carrera="${carreraId}"]`).classList.add('active');
+    
+    const targetBtn = document.querySelector(`[data-carrera="${carreraId}"]`);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+    }
 
-    document.getElementById('nombre-carrera').textContent = getNombreCarrera(carreraId);
+    const titleEl = document.getElementById('nombre-carrera');
+    if (titleEl) titleEl.textContent = getNombreCarrera(carreraId);
 
     // Actualizar visibilidad del botón de convalidaciones
     const btnContainer = document.getElementById('btn-convalidaciones-container');
@@ -697,8 +725,133 @@ function inicializar() {
     document.querySelector(`[data-carrera="${carreraActual}"]`)?.classList.add('active');
     document.getElementById('nombre-carrera').textContent = getNombreCarrera(carreraActual);
     renderizarCarrera();
+    
+    // Iniciar detección de AdBlocker
+    setTimeout(detectarAdBlocker, 2000);
+
     console.log('Aplicación inicializada correctamente');
 }
+
+// ===================================
+// DETECCIÓN DE ADBLOCKER (POR CAMBIO DE ESTADO)
+// ===================================
+
+const ADBLOCK_STATE_KEY = 'ucr_adblock_state'; // 'blocked' | 'allowed' | null
+
+function _verificarEstadoAdBlock(callback) {
+    const adTest = document.createElement('div');
+    adTest.className = 'ad-banner adsbox doubleclick';
+    adTest.style.cssText = 'width:1px;height:1px;position:absolute;left:-9999px;top:-9999px;';
+    document.body.appendChild(adTest);
+
+    setTimeout(() => {
+        const bloqueado = adTest.offsetHeight === 0 || window.getComputedStyle(adTest).display === 'none';
+        adTest.remove();
+        callback(bloqueado);
+    }, 300);
+}
+
+function detectarAdBlocker() {
+    _verificarEstadoAdBlock((bloqueado) => {
+        const estadoActual = bloqueado ? 'blocked' : 'allowed';
+        const estadoAnterior = localStorage.getItem(ADBLOCK_STATE_KEY);
+
+        // Solo mostrar mensaje si el estado CAMBIÓ respecto a la última visita conocida
+        if (estadoAnterior !== estadoActual) {
+            localStorage.setItem(ADBLOCK_STATE_KEY, estadoActual);
+
+            if (bloqueado) {
+                mostrarToastNotificacion(
+                    "Hola, veo que estás usando un adblocker. La página es gratis y podés seguirla usando así, pero me serviría mucho que lo desactivaras. No te van a aparecer anuncios molestos, es solo para ayudarme. ¡Muchas gracias y espero que disfrutes la app! 🙏",
+                    "warning"
+                );
+            } else {
+                mostrarToastNotificacion(
+                    "¡Gracias por no usar un adblocker! Me estás ayudando muchísimo a mantener este proyecto. No te van a aparecer anuncios molestos, así que no hay problema. ¡Disfrutá la app! 🎉",
+                    "success"
+                );
+            }
+        }
+        // Si el estado es igual al anterior → no se muestra nada
+    });
+
+    // Polling cada 15 segundos para detectar si el usuario activa/desactiva el bloqueador en vivo
+    setInterval(() => {
+        _verificarEstadoAdBlock((bloqueado) => {
+            const estadoActual = bloqueado ? 'blocked' : 'allowed';
+            const estadoAnterior = localStorage.getItem(ADBLOCK_STATE_KEY);
+
+            if (estadoAnterior !== estadoActual) {
+                localStorage.setItem(ADBLOCK_STATE_KEY, estadoActual);
+
+                if (bloqueado) {
+                    mostrarToastNotificacion(
+                        "Hola, veo que ahora estás usando un adblocker. Podés seguir usando la app, pero me serviría mucho que lo desactivaras. ¡Gracias! 🙏",
+                        "warning"
+                    );
+                } else {
+                    mostrarToastNotificacion(
+                        "¡Muchas gracias por desactivar el adblocker! Me estás ayudando un montón. No te van a aparecer anuncios molestos. ¡Disfrutá la app! 🎉",
+                        "success"
+                    );
+                }
+            }
+        });
+    }, 15000);
+}
+
+function mostrarToastNotificacion(mensaje, tipo) {
+    const container = document.getElementById('adblock-toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    const clasesBase = "p-4 rounded-2xl border shadow-2xl flex items-start gap-3 w-full max-w-[320px] sm:max-w-sm backdrop-blur-xl transition-all relative overflow-hidden";
+
+    let iconoHtml = "";
+    if (tipo === "warning") {
+        toast.className = clasesBase + " bg-yellow-950/60 border-yellow-500/30 text-yellow-50";
+        iconoHtml = `<div class="flex-shrink-0 p-2 bg-yellow-500/20 rounded-xl text-yellow-500 border border-yellow-500/20 mt-0.5"><i data-lucide="shield-alert" class="w-5 h-5"></i></div>`;
+    } else {
+        toast.className = clasesBase + " bg-emerald-950/60 border-emerald-500/30 text-emerald-50";
+        iconoHtml = `<div class="flex-shrink-0 p-2 bg-emerald-500/20 rounded-xl text-emerald-400 border border-emerald-500/20 mt-0.5"><i data-lucide="shield-check" class="w-5 h-5"></i></div>`;
+    }
+
+    // Entrada animada
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(16px)';
+
+    toast.innerHTML = `
+        ${iconoHtml}
+        <div class="flex-1 min-w-0 pr-6">
+            <p class="text-xs font-medium leading-relaxed">${mensaje}</p>
+        </div>
+        <button class="absolute top-3 right-3 text-gray-500 hover:text-white transition-colors" onclick="this.parentElement.remove()">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    `;
+
+    container.appendChild(toast);
+    if (window.lucide) lucide.createIcons();
+
+    // Animar entrada
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        }, 30);
+    });
+
+    // Auto-eliminar después de 12 segundos con animación de salida
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(10px)';
+            setTimeout(() => toast.remove(), 400);
+        }
+    }, 12000);
+}
+
 
 // Filtra las pestañas de carrera según lo que el usuario eligió en su perfil
 function filtrarCarrerasPorPerfil(selectedCarreras) {
@@ -852,10 +1005,12 @@ async function submitFeedback() {
         successEl.classList.remove('hidden');
         messageEl.value = ''; // Limpiar textarea
         
-        // Cerrar modal automáticamente después de 2 segundos
+        // Cerrar modal y limpiar
         setTimeout(() => {
             document.getElementById('feedback-modal').classList.add('hidden');
             successEl.classList.add('hidden'); // Resetear para la próxima vez
+            // Si mandó una idea, recargar sus mensajes por si abre la pestaña
+            loadUserMessages();
         }, 2000);
         
     } catch (err) {
@@ -867,6 +1022,172 @@ async function submitFeedback() {
         btnSubmit.innerHTML = originalText;
         btnSubmit.disabled = false;
         messageEl.disabled = false;
+    }
+}
+
+function switchFeedbackTab(tab) {
+    const tabNew = document.getElementById('fb-tab-new');
+    const tabMsgs = document.getElementById('fb-tab-messages');
+    const contentNew = document.getElementById('fb-content-new');
+    const contentMsgs = document.getElementById('fb-content-messages');
+    
+    if (tab === 'new') {
+        tabNew.classList.replace('bg-transparent', 'bg-zinc-800');
+        tabNew.classList.replace('text-gray-400', 'text-white');
+        tabMsgs.classList.replace('bg-zinc-800', 'bg-transparent');
+        tabMsgs.classList.replace('text-white', 'text-gray-400');
+        contentNew.classList.remove('hidden');
+        contentMsgs.classList.add('hidden');
+        contentMsgs.classList.remove('flex');
+    } else {
+        tabMsgs.classList.replace('bg-transparent', 'bg-zinc-800');
+        tabMsgs.classList.replace('text-gray-400', 'text-white');
+        tabNew.classList.replace('bg-zinc-800', 'bg-transparent');
+        tabNew.classList.replace('text-white', 'text-gray-400');
+        contentNew.classList.add('hidden');
+        contentMsgs.classList.remove('hidden');
+        contentMsgs.classList.add('flex');
+        
+        loadUserMessages();
+    }
+}
+
+async function loadUserMessages() {
+    const listEl = document.getElementById('user-messages-list');
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session || !window.supaAuth?.supabase) {
+        listEl.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">Inicia sesión para ver tus mensajes.</p>';
+        return;
+    }
+
+    try {
+        listEl.innerHTML = '<p class="text-gray-500 text-sm text-center py-8 animate-pulse">Cargando...</p>';
+        
+        const { data: feedbacks, error } = await window.supaAuth.supabase
+            .from('user_feedback')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .order('created_at', { ascending: false });
+            
+        if (error) throw error;
+        
+        if (!feedbacks || feedbacks.length === 0) {
+            listEl.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">No has enviado ninguna idea aún.</p>';
+            return;
+        }
+
+        // Marcar mensajes como leídos si tienen notificación
+        const unreadIds = feedbacks.filter(f => f.has_unread_reply).map(f => f.id);
+        if (unreadIds.length > 0) {
+            await window.supaAuth.supabase.from('user_feedback').update({ has_unread_reply: false }).in('id', unreadIds);
+            document.getElementById('fb-unread-badge')?.classList.add('hidden');
+        }
+        
+        listEl.innerHTML = '';
+        feedbacks.forEach(f => {
+            const hasReplies = f.conversation && f.conversation.length > 0;
+            const statusColor = f.status === 'reviewed' ? 'text-blue-400' : (f.status === 'implemented' ? 'text-green-400' : 'text-yellow-400');
+            const statusText = f.status === 'reviewed' ? 'Revisado' : (f.status === 'implemented' ? 'Implementado' : 'Pendiente');
+            
+            const item = document.createElement('div');
+            item.className = 'bg-black/40 border border-white/5 p-4 rounded-xl cursor-pointer hover:border-white/20 transition-all';
+            item.onclick = () => openUserFeedbackChat(f);
+            
+            item.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-bold ${statusColor}">${statusText}</span>
+                    <span class="text-[10px] text-gray-500">${new Date(f.created_at).toLocaleDateString()}</span>
+                </div>
+                <p class="text-sm text-white line-clamp-2">${f.message}</p>
+                ${hasReplies ? `<div class="mt-3 flex items-center gap-2 text-xs text-emerald-400"><i data-lucide="message-circle" class="w-3 h-3"></i> Tienes ${f.conversation.length} respuesta(s)</div>` : ''}
+            `;
+            listEl.appendChild(item);
+        });
+        if (window.lucide) lucide.createIcons();
+    } catch (err) {
+        console.error("Error loading user messages:", err);
+        listEl.innerHTML = '<p class="text-red-500 text-sm text-center py-8">Error cargando mensajes.</p>';
+    }
+}
+
+function openUserFeedbackChat(feedback) {
+    const listEl = document.getElementById('user-messages-list');
+    
+    let chatHtml = `
+        <div class="flex items-center gap-2 mb-4">
+            <button onclick="switchFeedbackTab('messages')" class="text-gray-400 hover:text-white p-1 rounded hover:bg-white/10 transition-colors">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            </button>
+            <h4 class="font-bold text-sm text-white">Conversación</h4>
+        </div>
+        <div class="flex-1 overflow-y-auto space-y-3 mb-4 pr-2" id="user-chat-messages">
+            <div class="bg-white/5 p-3 rounded-tr-xl rounded-b-xl max-w-[85%] self-start">
+                <p class="text-xs text-gray-400 font-bold mb-1">Tú</p>
+                <p class="text-sm text-white">${feedback.message}</p>
+            </div>
+    `;
+    
+    if (feedback.conversation && feedback.conversation.length > 0) {
+        feedback.conversation.forEach(msg => {
+            const isMe = msg.sender === 'user';
+            chatHtml += `
+                <div class="${isMe ? 'bg-emerald-500/20 ml-auto rounded-tl-xl' : 'bg-blue-500/20 mr-auto rounded-tr-xl'} p-3 rounded-b-xl max-w-[85%]">
+                    <p class="text-xs ${isMe ? 'text-emerald-400 text-right' : 'text-blue-400'} font-bold mb-1">${isMe ? 'Tú' : 'Admin'}</p>
+                    <p class="text-sm text-white">${msg.msg}</p>
+                </div>
+            `;
+        });
+    }
+    
+    chatHtml += `
+        </div>
+        <div class="flex gap-2">
+            <input type="text" id="user-chat-input-${feedback.id}" class="flex-1 bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500/50 outline-none" placeholder="Escribe una respuesta...">
+            <button onclick="sendUserChatReply('${feedback.id}')" class="bg-emerald-500 hover:bg-emerald-600 text-black p-2 rounded-xl transition-colors">
+                <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+        </div>
+    `;
+    
+    listEl.innerHTML = chatHtml;
+    if (window.lucide) lucide.createIcons();
+    
+    // Auto-scroll
+    const chatContainer = document.getElementById('user-chat-messages');
+    if(chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+async function sendUserChatReply(feedbackId) {
+    const input = document.getElementById(`user-chat-input-${feedbackId}`);
+    if (!input) return;
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    try {
+        const { data: fb, error: errFb } = await window.supaAuth.supabase
+            .from('user_feedback')
+            .select('conversation, message')
+            .eq('id', feedbackId)
+            .single();
+
+        if (errFb) throw errFb;
+
+        let conv = fb.conversation || [];
+        conv.push({ sender: 'user', msg: msg, date: new Date().toISOString() });
+
+        const { error } = await window.supaAuth.supabase
+            .from('user_feedback')
+            .update({ conversation: conv })
+            .eq('id', feedbackId);
+
+        if (error) throw error;
+
+        input.value = '';
+        // Recargar mensajes para ver la conversación actualizada
+        loadUserMessages();
+    } catch (err) {
+        console.error("Error sending reply", err);
+        alert('Error al enviar mensaje');
     }
 }
 
@@ -901,7 +1222,7 @@ async function openAdminPanel() {
         // 1. Obtener todos los feedbacks
         const { data: feedbacks, error: fbError } = await supabase
             .from('user_feedback')
-            .select('id, user_id, message, status, created_at')
+            .select('id, user_id, message, status, created_at, conversation, has_unread_reply')
             .order('created_at', { ascending: false });
 
         if (fbError) throw fbError;
@@ -1018,12 +1339,33 @@ function renderAdminFeedback(tab) {
                     <p class="text-sm text-gray-200 leading-relaxed">${f.message}</p>
                 </div>
 
+                <!-- Área de Chat Inline (oculta por defecto) -->
+                <div id="admin-chat-area-${f.id}" class="hidden mt-4 pt-4 border-t border-white/5 animate-fade-in">
+                    <div class="space-y-3 mb-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar" id="admin-chat-msgs-${f.id}">
+                        <!-- Se llena dinámicamente al abrir -->
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="admin-chat-input-${f.id}" 
+                            class="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:border-blue-500/50 outline-none" 
+                            placeholder="Escribe tu respuesta..."
+                            onkeydown="if(event.key==='Enter') sendAdminChatReply('${f.id}')">
+                        <button onclick="sendAdminChatReply('${f.id}')" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl transition-colors">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Acciones -->
-                <div class="flex gap-2 justify-end">
+                <div class="flex gap-2 justify-end mt-4">
+                    <button onclick="openAdminFeedbackChat('${f.id}')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-500/15 hover:bg-blue-500/25 text-blue-400 rounded-lg border border-blue-500/25 transition-all">
+                        <i data-lucide="message-square" class="w-3 h-3"></i> Conversar
+                    </button>
                     ${isPending ? `
                     <button onclick="markFeedbackAsReviewed('${f.id}')"
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-green-500/15 hover:bg-green-500/25 text-green-400 rounded-lg border border-green-500/25 transition-all">
-                        <i data-lucide="check" class="w-3 h-3"></i> Marcar como Visto
+                        <i data-lucide="check" class="w-3 h-3"></i> Visto
                     </button>
                     ` : `
                     <button onclick="deleteFeedback('${f.id}')"
@@ -1037,6 +1379,82 @@ function renderAdminFeedback(tab) {
     }).join('');
 
     if (window.lucide) lucide.createIcons();
+}
+
+function openAdminFeedbackChat(feedbackId, forceOpen = false) {
+    const chatArea = document.getElementById(`admin-chat-area-${feedbackId}`);
+    if (!chatArea) return;
+
+    // Toggle visibilidad (solo si no se fuerza la apertura)
+    if (!forceOpen && !chatArea.classList.contains('hidden')) {
+        chatArea.classList.add('hidden');
+        return;
+    }
+
+    // Mostrar y cargar mensajes
+    chatArea.classList.remove('hidden');
+    const msgsEl = document.getElementById(`admin-chat-msgs-${feedbackId}`);
+    const f = _adminFeedbackAll.find(x => x.id === feedbackId);
+    if (!f || !msgsEl) return;
+
+    let chatHtml = `
+        <div class="bg-emerald-500/10 p-3 rounded-tr-xl rounded-b-xl border border-emerald-500/10 mb-2">
+            <p class="text-[9px] text-emerald-400 font-black uppercase tracking-widest mb-1">Usuario (Original)</p>
+            <p class="text-xs text-white">${f.message}</p>
+        </div>
+    `;
+
+    if (f.conversation && f.conversation.length > 0) {
+        f.conversation.forEach(msg => {
+            const isMe = msg.sender === 'admin';
+            chatHtml += `
+                <div class="${isMe ? 'bg-blue-500/10 ml-auto rounded-tl-xl border border-blue-500/10' : 'bg-emerald-500/10 mr-auto rounded-tr-xl border border-emerald-500/10'} p-3 rounded-b-xl max-w-[90%] mb-2">
+                    <p class="text-[9px] ${isMe ? 'text-blue-400 text-right' : 'text-emerald-400'} font-black uppercase tracking-widest mb-1">${isMe ? 'Tú (Admin)' : 'Usuario'}</p>
+                    <p class="text-xs text-white">${msg.msg}</p>
+                </div>
+            `;
+        });
+    }
+
+    msgsEl.innerHTML = chatHtml;
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+    if (window.lucide) lucide.createIcons();
+}
+
+async function sendAdminChatReply(feedbackId) {
+    const input = document.getElementById(`admin-chat-input-${feedbackId}`);
+    if (!input) return;
+    const msg = input.value.trim();
+    if (!msg) return;
+    
+    try {
+        const f = _adminFeedbackAll.find(x => x.id === feedbackId);
+        if (!f) return;
+        
+        let conv = f.conversation || [];
+        conv.push({ sender: 'admin', msg: msg, date: new Date().toISOString() });
+        
+        const { error } = await window.supaAuth.supabase
+            .from('user_feedback')
+            .update({ 
+                conversation: conv,
+                has_unread_reply: true,
+                status: f.status === 'pending' ? 'reviewed' : f.status
+            })
+            .eq('id', feedbackId);
+            
+        if (error) throw error;
+        
+        f.conversation = conv;
+        if(f.status === 'pending') f.status = 'reviewed';
+        
+        input.value = ''; // Limpiar input
+        _actualizarContadoresAdmin();
+        openAdminFeedbackChat(feedbackId, true); // Forzar actualización sin cerrar
+    } catch (err) {
+        console.error("Error sending reply from admin", err);
+        alert('Error al enviar mensaje');
+    }
 }
 
 async function markFeedbackAsReviewed(feedbackId) {

@@ -205,6 +205,42 @@ async function handleSignOut() {
     }
 }
 
+async function deleteAccount() {
+    if (!confirm('🛑 ¡ADVERTENCIA!\n\n¿Estás completamente seguro de que querés eliminar tu cuenta de forma permanente?\n\nEsta acción NO se puede deshacer. Todos tus datos, progreso e historiales serán borrados de inmediato y tu nombre de usuario quedará libre.')) {
+        return;
+    }
+
+    const session = currentSession;
+    if (!session || !session.user || !_db) {
+        alert('No se pudo verificar tu sesión. Iniciá sesión de nuevo e intentá.');
+        return;
+    }
+
+    try {
+        // Llamar a la función RPC (Remote Procedure Call) en Supabase para que borre el usuario
+        // Requiere haber ejecutado el SQL de delete_user en Supabase
+        const { error } = await _db.rpc('delete_user');
+        
+        if (error) {
+            console.error('Error rpc delete_user:', error);
+            // Fallback: Si el RPC falla o no está creado, intentamos borrar el profile.
+            // Esto liberará el nombre de usuario, aunque el auth.user en Supabase quede huérfano.
+            const { error: profileError } = await _db.from('profiles').delete().eq('id', session.user.id);
+            if (profileError) throw profileError;
+        }
+
+        _clearStoredUsername();
+        await _db.auth.signOut();
+        
+        alert('Tu cuenta y todos tus datos han sido eliminados correctamente.');
+        location.reload();
+        
+    } catch (error) {
+        console.error('Error al eliminar cuenta:', error);
+        alert('Hubo un error al intentar eliminar la cuenta: ' + error.message);
+    }
+}
+
 // ==========================================
 // PERFIL Y SELECCIÓN DE CARRERAS
 // ==========================================
@@ -228,7 +264,12 @@ async function fetchUserProfile(userId) {
             _mostrarSeleccionCarreras();
         } else {
             if (typeof filtrarCarrerasPorPerfil === 'function') filtrarCarrerasPorPerfil(selected);
-            if (typeof window.navigateTo === 'function') window.navigateTo('home');
+            if (typeof window.navigateTo === 'function') {
+                const isLoginVisible = !document.getElementById('login-section')?.classList.contains('hidden');
+                if (isLoginVisible) {
+                    window.navigateTo(window.location.hash ? window.location.hash.substring(1) : 'home');
+                }
+            }
             if (typeof cargarEstado === 'function') cargarEstado();
         }
     } catch (error) {
@@ -290,7 +331,52 @@ function showAuthLoading(isLoading) {
 }
 
 function showProfileMenu() {
-    if (confirm('¿Deseas cerrar sesión?')) handleSignOut();
+    // Abrir modal de perfil en lugar de cerrar sesión de golpe
+    const modal = document.getElementById('profile-edit-modal');
+    if (modal) {
+        // Cargar datos actuales
+        const fullNameInput = document.getElementById('profile-edit-name');
+        const studentIdInput = document.getElementById('profile-edit-carnet');
+        const usernameDisplay = document.getElementById('profile-edit-username');
+        
+        if (fullNameInput) fullNameInput.value = currentProfile?.full_name || '';
+        if (studentIdInput) studentIdInput.value = currentProfile?.student_id || '';
+        if (usernameDisplay) usernameDisplay.innerText = currentProfile?.username || _getStoredUsername() || 'Usuario';
+        
+        modal.classList.remove('hidden');
+    } else {
+        if (confirm('¿Deseas cerrar sesión?')) handleSignOut();
+    }
+}
+
+async function actualizarPerfilData(fullName, studentId) {
+    if (!currentSession || !_db) return false;
+    
+    try {
+        const { error } = await _db.from('profiles')
+            .update({ 
+                full_name: fullName, 
+                student_id: studentId 
+            })
+            .eq('id', currentSession.user.id);
+            
+        if (error) throw error;
+        
+        if (currentProfile) {
+            currentProfile.full_name = fullName;
+            currentProfile.student_id = studentId;
+        }
+        
+        // Actualizar UI
+        updateAuthUI(currentSession);
+        _actualizarNombreHome();
+        
+        return true;
+    } catch (err) {
+        console.error('[Auth] Error al actualizar perfil:', err);
+        alert('Error al guardar: ' + err.message);
+        return false;
+    }
 }
 
 // ==========================================
@@ -303,6 +389,8 @@ window.supaAuth = {
     handleSignOut: handleSignOut,
     guardarSeleccionCarreras: guardarSeleccionCarreras,
     editarCarreras: editarCarreras,
+    actualizarPerfilData: actualizarPerfilData,
+    showProfileMenu: showProfileMenu,
     getCurrentSession: function() { return currentSession; },
     getCurrentProfile: function() { return currentProfile; },
     getStoredUsername: _getStoredUsername

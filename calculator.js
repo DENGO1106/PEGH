@@ -570,6 +570,74 @@ async function calcDeleteSemester(id) {
     }
 }
 
+// ==========================================
+// COMBINAR HISTORIALES (PONDERADO ANUAL)
+// ==========================================
+
+function calcOpenCombineModal() {
+    if (calcHistoryData.length === 0) {
+        alert("No tenés historiales guardados para combinar.");
+        return;
+    }
+
+    const listEl = document.getElementById('calc-combine-list');
+    listEl.innerHTML = calcHistoryData.map(h => `
+        <label class="flex items-center gap-4 p-4 bg-black/30 border border-white/5 rounded-xl cursor-pointer hover:border-yellow-500/30 transition-all has-[:checked]:border-yellow-500/60 has-[:checked]:bg-yellow-500/10">
+            <input type="checkbox" value="${h.id}" class="w-5 h-5 accent-yellow-500 combine-checkbox">
+            <div class="flex-1">
+                <p class="text-white font-bold text-sm">${h.semester_name} - ${h.semester_year}</p>
+                <p class="text-gray-500 text-xs mt-0.5">${h.total_credits} CR · ${h.courses_json ? h.courses_json.length : 0} Cursos</p>
+            </div>
+            <div class="text-right">
+                <p class="text-yellow-500 font-black text-lg">${Number(h.gpa).toFixed(2)}</p>
+            </div>
+        </label>
+    `).join('');
+
+    document.getElementById('calc-combine-modal').classList.remove('hidden');
+}
+
+function calcConfirmCombine() {
+    const checkboxes = document.querySelectorAll('.combine-checkbox:checked');
+    if (checkboxes.length === 0) {
+        alert("Seleccioná al menos un historial para combinar.");
+        return;
+    }
+
+    let combinedCourses = [];
+
+    checkboxes.forEach(cb => {
+        const id = cb.value;
+        const h = calcHistoryData.find(x => x.id === id);
+        if (h && h.courses_json) {
+            combinedCourses = combinedCourses.concat(h.courses_json);
+        }
+    });
+
+    if (combinedCourses.length === 0) {
+        alert("No se encontraron cursos válidos en los historiales seleccionados.");
+        return;
+    }
+
+    // Transformar los cursos combinados al formato de Modo Manual Libre
+    calcManualCourses = combinedCourses.map((c, index) => ({
+        id: Date.now().toString() + index,
+        selectedCourseVal: 'CUSTOM', // Como es combinado, lo dejamos en CUSTOM para que se vea el nombre
+        name: c.name,
+        credits: c.credits,
+        grade: c.grade
+    }));
+
+    calcSaveData();
+    document.getElementById('calc-combine-modal').classList.add('hidden');
+    
+    // Cambiar a la pestaña de Modo Manual para que el usuario lo vea
+    calcSwitchTab('manual');
+    
+    // Opcionalmente, hacer un scroll arriba suave
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // Exponer la carga inicial para cuando se navegue a la calculadora
 document.addEventListener('DOMContentLoaded', () => {
     // Escuchar el evento de carga del estado en app.js para inicializar la auto carga
