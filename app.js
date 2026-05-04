@@ -732,8 +732,8 @@ function inicializar() {
     document.getElementById('nombre-carrera').textContent = getNombreCarrera(carreraActual);
     renderizarCarrera();
     
-    // Iniciar detección de AdBlocker
-    setTimeout(detectarAdBlocker, 2000);
+    // Mostrar mensaje de soporte amigable (una vez por usuario)
+    setTimeout(mostrarMensajeSoporte, 2000);
 
     console.log('Aplicación inicializada correctamente');
 }
@@ -742,79 +742,17 @@ function inicializar() {
 // DETECCIÓN DE ADBLOCKER (POR CAMBIO DE ESTADO)
 // ===================================
 
-const ADBLOCK_STATE_KEY = 'ucr_adblock_state'; // 'blocked' | 'allowed' | null
+const SUPPORT_MSG_KEY = 'ucr_support_msg_shown';
 
-function _verificarEstadoAdBlock(callback) {
-    // Técnica por petición de red: los adblockers modernos (uBlock, etc.) bloquean
-    // URLs con patrones típicos de anuncios, haciendo fallar la carga de la imagen.
-    const testImg = new Image();
-    const timestamp = Date.now(); // Evitar caché
-    let respondido = false;
-
-    const responder = (bloqueado) => {
-        if (respondido) return;
-        respondido = true;
-        testImg.onload = testImg.onerror = null;
-        callback(bloqueado);
-    };
-
-    testImg.onload  = () => responder(false); // Cargó → sin bloqueador
-    testImg.onerror = () => responder(true);  // Falló  → hay bloqueador
-
-    // URL con patrón típico de anuncio que uBlock y similares bloquean
-    testImg.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?t=${timestamp}`;
-
-    // Timeout de seguridad: si no responde en 2s, asumir que está bloqueado
-    setTimeout(() => responder(true), 2000);
-}
-
-function detectarAdBlocker() {
-    _verificarEstadoAdBlock((bloqueado) => {
-        const estadoActual = bloqueado ? 'blocked' : 'allowed';
-        const estadoAnterior = localStorage.getItem(ADBLOCK_STATE_KEY);
-
-        // Solo mostrar mensaje si el estado CAMBIÓ respecto a la última visita conocida
-        if (estadoAnterior !== estadoActual) {
-            localStorage.setItem(ADBLOCK_STATE_KEY, estadoActual);
-
-            if (bloqueado) {
-                mostrarToastNotificacion(
-                    "Hola, veo que estás usando un adblocker. La página es gratis y podés seguirla usando así, pero me serviría mucho que lo desactivaras. No te van a aparecer anuncios molestos, es solo para ayudarme. ¡Muchas gracias y espero que disfrutes la app! 🙏",
-                    "warning"
-                );
-            } else {
-                mostrarToastNotificacion(
-                    "¡Gracias por no usar un adblocker! Me estás ayudando muchísimo a mantener este proyecto. No te van a aparecer anuncios molestos, así que no hay problema. ¡Disfrutá la app! 🎉",
-                    "success"
-                );
-            }
-        }
-        // Si el estado es igual al anterior → no se muestra nada
-    });
-
-    // Polling cada 15 segundos para detectar si el usuario activa/desactiva el bloqueador en vivo
-    setInterval(() => {
-        _verificarEstadoAdBlock((bloqueado) => {
-            const estadoActual = bloqueado ? 'blocked' : 'allowed';
-            const estadoAnterior = localStorage.getItem(ADBLOCK_STATE_KEY);
-
-            if (estadoAnterior !== estadoActual) {
-                localStorage.setItem(ADBLOCK_STATE_KEY, estadoActual);
-
-                if (bloqueado) {
-                    mostrarToastNotificacion(
-                        "Hola, veo que ahora estás usando un adblocker. Podés seguir usando la app, pero me serviría mucho que lo desactivaras. ¡Gracias! 🙏",
-                        "warning"
-                    );
-                } else {
-                    mostrarToastNotificacion(
-                        "¡Muchas gracias por desactivar el adblocker! Me estás ayudando un montón. No te van a aparecer anuncios molestos. ¡Disfrutá la app! 🎉",
-                        "success"
-                    );
-                }
-            }
-        });
-    }, 15000);
+function mostrarMensajeSoporte() {
+    // Solo mostrar este mensaje una vez por dispositivo/navegador
+    if (!localStorage.getItem(SUPPORT_MSG_KEY)) {
+        mostrarToastNotificacion(
+            "👋 Hola, la plataforma funciona perfectamente con o sin adblocker. Sin embargo, no usamos anuncios molestos y tu apoyo desactivándolo o no usándolo nos ayudaría muchísimo a mantener este proyecto vivo. ¡Gracias y disfrutá la app!",
+            "info"
+        );
+        localStorage.setItem(SUPPORT_MSG_KEY, 'true');
+    }
 }
 
 function mostrarToastNotificacion(mensaje, tipo) {
@@ -828,6 +766,9 @@ function mostrarToastNotificacion(mensaje, tipo) {
     if (tipo === "warning") {
         toast.className = clasesBase + " bg-yellow-950/60 border-yellow-500/30 text-yellow-50";
         iconoHtml = `<div class="flex-shrink-0 p-2 bg-yellow-500/20 rounded-xl text-yellow-500 border border-yellow-500/20 mt-0.5"><i data-lucide="shield-alert" class="w-5 h-5"></i></div>`;
+    } else if (tipo === "info") {
+        toast.className = clasesBase + " bg-blue-950/60 border-blue-500/30 text-blue-50";
+        iconoHtml = `<div class="flex-shrink-0 p-2 bg-blue-500/20 rounded-xl text-blue-400 border border-blue-500/20 mt-0.5"><i data-lucide="info" class="w-5 h-5"></i></div>`;
     } else {
         toast.className = clasesBase + " bg-emerald-950/60 border-emerald-500/30 text-emerald-50";
         iconoHtml = `<div class="flex-shrink-0 p-2 bg-emerald-500/20 rounded-xl text-emerald-400 border border-emerald-500/20 mt-0.5"><i data-lucide="shield-check" class="w-5 h-5"></i></div>`;
