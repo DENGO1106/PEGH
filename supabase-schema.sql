@@ -480,18 +480,25 @@ CREATE POLICY "user_semesters_delete" ON public.user_semesters
   FOR DELETE USING (auth.uid() = user_id);
 
 -- ============================================================
--- 9. TABLA: user_schedules (Sincronización del Generador de Horarios)
+-- 9. TABLA: user_schedules (Historial del Generador de Horarios)
 -- ============================================================
+DROP TABLE IF EXISTS public.user_schedules CASCADE;
+
 CREATE TABLE public.user_schedules (
-  id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id     uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  data        jsonb NOT NULL DEFAULT '[]'::jsonb,
-  updated_at  timestamptz DEFAULT now() NOT NULL,
-  UNIQUE(user_id)
+  id              uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id         uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  schedule_name   text NOT NULL, -- Ej: "I Semestre 2026"
+  data            jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at      timestamptz DEFAULT now() NOT NULL
 );
 
 ALTER TABLE public.user_schedules ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "user_schedules_all" ON public.user_schedules FOR ALL
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "user_schedules_select" ON public.user_schedules 
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "user_schedules_insert" ON public.user_schedules 
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "user_schedules_delete" ON public.user_schedules 
+  FOR DELETE USING (auth.uid() = user_id);

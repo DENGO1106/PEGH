@@ -712,48 +712,19 @@ function guardarHorarios() {
     const session = window.supaAuth?.getCurrentSession();
     const key = session ? `${SCHED_STORAGE_KEY}_${session.user.id}` : SCHED_STORAGE_KEY;
     localStorage.setItem(key, JSON.stringify(data));
-
-    // Sincronizar con Supabase en segundo plano
-    if (session && window.supaAuth && typeof window.supaAuth.saveScheduleData === 'function') {
-        window.supaAuth.saveScheduleData(data).catch(e => console.error("Error sync horario:", e));
-    }
 }
 
-async function cargarHorarios() {
+function cargarHorarios() {
     const session = window.supaAuth?.getCurrentSession();
     const key = session ? `${SCHED_STORAGE_KEY}_${session.user.id}` : SCHED_STORAGE_KEY;
-    
-    // 1. Cargar local primero (rápido)
     const saved = localStorage.getItem(key);
+    
     if (saved) {
         try {
             const data = JSON.parse(saved);
             _aplicarDataHorario(data);
         } catch (e) {
             console.error('Error cargando horarios locales:', e);
-        }
-    }
-
-    // 2. Cargar de Supabase si hay sesión (sobrescribe la fuente de verdad)
-    if (session && window.supaAuth && typeof window.supaAuth.loadScheduleData === 'function') {
-        try {
-            const remoteData = await window.supaAuth.loadScheduleData();
-            if (remoteData) {
-                console.log('✅ Horario cargado desde Supabase');
-                _aplicarDataHorario(remoteData);
-                localStorage.setItem(key, JSON.stringify(remoteData));
-                
-                // Forzar actualización de UI si los datos llegaron tarde
-                if (typeof renderSchedulerCategories === 'function') renderSchedulerCategories();
-                if (typeof generateSchedule === 'function' && selectedCourses.length > 0) generateSchedule();
-            } else if (saved) {
-                // No hay datos en Supabase, pero SÍ hay datos locales (usuario legacy)
-                // Subimos los datos locales a Supabase para sincronizar el otro dispositivo
-                console.log('☁️ Subiendo horario local a Supabase por primera vez');
-                guardarHorarios();
-            }
-        } catch (e) {
-            console.error("Error cargando horario desde Supabase:", e);
         }
     }
 }
@@ -770,5 +741,151 @@ function _aplicarDataHorario(data) {
         if (radio) radio.checked = true;
         const weekendEl = document.getElementById('sched-weekend');
         if (weekendEl) weekendEl.checked = data.config.weekend;
+    }
+}
+
+// ==========================================
+// HISTORIAL DE HORARIOS (NUBE)
+// ==========================================
+
+function schedShowSaveModal() {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session) {
+        alert("Debes iniciar sesión para guardar horarios en la nube.");
+        return;
+    }
+    const cycleEl = document.getElementById('scheduler-cycle');
+    const nameInput = document.getElementById('sched-save-name');
+    if (cycleEl && cycleEl.value) {
+        nameInput.value = cycleEl.value;
+    } else {
+        nameInput.value = '';
+    }
+    document.getElementById('sched-save-modal').classList.remove('hidden');
+}
+
+async function schedConfirmSave() {
+    const nameInput = document.getElementById('sched-save-name');
+    const name = nameInput.value.trim();
+    if (!name) {
+        alert("Por favor ingresa un nombre para el horario.");
+        return;
+    }
+    
+    const cycleEl = document.getElementById('scheduler-cycle');
+    const startRad = document.querySelector('input[name="sched-start"]:checked');
+    const weekendEl = document.getElementById('sched-weekend');
+    
+    const data = {
+        courses: selectedCourses,
+        colorOverrides: categoryColorOverrides,
+        cycle: cycleEl ? cycleEl.value : '',
+        config: {
+            start: startRad ? startRad.value : 7,
+            weekend: weekendEl ? weekendEl.checked : false
+        }
+    };
+
+    const btn = document.getElementById('sched-btn-save-confirm');
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
+    btn.disabled = true;
+
+    try {
+        if (window.supaAuth && typeof window.supaAuth.saveScheduleToCloud === 'function') {
+            await window.supaAuth.saveScheduleToCloud(name, data);
+            document.getElementById('sched-save-modal').classList.add('hidden');
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Error guardando horario.");
+    } finally {
+        btn.innerHTML = origHtml;
+        btn.disabled = false;
+        if(typeof lucide !== 'undefined') lucide.createIcons();
+    }
+}
+
+async function schedShowHistoryModal() {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session) {
+        alert("Debes iniciar sesión para ver tus horarios.");
+        return;
+    }
+    const modal = document.getElementById('sched-history-modal');
+    modal.classList.remove('hidden');
+    
+    const listEl = document.getElementById('sched-history-list');
+    listEl.innerHTML = '<div class="flex items-center justify-center h-full"><i data-lucide="loader-2" class="w-8 h-8 text-gray-500 animate-spin"></i></div>';
+    if(typeof lucide !== 'undefined') lucide.createIcons();
+    
+    try {
+        const history = await window.supaAuth.loadAllSavedSchedules();
+        if (history.length === 0) {
+            listEl.innerHTML = '<p class="text-gray-500 text-center py-8 text-sm">No tienes horarios guardados en la nube.</p>';
+            return;
+        }
+        
+        let html = '';
+        history.forEach(item => {
+            const dateStr = new Date(item.created_at).toLocaleDateString();
+            const courseCount = item.data.courses ? item.data.courses.length : 0;
+            // Sanitizamos los datos para inyectarlos en el onclick
+            const dataStr = JSON.stringify(item.data).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+            
+            html += `
+                <div class="bg-black/30 border border-white/5 rounded-xl p-4 flex flex-col gap-3 group hover:border-white/10 transition-colors">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="font-bold text-white text-sm">${item.schedule_name}</div>
+                            <div class="text-[10px] text-gray-400 mt-0.5">${courseCount} cursos · Guardado: ${dateStr}</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="schedLoadCloudData('${dataStr}')" class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1 border border-white/5">
+                            <i data-lucide="download" class="w-3 h-3"></i> Cargar
+                        </button>
+                        <button onclick="schedDeleteHistory('${item.id}')" class="bg-red-900/20 hover:bg-red-900/40 text-red-500 p-2 rounded-lg transition-colors border border-red-500/10">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        listEl.innerHTML = html;
+        if(typeof lucide !== 'undefined') lucide.createIcons();
+    } catch (e) {
+        console.error(e);
+        listEl.innerHTML = '<p class="text-red-500 text-center py-8 text-sm">Error cargando historial.</p>';
+    }
+}
+
+function schedLoadCloudData(dataStr) {
+    if (confirm("Se reemplazará tu horario actual con el guardado en la nube. ¿Deseas continuar?")) {
+        try {
+            // Desanitizar la cadena JSON
+            const unescapedStr = dataStr.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+            const dataObj = JSON.parse(unescapedStr);
+            
+            _aplicarDataHorario(dataObj);
+            guardarHorarios(); // Guardar como borrador local actual
+            document.getElementById('sched-history-modal').classList.add('hidden');
+            renderSchedulerCategories();
+            if (typeof generateSchedule === 'function' && selectedCourses.length > 0) generateSchedule();
+        } catch (e) {
+            console.error("Error al parsear el horario cargado:", e);
+        }
+    }
+}
+
+async function schedDeleteHistory(id) {
+    if (confirm("¿Estás seguro de eliminar este horario guardado de la nube?")) {
+        try {
+            await window.supaAuth.deleteSavedSchedule(id);
+            schedShowHistoryModal(); // recargar
+        } catch (e) {
+            console.error(e);
+            alert("Error al eliminar.");
+        }
     }
 }

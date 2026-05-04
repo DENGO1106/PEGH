@@ -382,18 +382,18 @@ async function actualizarPerfilData(fullName, studentId) {
 }
 
 // ==========================================
-// SINCRONIZACIÓN DE HORARIOS (GENERADOR)
+// HISTORIAL DE HORARIOS (GENERADOR)
 // ==========================================
-async function saveScheduleData(data) {
+async function saveScheduleToCloud(name, data) {
     if (!currentSession || !_db) return false;
     try {
         const { error } = await _db
             .from('user_schedules')
-            .upsert({
+            .insert([{
                 user_id: currentSession.user.id,
-                data: data,
-                updated_at: new Date().toISOString()
-            }, { onConflict: 'user_id' });
+                schedule_name: name,
+                data: data
+            }]);
         
         if (error) throw error;
         return true;
@@ -403,21 +403,37 @@ async function saveScheduleData(data) {
     }
 }
 
-async function loadScheduleData() {
-    if (!currentSession || !_db) return null;
+async function loadAllSavedSchedules() {
+    if (!currentSession || !_db) return [];
     try {
         const { data, error } = await _db
             .from('user_schedules')
-            .select('data')
+            .select('*')
             .eq('user_id', currentSession.user.id)
-            .single();
+            .order('created_at', { ascending: false });
         
-        // PGRST116 es "No rows found", lo ignoramos si el usuario aún no tiene horario
-        if (error && error.code !== 'PGRST116') throw error; 
-        return data ? data.data : null;
+        if (error) throw error;
+        return data || [];
     } catch (error) {
-        console.error('[Auth] Error cargando horario:', error);
-        return null;
+        console.error('[Auth] Error cargando historial de horarios:', error);
+        return [];
+    }
+}
+
+async function deleteSavedSchedule(id) {
+    if (!currentSession || !_db) return false;
+    try {
+        const { error } = await _db
+            .from('user_schedules')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', currentSession.user.id);
+            
+        if (error) throw error;
+        return true;
+    } catch (error) {
+        console.error('[Auth] Error eliminando horario:', error);
+        return false;
     }
 }
 
@@ -436,8 +452,9 @@ window.supaAuth = {
     getCurrentSession: function() { return currentSession; },
     getCurrentProfile: function() { return currentProfile; },
     getStoredUsername: _getStoredUsername,
-    saveScheduleData: saveScheduleData,
-    loadScheduleData: loadScheduleData
+    saveScheduleToCloud: saveScheduleToCloud,
+    loadAllSavedSchedules: loadAllSavedSchedules,
+    deleteSavedSchedule: deleteSavedSchedule
 };
 // Acceso directo desde HTML onclick
 window.guardarSeleccionCarreras = guardarSeleccionCarreras;

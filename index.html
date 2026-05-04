@@ -523,6 +523,16 @@
           </div>
           <h2 class="text-3xl font-bold font-display text-white tracking-tighter">Generador de Horarios</h2>
         </div>
+        <div class="flex gap-3">
+          <button onclick="schedShowHistoryModal()" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-xl text-sm font-bold border border-white/10 transition-all shadow-lg">
+            <i data-lucide="library" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Mis Horarios</span>
+          </button>
+          <button onclick="schedShowSaveModal()" class="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-lg shadow-red-900/30">
+            <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Guardar</span>
+          </button>
+        </div>
       </header>
 
       <div class="flex flex-col lg:flex-row gap-8 items-start">
@@ -1036,6 +1046,46 @@
 
     </div>
   </section>
+
+  <!-- MODAL GUARDAR HORARIO -->
+  <div id="sched-save-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl p-6 relative">
+      <button onclick="document.getElementById('sched-save-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-black text-white mb-2 flex items-center gap-2"><i data-lucide="cloud-upload" class="text-red-500"></i> Guardar Horario</h3>
+      <p class="text-xs text-gray-400 mb-6">Guardá este horario en la nube para cargarlo cuando querás.</p>
+      
+      <div class="space-y-4 mb-6">
+        <div>
+          <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Nombre del Horario</label>
+          <input type="text" id="sched-save-name" placeholder="Ej: I Semestre 2026" class="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-red-500/50 transition-colors">
+        </div>
+      </div>
+      
+      <button id="sched-btn-save-confirm" onclick="schedConfirmSave()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+        <i data-lucide="save" class="w-4 h-4"></i> Guardar en Supabase
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL HISTORIAL DE HORARIOS -->
+  <div id="sched-history-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-md shadow-2xl p-6 relative flex flex-col max-h-[80vh]">
+      <button onclick="document.getElementById('sched-history-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-black text-white mb-2 flex items-center gap-2"><i data-lucide="library" class="text-blue-500"></i> Mis Horarios</h3>
+      <p class="text-xs text-gray-400 mb-6">Tus horarios guardados en la nube.</p>
+      
+      <div id="sched-history-list" class="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar min-h-[200px]">
+        <!-- JS inyecta lista de horarios aquí -->
+        <div class="flex items-center justify-center h-full">
+            <i data-lucide="loader-2" class="w-8 h-8 text-gray-500 animate-spin"></i>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL GUARDAR HISTORIAL CALCULADORA -->
   <div id="calc-save-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
