@@ -739,16 +739,27 @@ function inicializar() {
 const ADBLOCK_STATE_KEY = 'ucr_adblock_state'; // 'blocked' | 'allowed' | null
 
 function _verificarEstadoAdBlock(callback) {
-    const adTest = document.createElement('div');
-    adTest.className = 'ad-banner adsbox doubleclick';
-    adTest.style.cssText = 'width:1px;height:1px;position:absolute;left:-9999px;top:-9999px;';
-    document.body.appendChild(adTest);
+    // Técnica por petición de red: los adblockers modernos (uBlock, etc.) bloquean
+    // URLs con patrones típicos de anuncios, haciendo fallar la carga de la imagen.
+    const testImg = new Image();
+    const timestamp = Date.now(); // Evitar caché
+    let respondido = false;
 
-    setTimeout(() => {
-        const bloqueado = adTest.offsetHeight === 0 || window.getComputedStyle(adTest).display === 'none';
-        adTest.remove();
+    const responder = (bloqueado) => {
+        if (respondido) return;
+        respondido = true;
+        testImg.onload = testImg.onerror = null;
         callback(bloqueado);
-    }, 300);
+    };
+
+    testImg.onload  = () => responder(false); // Cargó → sin bloqueador
+    testImg.onerror = () => responder(true);  // Falló  → hay bloqueador
+
+    // URL con patrón típico de anuncio que uBlock y similares bloquean
+    testImg.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?t=${timestamp}`;
+
+    // Timeout de seguridad: si no responde en 2s, asumir que está bloqueado
+    setTimeout(() => responder(true), 2000);
 }
 
 function detectarAdBlocker() {
