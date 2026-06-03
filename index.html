@@ -8,6 +8,21 @@
   <meta name="author" content="App Universitaria">
   <title>Mis Planes de Estudio - UCR</title>
 
+  <!-- PREVENIR LAGASO / FLICKER -->
+  <script>
+    const lastPage = localStorage.getItem('ucr_last_page') || 'login';
+    document.documentElement.setAttribute('data-initial-page', lastPage);
+  </script>
+  <style>
+    html[data-initial-page] .tab-content { display: none !important; }
+    html[data-initial-page="home"] #home-section { display: flex !important; }
+    html[data-initial-page="plan"] #plan-section { display: block !important; }
+    html[data-initial-page="horario"] #horarios-section { display: block !important; }
+    html[data-initial-page="calculator"] #calculator-section { display: flex !important; }
+    html[data-initial-page="login"] #login-section { display: flex !important; }
+  </style>
+
+
   <!-- Estilos -->
   <link rel="stylesheet" href="styles.css">
 
@@ -140,7 +155,7 @@
 
   <!-- PANTALLA DE INICIO (HOME) -->
   <section id="home-section"
-    class="tab-content flex flex-col min-h-[100dvh] px-4 animate-fade-in">
+    class="tab-content hidden flex flex-col min-h-[100dvh] px-4 animate-fade-in">
 
     <!-- Top bar con info del usuario -->
     <div class="flex items-center justify-between py-5 max-w-4xl w-full mx-auto flex-wrap gap-2">
@@ -234,79 +249,7 @@
         <p class="text-gray-400">Elegí las carreras que querés gestionar. Podés cambiarlo después desde el inicio.</p>
       </div>
 
-      <div class="space-y-4 mb-8">
-        <label class="flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-red-500/40 transition-all has-[:checked]:border-red-500/60 has-[:checked]:bg-red-950/20">
-          <input type="checkbox" value="ingenieriaIndustrial" class="carrera-check w-5 h-5 accent-red-600">
-          <div class="text-left">
-            <div class="text-white font-bold">🏭 Ingeniería Industrial</div>
-            <div class="text-gray-500 text-xs mt-0.5">Escuela de Ingeniería Industrial · UCR</div>
-          </div>
-        </label>
-
-        <label class="flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-zinc-400/40 transition-all has-[:checked]:border-zinc-400/60 has-[:checked]:bg-zinc-800/30">
-          <input type="checkbox" value="contaduriaPublica" class="carrera-check w-5 h-5 accent-zinc-300">
-          <div class="text-left">
-            <div class="text-white font-bold">💼 Contaduría Pública</div>
-            <div class="text-gray-500 text-xs mt-0.5">Escuela de Administración · UCR</div>
-          </div>
-        </label>
-
-        <label class="flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-blue-500/40 transition-all has-[:checked]:border-blue-500/60 has-[:checked]:bg-blue-950/20">
-          <input type="checkbox" value="direccionEmpresas" class="carrera-check w-5 h-5 accent-blue-500">
-          <div class="text-left">
-            <div class="text-white font-bold">📈 Dirección de Empresas</div>
-            <div class="text-gray-500 text-xs mt-0.5">Escuela de Administración de Negocios · UCR</div>
-          </div>
-        </label>
-
-        <label class="flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-emerald-500/40 transition-all has-[:checked]:border-emerald-500/60 has-[:checked]:bg-emerald-950/20">
-          <input type="checkbox" value="cienciasActuariales" class="carrera-check w-5 h-5 accent-emerald-500">
-          <div class="text-left">
-            <div class="text-white font-bold">📊 Ciencias Actuariales</div>
-            <div class="text-gray-500 text-xs mt-0.5">Escuela de Matemática · UCR</div>
-          </div>
-        </label>
-
-        <label class="flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-purple-500/40 transition-all has-[:checked]:border-purple-500/60 has-[:checked]:bg-purple-950/20">
-          <input type="checkbox" value="farmacia" class="carrera-check w-5 h-5 accent-purple-500">
-          <div class="text-left">
-            <div class="text-white font-bold">💊 Farmacia</div>
-            <div class="text-gray-500 text-xs mt-0.5">Facultad de Farmacia · UCR</div>
-          </div>
-        </label>
-
-        <label class="flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-amber-500/40 transition-all has-[:checked]:border-amber-500/60 has-[:checked]:bg-amber-950/20">
-          <input type="checkbox" value="ingenieriaQuimica" class="carrera-check w-5 h-5 accent-amber-500">
-          <div class="text-left">
-            <div class="text-white font-bold">⚗️ Ingeniería Química</div>
-            <div class="text-gray-500 text-xs mt-0.5">Escuela de Ingeniería Química · UCR</div>
-          </div>
-        </label>
-
-        <label class="flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-cyan-500/40 transition-all has-[:checked]:border-cyan-500/60 has-[:checked]:bg-cyan-950/20">
-          <input type="checkbox" value="economia" class="carrera-check w-5 h-5 accent-cyan-500">
-          <div class="text-left">
-            <div class="text-white font-bold">📉 Economía</div>
-            <div class="text-gray-500 text-xs mt-0.5">Escuela de Economía · UCR</div>
-          </div>
-        </label>
-
-        <label class="flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-rose-500/40 transition-all has-[:checked]:border-rose-500/60 has-[:checked]:bg-rose-950/20">
-          <input type="checkbox" value="medicina" class="carrera-check w-5 h-5 accent-rose-500">
-          <div class="text-left">
-            <div class="text-white font-bold">🩺 Medicina</div>
-            <div class="text-gray-500 text-xs mt-0.5">Escuela de Medicina · UCR</div>
-          </div>
-        </label>
-
-        <label class="flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-fuchsia-500/40 transition-all has-[:checked]:border-fuchsia-500/60 has-[:checked]:bg-fuchsia-950/20">
-          <input type="checkbox" value="microbiologia" class="carrera-check w-5 h-5 accent-fuchsia-500">
-          <div class="text-left">
-            <div class="text-white font-bold">🔬 Microbiología</div>
-            <div class="text-gray-500 text-xs mt-0.5">Facultad de Microbiología · UCR</div>
-          </div>
-        </label>
-      </div>
+      <div id="career-selection-list" class="space-y-4 mb-8"></div>
 
       <button onclick="guardarSeleccionCarreras()" class="w-full bg-white hover:bg-gray-100 text-black font-black uppercase tracking-widest rounded-xl py-4 transition-all flex items-center justify-center gap-2">
         <span>Comenzar mi Plan</span>
@@ -318,35 +261,7 @@
 
   <div class="app-container tab-content hidden" id="plan-section">
     <!-- NAVEGACIÓN DE CARRERAS -->
-    <div class="carrera-tabs">
-      <button class="tab-btn" data-carrera="ingenieriaIndustrial">
-        🏭 Ingeniería Industrial
-      </button>
-      <button class="tab-btn" data-carrera="contaduriaPublica">
-        💼 Contaduría Pública
-      </button>
-      <button class="tab-btn" data-carrera="direccionEmpresas">
-        📈 Dirección de Empresas
-      </button>
-      <button class="tab-btn" data-carrera="cienciasActuariales">
-        📊 Ciencias Actuariales
-      </button>
-      <button class="tab-btn" data-carrera="farmacia">
-        💊 Farmacia
-      </button>
-      <button class="tab-btn" data-carrera="ingenieriaQuimica">
-        ⚗️ Ingeniería Química
-      </button>
-      <button class="tab-btn" data-carrera="economia">
-        📉 Economía
-      </button>
-      <button class="tab-btn" data-carrera="medicina">
-        🩺 Medicina
-      </button>
-      <button class="tab-btn" data-carrera="microbiologia">
-        🔬 Microbiología
-      </button>
-    </div>
+    <div class="carrera-tabs" id="carrera-tabs-container"></div>
 
     <!-- CONTROLES (FUERA DE LA IMAGEN) -->
     <div class="controls-container">

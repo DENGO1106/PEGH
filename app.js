@@ -38,6 +38,7 @@ window.navigateTo = (target, pushToHistory = true) => {
         history.pushState({ page: target }, '', '#' + target);
     }
 
+    document.documentElement.removeAttribute('data-initial-page');
     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
 
@@ -234,6 +235,39 @@ async function cargarEstado() {
 // Escuchar cambios de autenticación para recargar el plan (Definido globalmente)
 window.addEventListener('supabase_auth_changed', () => {
     cargarEstado();
+
+    // Generar UI dinámicamente desde CARRERAS
+    const selectionList = document.getElementById('career-selection-list');
+    const tabsContainer = document.getElementById('carrera-tabs-container');
+    if (selectionList) selectionList.innerHTML = '';
+    if (tabsContainer) tabsContainer.innerHTML = '';
+
+    Object.keys(CARRERAS).forEach(cId => {
+        const c = CARRERAS[cId];
+        // 1. Checkboxes en el modal
+        if (selectionList) {
+            const lbl = document.createElement('label');
+            lbl.className = "flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-red-500/40 transition-all has-[:checked]:border-red-500/60 has-[:checked]:bg-red-950/20";
+            lbl.innerHTML = `
+              <input type="checkbox" value="${cId}" class="carrera-check w-5 h-5 accent-red-600">
+              <div class="text-left">
+                <div class="text-white font-bold">${c.nombre}</div>
+                <div class="text-gray-500 text-xs mt-0.5">${c.descripcion}</div>
+              </div>
+            `;
+            selectionList.appendChild(lbl);
+        }
+        // 2. Tabs en la vista de plan
+        if (tabsContainer) {
+            const btn = document.createElement('button');
+            btn.className = "tab-btn hidden"; // hidden by default, unhidden by filtrarCarrerasPorPerfil
+            btn.dataset.carrera = cId;
+            btn.textContent = c.nombre;
+            btn.addEventListener('click', () => cambiarCarrera(cId));
+            tabsContainer.appendChild(btn);
+        }
+    });
+
 });
 
 /**
@@ -754,9 +788,40 @@ function inicializar() {
 
     cargarEstado();
 
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => cambiarCarrera(btn.dataset.carrera));
+    // Generar UI dinámicamente desde CARRERAS
+    const selectionList = document.getElementById('career-selection-list');
+    const tabsContainer = document.getElementById('carrera-tabs-container');
+    if (selectionList) selectionList.innerHTML = '';
+    if (tabsContainer) tabsContainer.innerHTML = '';
+
+    Object.keys(CARRERAS).forEach(cId => {
+        const c = CARRERAS[cId];
+        // 1. Checkboxes en el modal
+        if (selectionList) {
+            const lbl = document.createElement('label');
+            lbl.className = "flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-red-500/40 transition-all has-[:checked]:border-red-500/60 has-[:checked]:bg-red-950/20";
+            lbl.innerHTML = `
+              <input type="checkbox" value="${cId}" class="carrera-check w-5 h-5 accent-red-600">
+              <div class="text-left">
+                <div class="text-white font-bold">${c.nombre}</div>
+                <div class="text-gray-500 text-xs mt-0.5">${c.descripcion}</div>
+              </div>
+            `;
+            selectionList.appendChild(lbl);
+        }
+        // 2. Tabs en la vista de plan
+        if (tabsContainer) {
+            const btn = document.createElement('button');
+            btn.className = "tab-btn hidden"; // hidden by default, unhidden by filtrarCarrerasPorPerfil
+            btn.dataset.carrera = cId;
+            btn.textContent = c.nombre;
+            btn.addEventListener('click', () => cambiarCarrera(cId));
+            tabsContainer.appendChild(btn);
+        }
     });
+
+
+    // Event listeners for tab-btn are now attached dynamically
 
     document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', () => navigateTo(tab.dataset.tab));
