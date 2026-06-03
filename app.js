@@ -42,6 +42,8 @@ window.navigateTo = (target, pushToHistory = true) => {
     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
 
+    if (typeof cerrarPicker === 'function') cerrarPicker();
+
     const appNav = document.getElementById('app-nav');
 
     if (target === 'login') {
@@ -413,19 +415,29 @@ function clickCurso(event, carreraId, codigoCurso) {
         }
     }
 
-    // Cerrar al hacer clic fuera
+    // Cerrar al hacer clic fuera (mejorado para no consumirse si se hace clic dentro del picker)
     setTimeout(() => {
-        document.addEventListener('click', function (e) {
+        const outsideClickListener = (e) => {
             if (!picker.contains(e.target)) {
                 cerrarPicker();
+                document.removeEventListener('click', outsideClickListener);
             }
-        }, { once: true });
+        };
+        document.addEventListener('click', outsideClickListener);
+        
+        // Guardar referencia para poder removerlo si se cierra por otro medio
+        picker._outsideClickListener = outsideClickListener;
     }, 10);
 }
 
 function cerrarPicker() {
     const existente = document.getElementById('estado-picker-activo');
-    if (existente) existente.remove();
+    if (existente) {
+        if (existente._outsideClickListener) {
+            document.removeEventListener('click', existente._outsideClickListener);
+        }
+        existente.remove();
+    }
 }
 
 // ===================================
