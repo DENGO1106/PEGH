@@ -38,6 +38,9 @@ window.navigateTo = (target, pushToHistory = true) => {
         history.pushState({ page: target }, '', '#' + target);
     }
 
+    // Asegurar que al cambiar de sección, volvemos arriba (útil en móviles)
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
     document.documentElement.removeAttribute('data-initial-page');
     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -1738,6 +1741,12 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', inicializar);
 } else {
     inicializar();
+}
+
+// Establecer estado inicial en el historial para evitar que el primer "Atrás" cierre la app
+if (!history.state || !history.state.page) {
+    const currentPage = document.documentElement.getAttribute('data-initial-page') || 'home';
+    history.replaceState({ page: currentPage }, '', '#' + currentPage);
 }
 
 // Manejar el botón "Atrás" del navegador/móvil
