@@ -474,6 +474,14 @@ function calcOpenHistoryDetail(id) {
         calcDeleteSemester(id);
     };
 
+    // Configurar el botón de cargar al modo manual
+    const loadBtn = document.getElementById('calc-btn-load-history');
+    if (loadBtn) {
+        loadBtn.onclick = () => {
+            calcLoadHistoryToManual(id);
+        };
+    }
+
     document.getElementById('calc-history-detail-modal').classList.remove('hidden');
     if (window.lucide) lucide.createIcons();
 }
@@ -635,6 +643,29 @@ function calcConfirmCombine() {
     calcSwitchTab('manual');
     
     // Opcionalmente, hacer un scroll arriba suave
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function calcLoadHistoryToManual(id) {
+    const h = calcHistoryData.find(x => x.id === id);
+    if (!h || !h.courses_json) return;
+
+    if (!confirm("Esto reemplazará los cursos que tenés actualmente en el Modo Manual. ¿Deseás continuar?")) return;
+
+    // Transformar los cursos del historial al formato de Modo Manual Libre
+    calcManualCourses = h.courses_json.map((c, index) => ({
+        id: Date.now().toString() + index,
+        selectedCourseVal: 'CUSTOM', // Como es cargado, lo dejamos en CUSTOM para preservar el nombre literal
+        name: c.name,
+        credits: c.credits,
+        grade: c.grade
+    }));
+
+    calcSaveData();
+    document.getElementById('calc-history-detail-modal').classList.add('hidden');
+    
+    // Cambiar a la pestaña de Modo Manual
+    calcSwitchTab('manual');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

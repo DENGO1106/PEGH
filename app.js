@@ -230,6 +230,10 @@ async function cargarEstado() {
 
     if (typeof renderizarCarrera === 'function') renderizarCarrera();
     if (typeof cargarHorarios === 'function') cargarHorarios();
+
+    // Iniciar realtime y tutorial al finalizar carga
+    setupRealtimeSubscription();
+    iniciarTutorial();
 }
 
 // Escuchar cambios de autenticación para recargar el plan (Definido globalmente)
@@ -1770,4 +1774,497 @@ function sincronizarCompartidosGlobal() {
             }
         });
     });
+}
+
+// ===================================
+// LÓGICA DE SNAPSHOTS DEL PLAN
+// ===================================
+
+async function guardarSnapshotPlan() {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session) {
+        alert("Debes iniciar sesión para guardar tu progreso en la nube.");
+        return;
+    }
+
+    const nombre = document.getElementById('plan-save-name').value.trim() || 'Mi Respaldo Automático';
+    
+    // Preparar el estado completo de todas las carreras activas (estado > 0)
+    const estado = {};
+    Object.keys(CARRERAS).forEach(cId => {
+        const cursosGuardar = CARRERAS[cId].cursos.filter(c => c.estado > 0).map(c => ({ codigo: c.codigo, estado: c.estado }));
+        if (cursosGuardar.length > 0) {
+            estado[cId] = cursosGuardar;
+        }
+    });
+
+    const btn = document.querySelector('#plan-save-modal button.bg-yellow-500');
+    const oldText = btn.innerHTML;
+    btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
+    btn.disabled = true;
+
+    try {
+        const { error } = await window.supaAuth.supabase
+            .from('user_plan_snapshots')
+            .insert([{
+                user_id: session.user.id,
+                nombre: nombre,
+                datos_json: estado
+            }]);
+
+        if (error) throw error;
+        
+        alert("¡Respaldo guardado exitosamente!");
+        document.getElementById('plan-save-modal').classList.add('hidden');
+        document.getElementById('plan-save-name').value = '';
+    } catch (err) {
+        console.error("Error al guardar snapshot:", err);
+        alert("Hubo un error al guardar tu progreso.");
+    } finally {
+        btn.innerHTML = oldText;
+        btn.disabled = false;
+        if (window.lucide) lucide.createIcons();
+    }
+}
+
+async function abrirModalHistorialPlanes() {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session) {
+        alert("Debes iniciar sesión para ver tus respaldos guardados.");
+        return;
+    }
+    document.getElementById('plan-history-modal').classList.remove('hidden');
+    cargarHistorialPlanes();
+}
+
+async function cargarHistorialPlanes() {
+    const lista = document.getElementById('plan-history-list');
+    lista.innerHTML = '<div class="flex items-center justify-center h-full"><i data-lucide="loader-2" class="w-8 h-8 text-gray-500 animate-spin"></i></div>';
+    if (window.lucide) lucide.createIcons();
+
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session) return;
+
+    try {
+        const { data, error } = await window.supaAuth.supabase
+            .from('user_plan_snapshots')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            lista.innerHTML = '<div class="text-center p-4 text-sm text-gray-500 bg-black/30 border border-white/5 rounded-2xl">No tienes respaldos guardados.</div>';
+            return;
+        }
+
+        let html = '';
+        data.forEach(snap => {
+            const dateStr = new Date(snap.created_at).toLocaleDateString('es-CR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+            
+            // Contar cuántos cursos guardados hay en total
+            let totalCursos = 0;
+            if (snap.datos_json) {
+                Object.keys(snap.datos_json).forEach(cId => {
+                    totalCursos += snap.datos_json[cId].length;
+                });
+            }
+
+            html += `
+                <div class="bg-black/40 border border-white/5 p-4 rounded-xl flex items-center justify-between group hover:border-yellow-500/30 transition-colors">
+                    <div>
+                        <div class="font-bold text-white text-sm">${snap.nombre}</div>
+                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">${dateStr} • ${totalCursos} cursos registrados</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="abrirSnapshotPlan('${snap.id}')" title="Cargar y sobreescribir plan actual" class="bg-blue-500/10 hover:bg-blue-500/30 text-blue-500 p-2 rounded-lg transition-colors border border-blue-500/20">
+                            <i data-lucide="download-cloud" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="eliminarSnapshotPlan('${snap.id}')" title="Eliminar respaldo" class="bg-red-500/10 hover:bg-red-500/30 text-red-500 p-2 rounded-lg transition-colors border border-red-500/20">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        lista.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
+
+    } catch (err) {
+        console.error("Error al cargar historial de planes:", err);
+        lista.innerHTML = '<div class="text-center text-red-500 text-sm py-4">Error al cargar historial.</div>';
+    }
+}
+
+async function abrirSnapshotPlan(snapshotId) {
+    if (!confirm("¿Estás seguro de querer cargar este respaldo? Reemplazará tu progreso actual con los datos guardados.")) return;
+
+    try {
+        const { data, error } = await window.supaAuth.supabase
+            .from('user_plan_snapshots')
+            .select('datos_json')
+            .eq('id', snapshotId)
+            .single();
+
+        if (error) throw error;
+        if (!data || !data.datos_json) throw new Error("No hay datos en el snapshot.");
+
+        // 1. Resetear todos los estados a 0 (Limpiar el canvas)
+        Object.keys(CARRERAS).forEach(carreraId => {
+            CARRERAS[carreraId].cursos.forEach(curso => { curso.estado = 0; });
+        });
+
+        // 2. Aplicar los estados guardados
+        const savedData = data.datos_json;
+        Object.keys(savedData).forEach(cId => {
+            if (CARRERAS[cId]) {
+                const arr = savedData[cId];
+                arr.forEach(savedCurso => {
+                    const idx = CARRERAS[cId].cursos.findIndex(c => c.codigo === savedCurso.codigo);
+                    if (idx !== -1) {
+                        CARRERAS[cId].cursos[idx].estado = savedCurso.estado;
+                    }
+                });
+            }
+        });
+
+        // 3. Sincronizar compartidos globalmente (Asegura consistencia cruzada)
+        if (typeof sincronizarCompartidosGlobal === 'function') {
+            sincronizarCompartidosGlobal();
+        }
+
+        // 4. Guardar como estado principal oficial
+        guardarEstado();
+
+        // 5. Renderizar interfaz y cerrar modal
+        renderizarCarrera();
+        document.getElementById('plan-history-modal').classList.add('hidden');
+        alert("¡Progreso cargado y sincronizado exitosamente!");
+
+    } catch (err) {
+        console.error("Error al abrir snapshot:", err);
+        alert("Hubo un problema cargando el respaldo.");
+    }
+}
+
+async function eliminarSnapshotPlan(snapshotId) {
+    if (!confirm("¿Estás seguro de eliminar este respaldo permanentemente?")) return;
+
+    try {
+        const { error } = await window.supaAuth.supabase
+            .from('user_plan_snapshots')
+            }
+        });
+    });
+
+    // Luego, aplicar ese estado más alto a todos los hermanos
+    Object.keys(CARRERAS).forEach(cId => {
+        const cursos = CARRERAS[cId].cursos;
+        if (!cursos) return;
+        cursos.forEach(curso => {
+            const maxEstado = mejorEstadoPorCodigo[curso.codigo];
+            if (maxEstado && curso.estado < maxEstado) {
+                curso.estado = maxEstado;
+            }
+        });
+    });
+}
+
+// ===================================
+// LÓGICA DE SNAPSHOTS DEL PLAN
+// ===================================
+
+async function guardarSnapshotPlan() {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session) {
+        alert("Debes iniciar sesión para guardar tu progreso en la nube.");
+        return;
+    }
+
+    const nombre = document.getElementById('plan-save-name').value.trim() || 'Mi Respaldo Automático';
+    
+    // Preparar el estado completo de todas las carreras activas (estado > 0)
+    const estado = {};
+    Object.keys(CARRERAS).forEach(cId => {
+        const cursosGuardar = CARRERAS[cId].cursos.filter(c => c.estado > 0).map(c => ({ codigo: c.codigo, estado: c.estado }));
+        if (cursosGuardar.length > 0) {
+            estado[cId] = cursosGuardar;
+        }
+    });
+
+    const btn = document.querySelector('#plan-save-modal button.bg-yellow-500');
+    const oldText = btn.innerHTML;
+    btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
+    btn.disabled = true;
+
+    try {
+        const { error } = await window.supaAuth.supabase
+            .from('user_plan_snapshots')
+            .insert([{
+                user_id: session.user.id,
+                nombre: nombre,
+                datos_json: estado
+            }]);
+
+        if (error) throw error;
+        
+        alert("¡Respaldo guardado exitosamente!");
+        document.getElementById('plan-save-modal').classList.add('hidden');
+        document.getElementById('plan-save-name').value = '';
+    } catch (err) {
+        console.error("Error al guardar snapshot:", err);
+        alert("Hubo un error al guardar tu progreso.");
+    } finally {
+        btn.innerHTML = oldText;
+        btn.disabled = false;
+        if (window.lucide) lucide.createIcons();
+    }
+}
+
+async function abrirModalHistorialPlanes() {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session) {
+        alert("Debes iniciar sesión para ver tus respaldos guardados.");
+        return;
+    }
+    document.getElementById('plan-history-modal').classList.remove('hidden');
+    cargarHistorialPlanes();
+}
+
+async function cargarHistorialPlanes() {
+    const lista = document.getElementById('plan-history-list');
+    lista.innerHTML = '<div class="flex items-center justify-center h-full"><i data-lucide="loader-2" class="w-8 h-8 text-gray-500 animate-spin"></i></div>';
+    if (window.lucide) lucide.createIcons();
+
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session) return;
+
+    try {
+        const { data, error } = await window.supaAuth.supabase
+            .from('user_plan_snapshots')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            lista.innerHTML = '<div class="text-center p-4 text-sm text-gray-500 bg-black/30 border border-white/5 rounded-2xl">No tienes respaldos guardados.</div>';
+            return;
+        }
+
+        let html = '';
+        data.forEach(snap => {
+            const dateStr = new Date(snap.created_at).toLocaleDateString('es-CR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+            
+            // Contar cuántos cursos guardados hay en total
+            let totalCursos = 0;
+            if (snap.datos_json) {
+                Object.keys(snap.datos_json).forEach(cId => {
+                    totalCursos += snap.datos_json[cId].length;
+                });
+            }
+
+            html += `
+                <div class="bg-black/40 border border-white/5 p-4 rounded-xl flex items-center justify-between group hover:border-yellow-500/30 transition-colors">
+                    <div>
+                        <div class="font-bold text-white text-sm">${snap.nombre}</div>
+                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">${dateStr} • ${totalCursos} cursos registrados</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="abrirSnapshotPlan('${snap.id}')" title="Cargar y sobreescribir plan actual" class="bg-blue-500/10 hover:bg-blue-500/30 text-blue-500 p-2 rounded-lg transition-colors border border-blue-500/20">
+                            <i data-lucide="download-cloud" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="eliminarSnapshotPlan('${snap.id}')" title="Eliminar respaldo" class="bg-red-500/10 hover:bg-red-500/30 text-red-500 p-2 rounded-lg transition-colors border border-red-500/20">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        lista.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
+
+    } catch (err) {
+        console.error("Error al cargar historial de planes:", err);
+        lista.innerHTML = '<div class="text-center text-red-500 text-sm py-4">Error al cargar historial.</div>';
+    }
+}
+
+async function abrirSnapshotPlan(snapshotId) {
+    if (!confirm("¿Estás seguro de querer cargar este respaldo? Reemplazará tu progreso actual con los datos guardados.")) return;
+
+    try {
+        const { data, error } = await window.supaAuth.supabase
+            .from('user_plan_snapshots')
+            .select('datos_json')
+            .eq('id', snapshotId)
+            .single();
+
+        if (error) throw error;
+        if (!data || !data.datos_json) throw new Error("No hay datos en el snapshot.");
+
+        // 1. Resetear todos los estados a 0 (Limpiar el canvas)
+        Object.keys(CARRERAS).forEach(carreraId => {
+            CARRERAS[carreraId].cursos.forEach(curso => { curso.estado = 0; });
+        });
+
+        // 2. Aplicar los estados guardados
+        const savedData = data.datos_json;
+        Object.keys(savedData).forEach(cId => {
+            if (CARRERAS[cId]) {
+                const arr = savedData[cId];
+                arr.forEach(savedCurso => {
+                    const idx = CARRERAS[cId].cursos.findIndex(c => c.codigo === savedCurso.codigo);
+                    if (idx !== -1) {
+                        CARRERAS[cId].cursos[idx].estado = savedCurso.estado;
+                    }
+                });
+            }
+        });
+
+        // 3. Sincronizar compartidos globalmente (Asegura consistencia cruzada)
+        if (typeof sincronizarCompartidosGlobal === 'function') {
+            sincronizarCompartidosGlobal();
+        }
+
+        // 4. Guardar como estado principal oficial
+        guardarEstado();
+
+        // 5. Renderizar interfaz y cerrar modal
+        renderizarCarrera();
+        document.getElementById('plan-history-modal').classList.add('hidden');
+        alert("¡Progreso cargado y sincronizado exitosamente!");
+
+    } catch (err) {
+        console.error("Error al abrir snapshot:", err);
+        alert("Hubo un problema cargando el respaldo.");
+    }
+}
+
+async function eliminarSnapshotPlan(snapshotId) {
+    if (!confirm("¿Estás seguro de eliminar este respaldo permanentemente?")) return;
+
+    try {
+        const { error } = await window.supaAuth.supabase
+            .from('user_plan_snapshots')
+            .delete()
+            .eq('id', snapshotId);
+
+        if (error) throw error;
+        cargarHistorialPlanes(); // Recargar la lista
+    } catch (err) {
+        console.error("Error al eliminar snapshot:", err);
+        alert("Error al eliminar el respaldo.");
+    }
+}
+
+// ===================================
+// REALTIME Y ONBOARDING
+// ===================================
+
+let realtimeChannel = null;
+
+function setupRealtimeSubscription() {
+    const session = window.supaAuth?.getCurrentSession();
+    if (!session || !window.supaAuth?.supabase) return;
+
+    if (realtimeChannel) {
+        window.supaAuth.supabase.removeChannel(realtimeChannel);
+    }
+
+    realtimeChannel = window.supaAuth.supabase.channel('custom-all-channel')
+    .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'user_courses', filter: `user_id=eq.${session.user.id}` },
+        (payload) => {
+            console.log('Cambio detectado en tiempo real:', payload);
+            
+            // Actualizar memoria local
+            if (payload.new && payload.new.carrera_id && payload.new.course_id) {
+                const cId = payload.new.carrera_id;
+                if (CARRERAS[cId]) {
+                    const curso = CARRERAS[cId].cursos.find(c => c.codigo === payload.new.course_id);
+                    if (curso) {
+                        curso.estado = parseInt(payload.new.status);
+                    }
+                }
+                
+                // Forzar sincronización de compartidos si está definido
+                if (typeof sincronizarCompartidosGlobal === 'function') {
+                    sincronizarCompartidosGlobal();
+                }
+
+                // Guardar en localStorage silenciosamente
+                guardarEstadoLocalSilencioso();
+
+                // Re-renderizar
+                if (typeof renderizarCarrera === 'function') renderizarCarrera();
+            }
+        }
+    )
+    .subscribe();
+}
+
+function guardarEstadoLocalSilencioso() {
+    const session = window.supaAuth?.getCurrentSession();
+    const storageKey = session ? `ucr_estado_${session.user.id}` : APP_STORAGE_KEY;
+    const localState = { carreraActual };
+    Object.keys(CARRERAS).forEach(cId => {
+        localState[cId] = CARRERAS[cId].cursos.map(c => ({ codigo: c.codigo, estado: c.estado }));
+    });
+    localStorage.setItem(storageKey, JSON.stringify(localState));
+}
+
+function iniciarTutorial() {
+    // Si ya lo vió o no cargó la librería, ignorar
+    if (localStorage.getItem('tutorial_visto') === 'true') return;
+    if (typeof introJs !== 'function') return;
+
+    const intro = introJs();
+    intro.setOptions({
+        nextLabel: 'Siguiente',
+        prevLabel: 'Atrás',
+        doneLabel: '¡Comenzar!',
+        showStepNumbers: false,
+        showProgress: true,
+        exitOnOverlayClick: false,
+        steps: [
+            {
+                intro: "👋 ¡Bienvenido! Te daré un recorrido rápido de 30 segundos para que saqués el máximo provecho a la plataforma."
+            },
+            {
+                element: document.querySelector('.malla-container') || document.querySelector('#plan-section'),
+                intro: "💡 **Tu Plan de Estudios:** Dale clic a cualquier curso para cambiarlo de color (Aprobado, Cursando, Pendiente).",
+                position: 'top'
+            },
+            {
+                element: document.querySelector('.controls-left') || document.querySelector('.controls-container'),
+                intro: "💾 **Respaldos y Exportación:** Guardá tu progreso en la nube o descargá tu plan en formato imagen desde aquí.",
+                position: 'top'
+            },
+            {
+                element: document.querySelector('button[data-navigate="calculator"]') || document.querySelector('.mobile-nav'),
+                intro: "🔢 **Herramientas Extra:** Accedé a la Calculadora de Ponderado y al Generador de Horarios desde la navegación inferior.",
+                position: 'top'
+            }
+        ]
+    });
+
+    intro.oncomplete(function() {
+        localStorage.setItem('tutorial_visto', 'true');
+    });
+
+    intro.onexit(function() {
+        localStorage.setItem('tutorial_visto', 'true');
+    });
+
+    setTimeout(() => {
+        // Asegurarse de que el usuario esté en la pestaña de "Plan"
+        const planSection = document.getElementById('plan-section');
+        if (planSection && !planSection.classList.contains('hidden')) {
+            intro.start();
+        }
+    }, 1000);
 }

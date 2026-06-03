@@ -12,13 +12,13 @@
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, 
 requisitos) VALUES
 -- CICLO 1
-('ingenieriaCivil', 'EG-', 'CURSO DE ARTE', 2, 1, ARRAY['{}']),
-('ingenieriaCivil', 'EG-I', 'CURSO INTEGRADO DE HUMANIDADES I', 6, 1, ARRAY['{}']),
+('ingenieriaCivil', 'EG-', 'CURSO DE ARTE', 2, 1, ARRAY[]::text[]),
+('ingenieriaCivil', 'EG-I', 'CURSO INTEGRADO DE HUMANIDADES I', 6, 1, ARRAY[]::text[]),
 ('ingenieriaCivil', 'IC0101', 'TALLER DE INTRODUCCIÓN A LA INGENIERÍA', 3, 1, 
 ARRAY['MA0001']),
-('ingenieriaCivil', 'MA0001', 'PRECÁLCULO', 0, 1, ARRAY['{}']),
+('ingenieriaCivil', 'MA0001', 'PRECÁLCULO', 0, 1, ARRAY[]::text[]),
 ('ingenieriaCivil', 'MA1001', 'CÁLCULO I', 3, 1, ARRAY['MA0001']),
-('ingenieriaCivil', 'RP-1', 'REPERTORIO', 3, 1, ARRAY['{}']),
+('ingenieriaCivil', 'RP-1', 'REPERTORIO', 3, 1, ARRAY[]::text[]),
 
 -- CICLO 2
 ('ingenieriaCivil', 'EF-', 'ACTIVIDAD DEPORTIVA', 0, 2, ARRAY['EG-I']),
@@ -27,7 +27,7 @@ ARRAY['MA0001']),
 ('ingenieriaCivil', 'FS0211', 'LABORATORIO DE FÍSICA GENERAL I', 1, 2, 
 ARRAY['MA1001', 'FS0210']),
 ('ingenieriaCivil', 'MA1002', 'CÁLCULO II', 4, 2, ARRAY['MA1001']),
-('ingenieriaCivil', 'OPT1125', 'BLOQUE DE TRANSICIÓN DE QUÍMICA', 5, 2, ARRAY['{}']),
+('ingenieriaCivil', 'OPT1125', 'BLOQUE DE TRANSICIÓN DE QUÍMICA', 5, 2, ARRAY[]::text[]),
 
 -- CICLO 3
 ('ingenieriaCivil', 'C10202', 'PRINCIPIOS DE INFORMÁTICA', 4, 3, ARRAY['MA1001']),
@@ -36,7 +36,7 @@ ARRAY['MA1001', 'FS0210']),
 ARRAY['FS0210', 'FS0211', 'MA1002', 'FS0310']),
 ('ingenieriaCivil', 'IC0302', 'DISEÑO GRÁFICO', 3, 3, ARRAY['FS0210', 'IC0101', 'MA1002']),
 ('ingenieriaCivil', 'MA1003', 'CÁLCULO III', 4, 3, ARRAY['MA1002']),
-('ingenieriaCivil', 'MA1004', 'ÁLGEBRA LINEAL', 3, 3, ARRAY['{}']),
+('ingenieriaCivil', 'MA1004', 'ÁLGEBRA LINEAL', 3, 3, ARRAY[]::text[]),
 
 -- CICLO 4
 ('ingenieriaCivil', 'FS0410', 'FÍSICA GENERAL III', 3, 4, ARRAY['FS0310', 'FS0311', 'MA1003']),
@@ -55,8 +55,8 @@ ARRAY['FS0310', 'IC0302']),
 ('ingenieriaCivil', 'IC0510', 'MECÁNICA DEL SÓLIDO I', 4, 5, ARRAY['IC0401', 'MA1005']),
 ('ingenieriaCivil', 'MA1006', 'INTRODUCCIÓN AL ANÁLISIS NUMÉRICO', 5, 5, 
 ARRAY['C10202', 'MA1005']),
-('ingenieriaCivil', 'OPT1126', 'BLOQUE DE TRANSICIÓN DE ESTADÍSTICA', 3, 5, ARRAY['{}']),
-('ingenieriaCivil', 'XE0156', 'INTRODUCCIÓN A LA ECONOMÍA', 4, 5, ARRAY['{}']),
+('ingenieriaCivil', 'OPT1126', 'BLOQUE DE TRANSICIÓN DE ESTADÍSTICA', 3, 5, ARRAY[]::text[]),
+('ingenieriaCivil', 'XE0156', 'INTRODUCCIÓN A LA ECONOMÍA', 4, 5, ARRAY[]::text[]),
 
 -- CICLO 6
 ('ingenieriaCivil', 'IC0604', 'MATERIALES DE CONSTRUCCIÓN', 3, 6, ARRAY['IC0510']),
@@ -65,7 +65,7 @@ ARRAY['IC0510', 'IC0502', 'MA1006']),
 ('ingenieriaCivil', 'IC0607', 'TALLER DE SISTEMAS DE INGENIERÍA', 4, 6, 
 ARRAY['IC0403', 'IC0410', 'IC0502', 'IC0510', 'MA1006', 'IC0811']),
 ('ingenieriaCivil', 'IC0811', 'ADMINISTRACIÓN EN INGENIERÍA', 3, 6, ARRAY['XE0156']),
-('ingenieriaCivil', 'OPT1122', 'BLOQUE MECÁNICA DE SÓLIDOS', 3, 6, ARRAY['{}']),
+('ingenieriaCivil', 'OPT1122', 'BLOQUE MECÁNICA DE SÓLIDOS', 3, 6, ARRAY[]::text[]),
 ('ingenieriaCivil', 'SR-I', 'SEMINARIO DE REALIDAD NACIONAL I', 2, 6, ARRAY['EG-II']),
 
 -- CICLO 7
@@ -90,18 +90,18 @@ ARRAY['IC0704', 'IC0811']),
 -- CICLO 9
 ('ingenieriaCivil', 'IC0905', 'TALLER DE DISEÑO', 4, 9, 
 ARRAY['IC0801', 'IC0804', 'IC0808', 'IC0809', 'IC0810', 'IC1006']),
-('ingenieriaCivil', 'OPT1119', 'OPTATIVOS DE INGENIERÍA CIVIL', 9, 9, ARRAY['{}']),
+('ingenieriaCivil', 'OPT1119', 'OPTATIVOS DE INGENIERÍA CIVIL', 9, 9, ARRAY[]::text[]),
 ('ingenieriaCivil', 'SR-II', 'SEMINARIO DE REALIDAD NACIONAL II', 2, 9, ARRAY['SR-I']),
 
 -- CICLO 10
-('ingenieriaCivil', 'OPT1123', 'BLOQUE 0', 12, 10, ARRAY['{}']),
+('ingenieriaCivil', 'OPT1123', 'BLOQUE 0', 12, 10, ARRAY[]::text[]),
 
 -- CICLO 11
-('ingenieriaCivil', 'IC9500', 'INVESTIGACIÓN DIRIGIDA 1', 0, 11, ARRAY['{}']),
-('ingenieriaCivil', 'IC9501', 'INVESTIGACIÓN DIRIGIDA 2', 0, 11, ARRAY['{}']),
-('ingenieriaCivil', 'IC9502', 'INVESTIGACIÓN DIRIGIDA 3', 0, 11, ARRAY['{}']),
-('ingenieriaCivil', 'IC9600', 'SEMINARIO DE GRADUACIÓN 1', 0, 11, ARRAY['{}']),
-('ingenieriaCivil', 'IC9601', 'SEMINARIO DE GRADUACIÓN II', 0, 11, ARRAY['{}'])
+('ingenieriaCivil', 'IC9500', 'INVESTIGACIÓN DIRIGIDA 1', 0, 11, ARRAY[]::text[]),
+('ingenieriaCivil', 'IC9501', 'INVESTIGACIÓN DIRIGIDA 2', 0, 11, ARRAY[]::text[]),
+('ingenieriaCivil', 'IC9502', 'INVESTIGACIÓN DIRIGIDA 3', 0, 11, ARRAY[]::text[]),
+('ingenieriaCivil', 'IC9600', 'SEMINARIO DE GRADUACIÓN 1', 0, 11, ARRAY[]::text[]),
+('ingenieriaCivil', 'IC9601', 'SEMINARIO DE GRADUACIÓN II', 0, 11, ARRAY[]::text[])
 ON CONFLICT (carrera_id, codigo) DO UPDATE SET
   nombre = EXCLUDED.nombre,
   creditos = EXCLUDED.creditos,
@@ -115,16 +115,16 @@ ON CONFLICT (carrera_id, codigo) DO UPDATE SET
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) 
 VALUES
 -- I CICLO
-('administracionPublica', 'EG-1', 'Curso Integrado de Humanidades I', 6, 1, ARRAY['{}']),
-('administracionPublica', 'LM0348', 'Inglés para Administración y Comercio I', 3, 1, ARRAY['{}']),
-('administracionPublica', 'MA0001', 'Precálculo', 0, 1, ARRAY['{}']),
-('administracionPublica', 'XP0450', 'Teoría del Estado Contemporáneo', 3, 1, ARRAY['{}']),
-('administracionPublica', 'XP0452', 'Teorías y Modelos Organizacionales', 3, 1, ARRAY['{}']),
+('administracionPublica', 'EG-1', 'Curso Integrado de Humanidades I', 6, 1, ARRAY[]::text[]),
+('administracionPublica', 'LM0348', 'Inglés para Administración y Comercio I', 3, 1, ARRAY[]::text[]),
+('administracionPublica', 'MA0001', 'Precálculo', 0, 1, ARRAY[]::text[]),
+('administracionPublica', 'XP0450', 'Teoría del Estado Contemporáneo', 3, 1, ARRAY[]::text[]),
+('administracionPublica', 'XP0452', 'Teorías y Modelos Organizacionales', 3, 1, ARRAY[]::text[]),
 ('administracionPublica', 'XP0453', 'Taller de Comunicación Administrativa y Académica', 2, 
-1, ARRAY['{}']),
+1, ARRAY[]::text[]),
 
 -- II CICLO
-('administracionPublica', 'EF-', 'Actividad Deportiva', 0, 2, ARRAY['{}']),
+('administracionPublica', 'EF-', 'Actividad Deportiva', 0, 2, ARRAY[]::text[]),
 ('administracionPublica', 'EG-II', 'Curso Integrado de Humanidades II', 6, 2, 
 ARRAY['EG-1']),
 ('administracionPublica', 'MA1021', 'Cálculo para Ciencias Económicas I', 4, 2, 
@@ -135,7 +135,7 @@ ARRAY['XP0450']),
 ARRAY['XP0450', 'XP0452', 'XP0453']),
 
 -- III CICLO
-('administracionPublica', 'EG-', 'Curso de Arte', 2, 3, ARRAY['{}']),
+('administracionPublica', 'EG-', 'Curso de Arte', 2, 3, ARRAY[]::text[]),
 ('administracionPublica', 'SR-1', 'Seminario de Realidad Nacional I', 2, 3, ARRAY['EG-II']),
 ('administracionPublica', 'XP0456', 'Análisis Económico para el Sector Público', 3, 3, 
 ARRAY['MA1021']),
@@ -161,7 +161,7 @@ ARRAY['XP0457']),
 ARRAY['XP0457', 'XP0459']),
 
 -- V CICLO
-('administracionPublica', 'RP-1', 'Repertorio', 3, 5, ARRAY['{}']),
+('administracionPublica', 'RP-1', 'Repertorio', 3, 5, ARRAY[]::text[]),
 ('administracionPublica', 'XP0464', 'Administración Financiera para el Sector Público', 4, 
 5, ARRAY['XP0461']),
 ('administracionPublica', 'XP0465', 'TICs para el Análisis de Datos en la Gestión Pública', 
@@ -235,15 +235,15 @@ ARRAY['XP0485', 'XP0494', 'XP0495']),
 'XP0495']),
 
 -- XI CICLO (Trabajo Final de Graduación)
-('administracionPublica', 'XP9500', 'Investigación Dirigida I', 0, 11, ARRAY['{}']),
+('administracionPublica', 'XP9500', 'Investigación Dirigida I', 0, 11, ARRAY[]::text[]),
 ('administracionPublica', 'XP9501', 'Investigación Dirigida II', 0, 11, ARRAY['XP9500']),
 ('administracionPublica', 'XP9502', 'Investigación Dirigida III', 0, 11, ARRAY['XP9501']),
-('administracionPublica', 'XP9600', 'Seminario de Graduación 1', 0, 11, ARRAY['{}']),
+('administracionPublica', 'XP9600', 'Seminario de Graduación 1', 0, 11, ARRAY[]::text[]),
 ('administracionPublica', 'XP9601', 'Seminario de Graduación 2', 0, 11, ARRAY['XP9600']),
-('administracionPublica', 'XP9602', 'Seminario de Graduación 3', 0, 11, ARRAY['{}']),
-('administracionPublica', 'XP9700', 'Práctica Dirigida 1', 0, 11, ARRAY['{}']),
-('administracionPublica', 'XP9701', 'Práctica Dirigida 2', 0, 11, ARRAY['{}']),
-('administracionPublica', 'XP9702', 'Práctica Dirigida 3', 0, 11, ARRAY['{}'])
+('administracionPublica', 'XP9602', 'Seminario de Graduación 3', 0, 11, ARRAY[]::text[]),
+('administracionPublica', 'XP9700', 'Práctica Dirigida 1', 0, 11, ARRAY[]::text[]),
+('administracionPublica', 'XP9701', 'Práctica Dirigida 2', 0, 11, ARRAY[]::text[]),
+('administracionPublica', 'XP9702', 'Práctica Dirigida 3', 0, 11, ARRAY[]::text[])
 ON CONFLICT (carrera_id, codigo) DO UPDATE SET
   nombre = EXCLUDED.nombre,
   creditos = EXCLUDED.creditos,
@@ -257,12 +257,12 @@ ON CONFLICT (carrera_id, codigo) DO UPDATE SET
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) 
 VALUES
 -- I CICLO
-('arquitectura', 'AQ0100', 'Taller de Diseño 1', 4, 1, ARRAY['{}']),
-('arquitectura', 'AQ0216', 'Fundamentos de Diseño I', 2, 1, ARRAY['{}']),
-('arquitectura', 'AQ0232', 'Dibujo del Espacio Arquitectónico', 2, 1, ARRAY['{}']),
-('arquitectura', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY['{}']),
-('arquitectura', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY['{}']),
-('arquitectura', 'MA1111', 'Fundamentos de Geometría con Trigonometría', 4, 1, ARRAY['{}']),
+('arquitectura', 'AQ0100', 'Taller de Diseño 1', 4, 1, ARRAY[]::text[]),
+('arquitectura', 'AQ0216', 'Fundamentos de Diseño I', 2, 1, ARRAY[]::text[]),
+('arquitectura', 'AQ0232', 'Dibujo del Espacio Arquitectónico', 2, 1, ARRAY[]::text[]),
+('arquitectura', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY[]::text[]),
+('arquitectura', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY[]::text[]),
+('arquitectura', 'MA1111', 'Fundamentos de Geometría con Trigonometría', 4, 1, ARRAY[]::text[]),
 
 -- II CICLO
 ('arquitectura', 'AQ0101', 'Taller de Diseño 2', 4, 2, ARRAY['AQ0100']),
@@ -294,7 +294,7 @@ VALUES
 ('arquitectura', 'AQ0220', 'Teoría de la Arquitectura III', 2, 5, ARRAY['AQ0219']),
 ('arquitectura', 'AQ0242', 'Sistemas Estructurales III', 3, 5, ARRAY['AQ0241']),
 ('arquitectura', 'AQ0250', 'Materiales y Métodos de Construcción I', 3, 5, ARRAY['AQ0240']),
-('arquitectura', 'RP-1', 'Repertorio', 3, 5, ARRAY['{}']),
+('arquitectura', 'RP-1', 'Repertorio', 3, 5, ARRAY[]::text[]),
 
 -- VI CICLO
 ('arquitectura', 'AQ0105', 'Taller de Diseño 6', 5, 6, ARRAY['AQ0104']),
@@ -343,7 +343,7 @@ ARRAY['AQ0280']),
 ('arquitectura', 'AQ0258', 'Modelos Bioclimáticos', 2, 7, ARRAY['AQ0106']),
 ('arquitectura', 'AQ0260', 'Modelos de la Estructura y de la Forma', 2, 7, ARRAY['AQ0106']),
 ('arquitectura', 'AQ0263', 'Modelos y Maquetas', 2, 7, ARRAY['AQ0106']),
-('arquitectura', 'AQ0264', 'Grabado para Arquitectura', 2, 7, ARRAY['{}']),
+('arquitectura', 'AQ0264', 'Grabado para Arquitectura', 2, 7, ARRAY[]::text[]),
 ('arquitectura', 'AQ0266', 'Restauración Arquitectónica', 2, 7, ARRAY['AQ0106'])
 ON CONFLICT (carrera_id, codigo) DO UPDATE SET
   nombre = EXCLUDED.nombre,
@@ -358,13 +358,13 @@ ON CONFLICT (carrera_id, codigo) DO UPDATE SET
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) 
 VALUES
 -- CICLO I
-('computadoras_redes', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY['{}']),
-('computadoras_redes', 'QU-0100', 'Química General I', 3, 1, ARRAY['{}']),
-('computadoras_redes', 'QU-0101', 'Laboratorio de Química General I', 1, 1, ARRAY['{}']),
-('computadoras_redes', 'MA-1101', 'Cálculo I', 3, 1, ARRAY['{}']),
-('computadoras_redes', 'MA-1004', 'Álgebra Lineal', 3, 1, ARRAY['{}']),
-('computadoras_redes', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY['{}']),
-('computadoras_redes', 'EG-', 'Curso de Arte', 2, 1, ARRAY['{}']),
+('computadoras_redes', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY[]::text[]),
+('computadoras_redes', 'QU-0100', 'Química General I', 3, 1, ARRAY[]::text[]),
+('computadoras_redes', 'QU-0101', 'Laboratorio de Química General I', 1, 1, ARRAY[]::text[]),
+('computadoras_redes', 'MA-1101', 'Cálculo I', 3, 1, ARRAY[]::text[]),
+('computadoras_redes', 'MA-1004', 'Álgebra Lineal', 3, 1, ARRAY[]::text[]),
+('computadoras_redes', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY[]::text[]),
+('computadoras_redes', 'EG-', 'Curso de Arte', 2, 1, ARRAY[]::text[]),
 
 -- CICLO II
 ('computadoras_redes', 'EG-II', 'Curso Integrado de Humanidades II', 6, 2, 
@@ -431,9 +431,9 @@ ARRAY['IE-0307']::text[]),
 
 -- CICLO VII
 ('computadoras_redes', 'IE-Optativa_Comp_I', 'Optativa I del Bloque de Ingeniería en 
-Computadoras', 3, 7, ARRAY['{}']),
+Computadoras', 3, 7, ARRAY[]::text[]),
 ('computadoras_redes', 'IE-Optativa_Comp_II', 'Optativa II del Bloque de Ingeniería en 
-Computadoras', 3, 7, ARRAY['{}']),
+Computadoras', 3, 7, ARRAY[]::text[]),
 ('computadoras_redes', 'IE-0424', 'Laboratorio de Diseño Digital', 3, 7, 
 ARRAY['IE-0308','IE-0321','IE-0523']::text[]),
 ('computadoras_redes', 'IE-0431', 'Sistemas de Control', 3, 7, ARRAY['IE-0347']::text[]),
@@ -444,12 +444,12 @@ ARRAY['SR-I']::text[]),
 
 -- CICLO VIII
 ('computadoras_redes', 'IE-Optativa_Micro', 'Optativa del Bloque de Microprocesadores', 3, 
-8, ARRAY['{}']),
+8, ARRAY[]::text[]),
 ('computadoras_redes', 'IE-0499', 'Proyecto Eléctrico', 3, 8, ARRAY['IE-0431']::text[]),
 ('computadoras_redes', 'IE-0425', 'Redes de Computadoras', 3, 8, 
 ARRAY['IE-0321','IE-0527']::text[]),
 ('computadoras_redes', 'IE-0479', 'Ingeniería Económica', 3, 8, ARRAY['IE0501']::text[]),
-('computadoras_redes', 'RP-', 'Repertorio', 3, 8, ARRAY['{}'])
+('computadoras_redes', 'RP-', 'Repertorio', 3, 8, ARRAY[]::text[])
 ON CONFLICT (carrera_id, codigo) DO UPDATE SET
   nombre = EXCLUDED.nombre,
   creditos = EXCLUDED.creditos,
@@ -462,13 +462,13 @@ ON CONFLICT (carrera_id, codigo) DO UPDATE SET
 -- ============================================================
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) VALUES
 -- CICLO I
-('electronica_telecomunicaciones', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY['{}']),
-('electronica_telecomunicaciones', 'QU-0100', 'Química General I', 3, 1, ARRAY['{}']),
-('electronica_telecomunicaciones', 'QU-0101', 'Laboratorio de Química General I', 1, 1, ARRAY['{}']),
-('electronica_telecomunicaciones', 'MA-1101', 'Cálculo I', 3, 1, ARRAY['{}']),
-('electronica_telecomunicaciones', 'MA-1004', 'Álgebra Lineal', 3, 1, ARRAY['{}']),
-('electronica_telecomunicaciones', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY['{}']),
-('electronica_telecomunicaciones', 'EG-', 'Curso de Arte', 2, 1, ARRAY['{}']),
+('electronica_telecomunicaciones', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY[]::text[]),
+('electronica_telecomunicaciones', 'QU-0100', 'Química General I', 3, 1, ARRAY[]::text[]),
+('electronica_telecomunicaciones', 'QU-0101', 'Laboratorio de Química General I', 1, 1, ARRAY[]::text[]),
+('electronica_telecomunicaciones', 'MA-1101', 'Cálculo I', 3, 1, ARRAY[]::text[]),
+('electronica_telecomunicaciones', 'MA-1004', 'Álgebra Lineal', 3, 1, ARRAY[]::text[]),
+('electronica_telecomunicaciones', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY[]::text[]),
+('electronica_telecomunicaciones', 'EG-', 'Curso de Arte', 2, 1, ARRAY[]::text[]),
 
 -- CICLO II
 ('electronica_telecomunicaciones', 'EG-II', 'Curso Integrado de Humanidades II', 6, 2, ARRAY['EG-I']::text[]),
@@ -508,7 +508,7 @@ ARRAY['FS-0410','FS-0411','IE-0247','IE-0313','MA-1003']::text[]),
 ('electronica_telecomunicaciones', 'IE-0308', 'Laboratorio de Electrónica I', 3, 5, ARRAY['IE-0309','IE-0313']::text[]),
 
 -- CICLO VI (Divergencia)
-('electronica_telecomunicaciones', 'RP-', 'Repertorio', 3, 6, ARRAY['{}']),
+('electronica_telecomunicaciones', 'RP-', 'Repertorio', 3, 6, ARRAY[]::text[]),
 ('electronica_telecomunicaciones', 'IE-0321', 'Estructura de Computadoras Digitales I', 3, 6, ARRAY['IE-0323']::text[]),
 ('electronica_telecomunicaciones', 'IE-0405', 'Modelos Probabilísticos de Señales y Sistemas', 3, 6, ARRAY['IE-0347']::text[]),
 ('electronica_telecomunicaciones', 'IE-0315', 'Máquinas Eléctricas I', 3, 6, ARRAY['IE-0307','IE-0309']::text[]),
@@ -517,7 +517,7 @@ ARRAY['FS-0410','FS-0411','IE-0247','IE-0313','MA-1003']::text[]),
 ('electronica_telecomunicaciones', 'IE-0501', 'Responsabilidad en el Ejercicio Profesional', 1, 6, ARRAY['IE-0307']::text[]),
 
 -- CICLO VII
-('electronica_telecomunicaciones', 'IE-Optativa_I', 'Optativa I', 3, 7, ARRAY['{}']),
+('electronica_telecomunicaciones', 'IE-Optativa_I', 'Optativa I', 3, 7, ARRAY[]::text[]),
 ('electronica_telecomunicaciones', 'IE-0527', 'Ingeniería de Comunicaciones', 3, 7, ARRAY['IE-0307','IE-0405']::text[]),
 ('electronica_telecomunicaciones', 'IE-0431', 'Sistemas de Control', 3, 7, ARRAY['IE-0347']::text[]),
 ('electronica_telecomunicaciones', 'IE-0615', 'Máquinas Eléctricas II', 3, 7, ARRAY['IE-0315','IE-0316','IE-0347']::text[]),
@@ -527,7 +527,7 @@ ARRAY['IE-0315','IE-0316','IE-0347']::text[]),
 ('electronica_telecomunicaciones', 'SR-II', 'Seminario de Realidad Nacional II', 2, 7, ARRAY['SR-I']::text[]),
 
 -- CICLO VIII
-('electronica_telecomunicaciones', 'IE-Optativa_II', 'Optativa II', 3, 8, ARRAY['{}']),
+('electronica_telecomunicaciones', 'IE-Optativa_II', 'Optativa II', 3, 8, ARRAY[]::text[]),
 ('electronica_telecomunicaciones', 'IE-0425', 'Redes de Computadoras', 3, 8, ARRAY['IE-0321','IE-0527']::text[]),
 ('electronica_telecomunicaciones', 'IE-0499', 'Proyecto Eléctrico', 3, 8, ARRAY['IE-0431']::text[]),
 ('electronica_telecomunicaciones', 'IE-0471', 'Diseño Eléctrico Industrial I', 3, 8, ARRAY['IE-0315','IE-0316']::text[]),
@@ -545,15 +545,15 @@ ON CONFLICT (carrera_id, codigo) DO UPDATE SET
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) 
 VALUES
 -- I CICLO
-('estadistica', 'EG-', 'Curso de Arte', 2, 1, ARRAY['{}']),
-('estadistica', 'EG-1', 'Curso Integrado de Humanidades I', 6, 1, ARRAY['{}']),
+('estadistica', 'EG-', 'Curso de Arte', 2, 1, ARRAY[]::text[]),
+('estadistica', 'EG-1', 'Curso Integrado de Humanidades I', 6, 1, ARRAY[]::text[]),
 ('estadistica', 'LM1030', 'Estrategias de Lectura en Inglés I (para otras carreras)', 4, 1, 
-ARRAY['{}']),
-('estadistica', 'MA0001', 'Precálculo', 0, 1, ARRAY['{}']),
-('estadistica', 'XS1110', 'Estadística Introductoria I', 4, 1, ARRAY['{}']),
+ARRAY[]::text[]),
+('estadistica', 'MA0001', 'Precálculo', 0, 1, ARRAY[]::text[]),
+('estadistica', 'XS1110', 'Estadística Introductoria I', 4, 1, ARRAY[]::text[]),
 
 -- II CICLO
-('estadistica', 'EF-', 'Actividad Deportiva', 0, 2, ARRAY['{}']),
+('estadistica', 'EF-', 'Actividad Deportiva', 0, 2, ARRAY[]::text[]),
 ('estadistica', 'EG-II', 'Curso Integrado de Humanidades II', 6, 2, ARRAY['EG-1']),
 ('estadistica', 'MA1001', 'Cálculo I', 3, 2, ARRAY['MA0001']),
 ('estadistica', 'XS1130', 'Estadística Introductoria II', 4, 2, ARRAY['XS1110']),
@@ -575,7 +575,7 @@ ARRAY['{}']),
 'XS2310']),
 
 -- V CICLO
-('estadistica', 'RP-1', 'Repertorio', 3, 5, ARRAY['{}']),
+('estadistica', 'RP-1', 'Repertorio', 3, 5, ARRAY[]::text[]),
 ('estadistica', 'XS3130', 'Diseño de Experimentos', 4, 5, ARRAY['MA1004', 'XS3310']),
 ('estadistica', 'XS3150', 'Análisis de Regresión', 4, 5, ARRAY['MA1004', 'XS3310']),
 ('estadistica', 'XS3330', 'Métodos No Paramétricos', 3, 5, ARRAY['XS3310']),
@@ -600,12 +600,12 @@ ARRAY['{}']),
 ('estadistica', 'XS4430', 'Consultoría Estadística II', 4, 8, ARRAY['XS4410']),
 
 -- CURSOS DEL BLOQUE OPTATIVO SUGERIDO (OPT296)
-('estadistica', 'CP1212', 'Política Actual Costarricense', 3, 5, ARRAY['{}']),
-('estadistica', 'FS0101', 'Fundamentos de Astronomía', 3, 5, ARRAY['{}']),
-('estadistica', 'FS0115', 'Fundamentos de Oceanografía', 3, 5, ARRAY['{}']),
+('estadistica', 'CP1212', 'Política Actual Costarricense', 3, 5, ARRAY[]::text[]),
+('estadistica', 'FS0101', 'Fundamentos de Astronomía', 3, 5, ARRAY[]::text[]),
+('estadistica', 'FS0115', 'Fundamentos de Oceanografía', 3, 5, ARRAY[]::text[]),
 ('estadistica', 'LM1032', 'Estrategias de Lectura en Inglés II (para otras carreras)', 4, 5, 
 ARRAY['LM1030']),
-('estadistica', 'PS0001', 'Psicología General', 3, 5, ARRAY['{}'])
+('estadistica', 'PS0001', 'Psicología General', 3, 5, ARRAY[]::text[])
 ON CONFLICT (carrera_id, codigo) DO UPDATE SET
   nombre = EXCLUDED.nombre,
   creditos = EXCLUDED.creditos,
@@ -619,20 +619,20 @@ ON CONFLICT (carrera_id, codigo) DO UPDATE SET
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) 
 VALUES
 -- I CICLO
-('geologia', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY['{}']),
-('geologia', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY['{}']),
+('geologia', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY[]::text[]),
+('geologia', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY[]::text[]),
 ('geologia', 'G0214', 'Geología General', 4, 1, ARRAY['QU0100', 'QU0101']::text[]),
-('geologia', 'MA0001', 'Precálculo', 0, 1, ARRAY['{}']),
+('geologia', 'MA0001', 'Precálculo', 0, 1, ARRAY[]::text[]),
 ('geologia', 'MA1001', 'Cálculo I', 3, 1, ARRAY['MA0001']::text[]),
-('geologia', 'QU0100', 'Química General I', 3, 1, ARRAY['{}']),
+('geologia', 'QU0100', 'Química General I', 3, 1, ARRAY[]::text[]),
 ('geologia', 'QU0101', 'Laboratorio de Química General I', 1, 1, ARRAY['QU0100']::text[]),
 
 -- II CICLO
-('geologia', 'EG-', 'Curso de Arte', 2, 2, ARRAY['{}']),
+('geologia', 'EG-', 'Curso de Arte', 2, 2, ARRAY[]::text[]),
 ('geologia', 'EG-II', 'Curso Integrado de Humanidades II', 6, 2, ARRAY['EG-I']::text[]),
 ('geologia', 'FS0210', 'Física General I', 3, 2, ARRAY['MA1001']::text[]),
 ('geologia', 'FS0211', 'Laboratorio de Física General I', 1, 2, ARRAY['MA1001']::text[]),
-('geologia', 'OPT174', 'Bloque Optativo (XS0215 / Cálculo II)', 3, 2, ARRAY['{}']),
+('geologia', 'OPT174', 'Bloque Optativo (XS0215 / Cálculo II)', 3, 2, ARRAY[]::text[]),
 ('geologia', 'QU0102', 'Química General II', 3, 2, ARRAY['QU0100', 'QU0101']::text[]),
 ('geologia', 'QU0103', 'Laboratorio de Química General II', 1, 2, ARRAY['QU0100', 
 'QU0101']::text[]),
@@ -647,13 +647,13 @@ VALUES
 ('geologia', 'G3003', 'Dibujo Geològico', 4, 3, ARRAY['FS0210', 'G0214']::text[]),
 ('geologia', 'G4101', 'Geología Numérica', 3, 3, ARRAY['FS0210', 'G0214', 
 'OPT174']::text[]),
-('geologia', 'RP-1', 'Repertorio', 3, 3, ARRAY['{}']),
+('geologia', 'RP-1', 'Repertorio', 3, 3, ARRAY[]::text[]),
 
 -- IV CICLO
 ('geologia', 'G0034', 'Mineralogía Óptica', 4, 4, ARRAY['FS0310', 'G0224']::text[]),
 ('geologia', 'G0316', 'Geomorfología', 4, 4, ARRAY['G3003', 'G4101']::text[]),
 ('geologia', 'G0419', 'Paleontología General', 4, 4, ARRAY['G0224']::text[]),
-('geologia', 'OPT172', 'Bloque Optativo (I)', 3, 4, ARRAY['{}']),
+('geologia', 'OPT172', 'Bloque Optativo (I)', 3, 4, ARRAY[]::text[]),
 ('geologia', 'SR-I', 'Seminario de Realidad Nacional I', 2, 4, ARRAY['EG-II']::text[]),
 
 -- V CICLO
@@ -700,7 +700,7 @@ VALUES
 'G5216']::text[]),
 ('geologia', 'G5128', 'Cuencas Sedimentarias e Hidrocarburos', 4, 10, 
 ARRAY['G5216']::text[]),
-('geologia', 'OPT173', 'Bloque Optativo (II)', 3, 10, ARRAY['{}']),
+('geologia', 'OPT173', 'Bloque Optativo (II)', 3, 10, ARRAY[]::text[]),
 
 -- XI CICLO
 ('geologia', 'G4213', 'Mecánica de Rocas', 4, 11, ARRAY['G5216']::text[]),
@@ -708,24 +708,24 @@ ARRAY['G5216']::text[]),
 ('geologia', 'G5130', 'Proyectos Geológicos', 3, 11, ARRAY['G5216']::text[]),
 
 -- XII, XIII, XIV CICLO (Bloques Finales / Trabajo Final de Graduación)
-('geologia', 'G9500', 'Investigación Dirigida I', 0, 12, ARRAY['{}']),
-('geologia', 'G9501', 'Investigación Dirigida II', 0, 13, ARRAY['{}']),
-('geologia', 'G9502', 'Investigación Dirigida III', 0, 14, ARRAY['{}']),
-('geologia', 'G9600', 'Seminario de Graduación I', 0, 12, ARRAY['{}']),
-('geologia', 'G9601', 'Seminario de Graduación II', 0, 13, ARRAY['{}']),
-('geologia', 'G9602', 'Seminario de Graduación III', 0, 14, ARRAY['{}']),
-('geologia', 'G9700', 'Práctica Dirigida I', 0, 12, ARRAY['{}']),
-('geologia', 'G9701', 'Práctica Dirigida II', 0, 13, ARRAY['{}']),
-('geologia', 'G9702', 'Práctica Dirigida III', 0, 14, ARRAY['{}']),
-('geologia', 'G9800', 'Proyecto de Graduación I', 0, 12, ARRAY['{}']),
-('geologia', 'G9801', 'Proyecto de Graduación II', 0, 13, ARRAY['{}']),
-('geologia', 'G9802', 'Proyecto de Graduación III', 0, 14, ARRAY['{}']),
+('geologia', 'G9500', 'Investigación Dirigida I', 0, 12, ARRAY[]::text[]),
+('geologia', 'G9501', 'Investigación Dirigida II', 0, 13, ARRAY[]::text[]),
+('geologia', 'G9502', 'Investigación Dirigida III', 0, 14, ARRAY[]::text[]),
+('geologia', 'G9600', 'Seminario de Graduación I', 0, 12, ARRAY[]::text[]),
+('geologia', 'G9601', 'Seminario de Graduación II', 0, 13, ARRAY[]::text[]),
+('geologia', 'G9602', 'Seminario de Graduación III', 0, 14, ARRAY[]::text[]),
+('geologia', 'G9700', 'Práctica Dirigida I', 0, 12, ARRAY[]::text[]),
+('geologia', 'G9701', 'Práctica Dirigida II', 0, 13, ARRAY[]::text[]),
+('geologia', 'G9702', 'Práctica Dirigida III', 0, 14, ARRAY[]::text[]),
+('geologia', 'G9800', 'Proyecto de Graduación I', 0, 12, ARRAY[]::text[]),
+('geologia', 'G9801', 'Proyecto de Graduación II', 0, 13, ARRAY[]::text[]),
+('geologia', 'G9802', 'Proyecto de Graduación III', 0, 14, ARRAY[]::text[]),
 
 -- ASIGNATURAS DE LOS BLOQUES OPTATIVOS (OPT172, OPT173, OPT174)
 ('geologia', 'CI0202', 'Principios de Informática', 4, 4, ARRAY['MA1001']::text[]),
 ('geologia', 'G0047', 'Sistemas de Información Geográfica Aplicados a la Geología', 3, 4, 
 ARRAY['G3003', 'G0316']::text[]),
-('geologia', 'MA1004', 'Álgebra Lineal', 3, 4, ARRAY['{}']),
+('geologia', 'MA1004', 'Álgebra Lineal', 3, 4, ARRAY[]::text[]),
 ('geologia', 'QU0200', 'Química Analítica Cuantitativa I', 3, 4, ARRAY['QU0102', 
 'QU0103']::text[]),
 ('geologia', 'QU0201', 'Laboratorio de Química Analítica Cuantitativa I', 2, 4, 
@@ -734,7 +734,7 @@ ARRAY['QU0102', 'QU0103']::text[]),
 'QU0115']::text[]),
 ('geologia', 'QU0211', 'Laboratorio de Fundamentos de Química Orgánica', 1, 4, 
 ARRAY['QU0114', 'QU0115']::text[]),
-('geologia', 'XE0156', 'Introducción a la Economía', 4, 4, ARRAY['{}']),
+('geologia', 'XE0156', 'Introducción a la Economía', 4, 4, ARRAY[]::text[]),
 ('geologia', 'XS0215', 'Estadística para Biociencias', 4, 4, ARRAY['MA1001']::text[]),
 ('geologia', 'G0016', 'Geoquímica Aplicada', 3, 10, ARRAY['G0018', 'G0411']::text[]),
 ('geologia', 'G0025', 'Sismología', 3, 10, ARRAY['G0024']::text[]),
@@ -765,16 +765,16 @@ ON CONFLICT (carrera_id, codigo) DO UPDATE SET
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) 
 VALUES
 -- I CICLO
-('ingenieriaTopografica', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY['{}']),
-('ingenieriaTopografica', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY['{}']),
-('ingenieriaTopografica', 'GF0215', 'Cartografía Básica', 3, 1, ARRAY['{}']),
-('ingenieriaTopografica', 'IT1000', 'Introducción a la Ingeniería Topográfica', 2, 1, ARRAY['{}']),
-('ingenieriaTopografica', 'IT1002', 'Dibujo Básico para Topografía', 3, 1, ARRAY['{}']),
-('ingenieriaTopografica', 'MA0001', 'Precálculo', 0, 1, ARRAY['{}']),
-('ingenieriaTopografica', 'MA1110', 'Trigonometría Plana y Esférica', 3, 1, ARRAY['{}']),
+('ingenieriaTopografica', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY[]::text[]),
+('ingenieriaTopografica', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY[]::text[]),
+('ingenieriaTopografica', 'GF0215', 'Cartografía Básica', 3, 1, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT1000', 'Introducción a la Ingeniería Topográfica', 2, 1, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT1002', 'Dibujo Básico para Topografía', 3, 1, ARRAY[]::text[]),
+('ingenieriaTopografica', 'MA0001', 'Precálculo', 0, 1, ARRAY[]::text[]),
+('ingenieriaTopografica', 'MA1110', 'Trigonometría Plana y Esférica', 3, 1, ARRAY[]::text[]),
 
 -- II CICLO
-('ingenieriaTopografica', 'EG-', 'Curso de Arte', 2, 2, ARRAY['{}']),
+('ingenieriaTopografica', 'EG-', 'Curso de Arte', 2, 2, ARRAY[]::text[]),
 ('ingenieriaTopografica', 'EG-II', 'Curso Integrado de Humanidades II', 6, 2, 
 ARRAY['EG-I']),
 ('ingenieriaTopografica', 'IT1003', 'Principios de Topografía', 3, 2, ARRAY['GF0215', 
@@ -795,7 +795,7 @@ ARRAY['MA1001']),
 ARRAY['IT1003', 'MA1001']),
 ('ingenieriaTopografica', 'IT2004', 'Práctica de Ajustes e Instrumentos Topogr.', 2, 3, 
 ARRAY['IT1003', 'IT1004', 'MA1001']),
-('ingenieriaTopografica', 'RP-1', 'Repertorio', 3, 3, ARRAY['{}']),
+('ingenieriaTopografica', 'RP-1', 'Repertorio', 3, 3, ARRAY[]::text[]),
 
 -- IV CICLO
 ('ingenieriaTopografica', 'IT3005', 'Levantamiento Topográfico de Vías', 3, 4, 
@@ -818,7 +818,7 @@ ARRAY['FS0210', 'FS0211', 'MA1002']),
 ARRAY['IT3005', 'IT3006', 'IT4004', 'MA1002']),
 ('ingenieriaTopografica', 'IT4006', 'Práctica de Replanteo Topográfico y Const.', 2, 5, 
 ARRAY['IT3005', 'IT3006', 'IT4004', 'MA1002']),
-('ingenieriaTopografica', 'MA1004', 'Álgebra Lineal', 3, 5, ARRAY['{}']),
+('ingenieriaTopografica', 'MA1004', 'Álgebra Lineal', 3, 5, ARRAY[]::text[]),
 ('ingenieriaTopografica', 'SR-II', 'Seminario de Realidad Nacional II', 2, 5, 
 ARRAY['SR-I']),
 
@@ -877,29 +877,29 @@ ARRAY['IT7001']),
 ARRAY['IT7005']),
 ('ingenieriaTopografica', 'IT8005', 'Geodesia Superior', 3, 10, ARRAY['IT7005']),
 ('ingenieriaTopografica', 'OPT919', 'Optativos de la Licenciatura en Ingeniería T.', 3, 10, 
-ARRAY['{}']),
+ARRAY[]::text[]),
 
 -- XI CICLO (Bloque de Graduación TFG)
-('ingenieriaTopografica', 'OPT1115', 'Bloque para TFG', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9500', 'Investigación Dirigida I', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9501', 'Investigación Dirigida II', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9502', 'Investigación Dirigida III', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9600', 'Seminario de Graduación', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9601', 'Seminario de Graduación II', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9602', 'Seminario de Graduación III', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9700', 'Práctica Dirigida I', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9701', 'Práctica Dirigida II', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9702', 'Práctica Dirigida III', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9800', 'Proyecto de Graduación I', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9801', 'Proyecto de Graduación II', 0, 11, ARRAY['{}']),
-('ingenieriaTopografica', 'IT9802', 'Proyecto de Graduación III', 0, 11, ARRAY['{}']),
+('ingenieriaTopografica', 'OPT1115', 'Bloque para TFG', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9500', 'Investigación Dirigida I', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9501', 'Investigación Dirigida II', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9502', 'Investigación Dirigida III', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9600', 'Seminario de Graduación', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9601', 'Seminario de Graduación II', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9602', 'Seminario de Graduación III', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9700', 'Práctica Dirigida I', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9701', 'Práctica Dirigida II', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9702', 'Práctica Dirigida III', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9800', 'Proyecto de Graduación I', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9801', 'Proyecto de Graduación II', 0, 11, ARRAY[]::text[]),
+('ingenieriaTopografica', 'IT9802', 'Proyecto de Graduación III', 0, 11, ARRAY[]::text[]),
 
 -- ASIGNATURAS DEL BLOQUE OPTATIVO (OPT919)
 ('ingenieriaTopografica', 'IT8006', 'Elementos de Ingeniería Ambiental para Topografía', 3, 
 10, ARRAY['IT7002']),
 ('ingenieriaTopografica', 'IT8007', 'Taller Diag. y Diseño de Procesos de Capacitación', 3, 
 10, ARRAY['IT7006']),
-('ingenieriaTopografica', 'LM1030', 'Estrategias de Lectura en Inglés I', 4, 10, ARRAY['{}'])
+('ingenieriaTopografica', 'LM1030', 'Estrategias de Lectura en Inglés I', 4, 10, ARRAY[]::text[])
 ON CONFLICT (carrera_id, codigo) DO UPDATE SET
   nombre = EXCLUDED.nombre,
   creditos = EXCLUDED.creditos,
@@ -920,9 +920,9 @@ ARRAY['IE-0413','IE-0315']::text[]),
 ('licenciatura_electrica', 'IE-0599', 'Anteproyecto de TFG', 4, 9, 
 ARRAY['IE-0499']::text[]),
 ('licenciatura_electrica', 'IE-Optativa_L_I', 'Optativa I (Nivel Licenciatura)', 3, 9, 
-ARRAY['{}']),
+ARRAY[]::text[]),
 ('licenciatura_electrica', 'IE-Optativa_L_II', 'Optativa II (Nivel Licenciatura)', 3, 9, 
-ARRAY['{}']),
+ARRAY[]::text[]),
 
 -- CICLO X (Bloque Conclusivo de Graduación)
 ('licenciatura_electrica', 'IE-0679', 'Ciencia de Datos para la Est. y Pron. de Eventos', 3, 
@@ -930,9 +930,9 @@ ARRAY['{}']),
 ('licenciatura_electrica', 'IE-0541', 'Seguridad Ocupacional', 3, 10, 
 ARRAY['IE-0501']::text[]),
 ('licenciatura_electrica', 'IE-Optativa_L_III', 'Optativa III (Nivel Licenciatura)', 3, 10, 
-ARRAY['{}']),
+ARRAY[]::text[]),
 ('licenciatura_electrica', 'IE-Optativa_L_IV', 'Optativa IV (Nivel Licenciatura)', 3, 10, 
-ARRAY['{}']),
+ARRAY[]::text[]),
 ('licenciatura_electrica', 'IE-TFG', 'Trabajo Final de Graduación (Tesis / Proyecto / 
 Práctica)', 12, 10, ARRAY['IE-0599']::text[])
 ON CONFLICT (carrera_id, codigo) DO UPDATE SET
@@ -948,37 +948,37 @@ ON CONFLICT (carrera_id, codigo) DO UPDATE SET
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) 
 VALUES
 -- I CICLO
-('odontologiaLic', 'B0106', 'Biología General', 3, 1, ARRAY['{}']),
-('odontologiaLic', 'B0107', 'Laboratorio de Biología General', 1, 1, ARRAY['{}']),
-('odontologiaLic', 'EG-', 'Curso de Arte', 2, 1, ARRAY['{}']),
-('odontologiaLic', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY['{}']),
-('odontologiaLic', 'MA0125', 'Matemática Elemental', 2, 1, ARRAY['{}']),
-('odontologiaLic', 'QU0114', 'Química General Intensiva', 4, 1, ARRAY['{}']),
-('odontologiaLic', 'QU0115', 'Laboratorio de Química General Intensiva', 1, 1, ARRAY['{}']),
+('odontologiaLic', 'B0106', 'Biología General', 3, 1, ARRAY[]::text[]),
+('odontologiaLic', 'B0107', 'Laboratorio de Biología General', 1, 1, ARRAY[]::text[]),
+('odontologiaLic', 'EG-', 'Curso de Arte', 2, 1, ARRAY[]::text[]),
+('odontologiaLic', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY[]::text[]),
+('odontologiaLic', 'MA0125', 'Matemática Elemental', 2, 1, ARRAY[]::text[]),
+('odontologiaLic', 'QU0114', 'Química General Intensiva', 4, 1, ARRAY[]::text[]),
+('odontologiaLic', 'QU0115', 'Laboratorio de Química General Intensiva', 1, 1, ARRAY[]::text[]),
 
 -- II CICLO
-('odontologiaLic', 'EF-', 'Actividad Deportiva', 0, 2, ARRAY['{}']),
+('odontologiaLic', 'EF-', 'Actividad Deportiva', 0, 2, ARRAY[]::text[]),
 ('odontologiaLic', 'EG-II', 'Curso Integrado de Humanidades II', 6, 2, ARRAY['EG-I']::text[]),
-('odontologiaLic', 'FS0121', 'Fundamentos de Física', 2, 2, ARRAY['{}']),
+('odontologiaLic', 'FS0121', 'Fundamentos de Física', 2, 2, ARRAY[]::text[]),
 ('odontologiaLic', 'MN0220', 'Anatomía Macroscópica', 4, 2, ARRAY['B0106', 'B0107']::text[]),
 
 -- III CICLO
-('odontologiaLic', 'F5011', 'Ética Profesional para Odontología', 1, 3, ARRAY['{}']),
+('odontologiaLic', 'F5011', 'Ética Profesional para Odontología', 1, 3, ARRAY[]::text[]),
 ('odontologiaLic', 'MN0116', 'Histología', 4, 3, ARRAY['MN0220']::text[]),
-('odontologiaLic', 'O0221', 'Innovación y Emprendimiento en Odontología', 1, 3, ARRAY['{}']),
+('odontologiaLic', 'O0221', 'Innovación y Emprendimiento en Odontología', 1, 3, ARRAY[]::text[]),
 ('odontologiaLic', 'O2000', 'Anatomía Dental Descriptiva y Funcional I', 4, 3, ARRAY['FS0121', 
 'MN0220']::text[]),
 ('odontologiaLic', 'QU0210', 'Fundamentos de Química Orgánica', 4, 3, ARRAY['QU0114', 
 'QU0115']::text[]),
 ('odontologiaLic', 'QU0211', 'Laboratorio de Fundamentos de Química Orgánica', 1, 3, 
 ARRAY['QU0114', 'QU0115']::text[]),
-('odontologiaLic', 'XS0235', 'Fundamentos de Bioestadística', 3, 3, ARRAY['{}']),
+('odontologiaLic', 'XS0235', 'Fundamentos de Bioestadística', 3, 3, ARRAY[]::text[]),
 
 -- IV CICLO
 ('odontologiaLic', 'MN0100', 'Anatomía, Cabeza y Cuyo', 4, 4, ARRAY['MN0220', 
 'O2000']::text[]),
 ('odontologiaLic', 'MQ0310', 'Bioquímica Dental', 4, 4, ARRAY['QU0210', 'QU0211']::text[]),
-('odontologiaLic', 'O0222', 'Infectología para Odontología', 1, 4, ARRAY['{}']),
+('odontologiaLic', 'O0222', 'Infectología para Odontología', 1, 4, ARRAY[]::text[]),
 ('odontologiaLic', 'O0223', 'Anatomía Dental Descriptiva y Funcional II', 1, 4, 
 ARRAY['O2000']::text[]),
 ('odontologiaLic', 'O0441', 'Epidemiología y Ecología del Biofilme Dental', 3, 4, 
@@ -990,7 +990,7 @@ ARRAY['O2000', 'XS0235']::text[]),
 -- V CICLO
 ('odontologiaLic', 'MF1000', 'Fisiología Humana', 6, 5, ARRAY['MQ0310']::text[]),
 ('odontologiaLic', 'O0224', 'Introducción a la Administración Clínica y Gestión de Servicios de 
-Salud', 1, 5, ARRAY['{}']),
+Salud', 1, 5, ARRAY[]::text[]),
 ('odontologiaLic', 'O0247', 'Principios de Ciencias Diagnósticas', 5, 5, ARRAY['MN0100', 
 'O0221', 'O0222', 'O3009', 'O3013']::text[]),
 ('odontologiaLic', 'O0248', 'Epidemiología, Ecología y Atención de la Caries Dental', 3, 5, 
@@ -1012,7 +1012,7 @@ ARRAY['MN0100', 'O3013']::text[]),
 'O0248']::text[]),
 ('odontologiaLic', 'O3002', 'Crecimiento Facial y Desarrollo de la Oclusión', 2, 6, 
 ARRAY['MN0100']::text[]),
-('odontologiaLic', 'RP-1', 'Repertorio', 3, 6, ARRAY['{}']),
+('odontologiaLic', 'RP-1', 'Repertorio', 3, 6, ARRAY[]::text[]),
 ('odontologiaLic', 'SR-II', 'Seminario de Realidad Nacional II', 2, 6, ARRAY['SR-I']::text[]),
 
 -- VII CICLO
@@ -1048,7 +1048,7 @@ ARRAY['O0360']::text[]),
 ('odontologiaLic', 'O0260', 'Restaurativa Protésica Fija II', 2, 8, ARRAY['O0319', 
 'O0331']::text[]),
 ('odontologiaLic', 'O0445', 'Proceso Salud-Enfermedad Oral en la Niñez y la Adolescencia', 1, 
-8, ARRAY['{}']),
+8, ARRAY[]::text[]),
 ('odontologiaLic', 'O4000', 'Cirugía Oral I', 2, 8, ARRAY['O0250']::text[]),
 ('odontologiaLic', 'O4009', 'Odontología Infantil II', 2, 8, ARRAY['O4008']::text[]),
 ('odontologiaLic', 'O4025', 'Ortodoncia II', 2, 8, ARRAY['O4013']::text[]),
@@ -1060,12 +1060,12 @@ ARRAY['O0360']::text[]),
 ARRAY['FR0415', 'O4019']::text[]),
 ('odontologiaLic', 'O5001', 'Cirugía Oral II', 2, 9, ARRAY['FR0415', 'O0251', 
 'O4000']::text[]),
-('odontologiaLic', 'OPT1096', 'Bloque de Clínica de Diagnóstico', 2, 9, ARRAY['{}']),
-('odontologiaLic', 'OPT1097', 'Bloque de Clínica de Periodoncia', 4, 9, ARRAY['{}']),
-('odontologiaLic', 'OPT1098', 'Bloque de Clínica de Exodoncia y Cirugía', 2, 9, ARRAY['{}']),
-('odontologiaLic', 'OPT1099', 'Bloque de Clínica de Ciencias Restaurativas', 8, 9, ARRAY['{}']),
-('odontologiaLic', 'OPT1100', 'Bloque de Clínica de Endodoncia', 2, 9, ARRAY['{}']),
-('odontologiaLic', 'OPT1101', 'Bloque de Clínica de Odontopediatría y Ortodoncia', 4, 9, ARRAY['{}']),
+('odontologiaLic', 'OPT1096', 'Bloque de Clínica de Diagnóstico', 2, 9, ARRAY[]::text[]),
+('odontologiaLic', 'OPT1097', 'Bloque de Clínica de Periodoncia', 4, 9, ARRAY[]::text[]),
+('odontologiaLic', 'OPT1098', 'Bloque de Clínica de Exodoncia y Cirugía', 2, 9, ARRAY[]::text[]),
+('odontologiaLic', 'OPT1099', 'Bloque de Clínica de Ciencias Restaurativas', 8, 9, ARRAY[]::text[]),
+('odontologiaLic', 'OPT1100', 'Bloque de Clínica de Endodoncia', 2, 9, ARRAY[]::text[]),
+('odontologiaLic', 'OPT1101', 'Bloque de Clínica de Odontopediatría y Ortodoncia', 4, 9, ARRAY[]::text[]),
 
 -- X CICLO
 ('odontologiaLic', 'O0246', 'Desórdenes Temporomandibulares y Dolor Orofacial', 2, 10, 
@@ -1078,7 +1078,7 @@ ARRAY['O0236']::text[]),
 ('odontologiaLic', 'O0258', 'Patología Oral II', 2, 11, ARRAY['O0246']::text[]),
 ('odontologiaLic', 'O0446', 'Administración de Servicios Odontológicos', 2, 11, 
 ARRAY['O0447']::text[]),
-('odontologiaLic', 'O0636', 'Seminario Integral', 2, 11, ARRAY['{}']),
+('odontologiaLic', 'O0636', 'Seminario Integral', 2, 11, ARRAY[]::text[]),
 ('odontologiaLic', 'O6010', 'Clínica Integral', 4, 11, ARRAY['O0238', 'O0257']::text[]),
 ('odontologiaLic', 'O6011', 'Clínica de Énfasis', 3, 11, ARRAY['O0238']::text[]),
 ('odontologiaLic', 'O6012', 'Clínica de Odontopediatría y Ortodoncia III', 2, 11, 
@@ -1089,9 +1089,9 @@ ARRAY['O0263']::text[]),
 'O0447', 'O0448']::text[]),
 
 -- SEMINARIOS DE GRADUACIÓN / TFG (CICLOS XIII, XIV, XV)
-('odontologiaLic', 'O9600', 'Seminario de Graduación 1', 0, 13, ARRAY['{}']),
-('odontologiaLic', 'O9601', 'Seminario de Graduación 2', 0, 14, ARRAY['{}']),
-('odontologiaLic', 'O9602', 'Seminario de Graduación 3', 0, 15, ARRAY['{}']),
+('odontologiaLic', 'O9600', 'Seminario de Graduación 1', 0, 13, ARRAY[]::text[]),
+('odontologiaLic', 'O9601', 'Seminario de Graduación 2', 0, 14, ARRAY[]::text[]),
+('odontologiaLic', 'O9602', 'Seminario de Graduación 3', 0, 15, ARRAY[]::text[]),
 
 -- ASIGNATURAS CONTENIDAS EN LOS BLOQUES CLÍNICOS OPTATIVOS (OPT1096 AL OPT1101)
 ('odontologiaLic', 'O0240', 'Clínica de Diagnóstico I', 1, 9, ARRAY['FR0415', 
@@ -1133,16 +1133,16 @@ ON CONFLICT (carrera_id, codigo) DO UPDATE SET
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) 
 VALUES
 -- I CICLO
-('nutricion', 'CH1010', 'Introducción a la Nutrición Humana', 2, 1, ARRAY['{}']),
-('nutricion', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY['{}']),
-('nutricion', 'MA0001', 'Precálculo', 0, 1, ARRAY['{}']),
-('nutricion', 'QU0101', 'Química General I', 4, 1, ARRAY['{}']),
-('nutricion', 'QU0103', 'Laboratorio de Química General I', 1, 1, ARRAY['{}']),
+('nutricion', 'CH1010', 'Introducción a la Nutrición Humana', 2, 1, ARRAY[]::text[]),
+('nutricion', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY[]::text[]),
+('nutricion', 'MA0001', 'Precálculo', 0, 1, ARRAY[]::text[]),
+('nutricion', 'QU0101', 'Química General I', 4, 1, ARRAY[]::text[]),
+('nutricion', 'QU0103', 'Laboratorio de Química General I', 1, 1, ARRAY[]::text[]),
 
 -- II CICLO
-('nutricion', 'B0106', 'Biología General', 3, 2, ARRAY['{}']),
-('nutricion', 'B0107', 'Laboratorio de Biología General', 1, 2, ARRAY['{}']),
-('nutricion', 'EF-', 'Actividad Deportiva', 0, 2, ARRAY['{}']),
+('nutricion', 'B0106', 'Biología General', 3, 2, ARRAY[]::text[]),
+('nutricion', 'B0107', 'Laboratorio de Biología General', 1, 2, ARRAY[]::text[]),
+('nutricion', 'EF-', 'Actividad Deportiva', 0, 2, ARRAY[]::text[]),
 ('nutricion', 'EG-II', 'Curso Integrado de Humanidades II', 6, 2, ARRAY['EG-I']),
 ('nutricion', 'QU0102', 'Química General II', 4, 2, ARRAY['QU0101', 'QU0103']),
 ('nutricion', 'QU0104', 'Laboratorio de Química General II', 1, 2, ARRAY['QU0101', 
@@ -1154,7 +1154,7 @@ VALUES
 'QU0104']),
 ('nutricion', 'QU0210', 'Fundamentos de Química Orgánica', 3, 3, ARRAY['QU0102', 'QU0104']),
 ('nutricion', 'QU0211', 'Laboratorio de Química Orgánica', 1, 3, ARRAY['QU0102', 'QU0104']),
-('nutricion', 'RP-1', 'Repertorio', 3, 3, ARRAY['{}']),
+('nutricion', 'RP-1', 'Repertorio', 3, 3, ARRAY[]::text[]),
 
 -- IV CICLO
 ('nutricion', 'BC0113', 'Bioquímica para Nutrición', 4, 4, ARRAY['QU0210', 'QU0211']),
@@ -1201,15 +1201,15 @@ ARRAY['NU4002', 'NU4003']),
 ('nutricion', 'NU5004', 'Seminario de Licenciatura', 2, 9, ARRAY['NU4003', 'NU4004']),
 
 -- X CICLO (Bloques Finales de Trabajo Final de Graduación / TFG)
-('nutricion', 'NU9500', 'Investigación Dirigida 1', 0, 10, ARRAY['{}']),
-('nutricion', 'NU9501', 'Investigación Dirigida 2', 0, 10, ARRAY['{}']),
-('nutricion', 'NU9502', 'Investigación Dirigida 3', 0, 10, ARRAY['{}']),
-('nutricion', 'NU9600', 'Seminario de Graduación 1', 0, 10, ARRAY['{}']),
-('nutricion', 'NU9601', 'Seminario de Graduación 2', 0, 10, ARRAY['{}']),
-('nutricion', 'NU9602', 'Seminario de Graduación 3', 0, 10, ARRAY['{}']),
-('nutricion', 'NU9700', 'Práctica Dirigida 1', 0, 10, ARRAY['{}']),
-('nutricion', 'NU9701', 'Práctica Dirigida 2', 0, 10, ARRAY['{}']),
-('nutricion', 'NU9702', 'Práctica Dirigida 3', 0, 10, ARRAY['{}']),
+('nutricion', 'NU9500', 'Investigación Dirigida 1', 0, 10, ARRAY[]::text[]),
+('nutricion', 'NU9501', 'Investigación Dirigida 2', 0, 10, ARRAY[]::text[]),
+('nutricion', 'NU9502', 'Investigación Dirigida 3', 0, 10, ARRAY[]::text[]),
+('nutricion', 'NU9600', 'Seminario de Graduación 1', 0, 10, ARRAY[]::text[]),
+('nutricion', 'NU9601', 'Seminario de Graduación 2', 0, 10, ARRAY[]::text[]),
+('nutricion', 'NU9602', 'Seminario de Graduación 3', 0, 10, ARRAY[]::text[]),
+('nutricion', 'NU9700', 'Práctica Dirigida 1', 0, 10, ARRAY[]::text[]),
+('nutricion', 'NU9701', 'Práctica Dirigida 2', 0, 10, ARRAY[]::text[]),
+('nutricion', 'NU9702', 'Práctica Dirigida 3', 0, 10, ARRAY[]::text[]),
 
 -- CURSOS OPTATIVOS DEL BLOQUE DE LA UNIDAD ACADÉMICA (OPT800)
 ('nutricion', 'NU0300', 'Tópicos Selectos en Alimentación y Nutrición I', 2, 7, 
@@ -1232,19 +1232,19 @@ ON CONFLICT (carrera_id, codigo) DO UPDATE SET
 -- ============================================================
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) VALUES
 -- I CICLO
-('odontologia', 'B0106', 'Biología General', 3, 1, ARRAY['{}']),
-('odontologia', 'B0107', 'Laboratorio de Biología General', 1, 1, ARRAY['{}']),
-('odontologia', 'EG-', 'Curso de Arte', 2, 1, ARRAY['{}']),
-('odontologia', 'EG-1', 'Curso Integrado de Humanidades I', 6, 1, ARRAY['{}']),
-('odontologia', 'MA0125', 'Matemática Elemental', 2, 1, ARRAY['{}']),
-('odontologia', 'QU0114', 'Química General Intensiva', 4, 1, ARRAY['{}']),
-('odontologia', 'QU0115', 'Laboratorio de Química General Intensiva', 1, 1, ARRAY['{}']),
+('odontologia', 'B0106', 'Biología General', 3, 1, ARRAY[]::text[]),
+('odontologia', 'B0107', 'Laboratorio de Biología General', 1, 1, ARRAY[]::text[]),
+('odontologia', 'EG-', 'Curso de Arte', 2, 1, ARRAY[]::text[]),
+('odontologia', 'EG-1', 'Curso Integrado de Humanidades I', 6, 1, ARRAY[]::text[]),
+('odontologia', 'MA0125', 'Matemática Elemental', 2, 1, ARRAY[]::text[]),
+('odontologia', 'QU0114', 'Química General Intensiva', 4, 1, ARRAY[]::text[]),
+('odontologia', 'QU0115', 'Laboratorio de Química General Intensiva', 1, 1, ARRAY[]::text[]),
 
 -- II CICLO
 ('odontologia', 'AN2104', 'Anatomía Humana para Odontología', 4, 2, ARRAY['B0106', 'B0107']),
-('odontologia', 'EF-', 'Actividad Deportiva', 0, 2, ARRAY['{}']),
+('odontologia', 'EF-', 'Actividad Deportiva', 0, 2, ARRAY[]::text[]),
 ('odontologia', 'EG-II', 'Curso Integrado de Humanidades II', 6, 2, ARRAY['EG-1']),
-('odontologia', 'O0110', 'Introducción a la Odontología', 2, 2, ARRAY['{}']),
+('odontologia', 'O0110', 'Introducción a la Odontología', 2, 2, ARRAY[]::text[]),
 ('odontologia', 'O0112', 'Morfología e Histología Dental', 3, 2, ARRAY['B0106', 'B0107']),
 ('odontologia', 'QU0212', 'Química Orgánica para Odontología', 3, 2, ARRAY['QU0114', 'QU0115']),
 
@@ -1254,7 +1254,7 @@ INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel,
 ('odontologia', 'H2103', 'Histología Humana para Odontología', 3, 3, ARRAY['AN2104']),
 ('odontologia', 'O0118', 'Materiales Dentales', 3, 3, ARRAY['QU0114', 'O0110', 'O0112']),
 ('odontologia', 'O0119', 'Preclínica de Operatoria Dental I', 3, 3, ARRAY['O0110', 'O0112']),
-('odontologia', 'RP-1', 'Repertorio', 3, 3, ARRAY['{}']),
+('odontologia', 'RP-1', 'Repertorio', 3, 3, ARRAY[]::text[]),
 
 -- IV CICLO
 ('odontologia', 'MB1104', 'Microbiología para Odontología', 4, 4, ARRAY['BC0111']),
@@ -1340,13 +1340,13 @@ ON CONFLICT (carrera_id, codigo) DO UPDATE SET
 INSERT INTO public.courses_catalog (carrera_id, codigo, nombre, creditos, nivel, requisitos) 
 VALUES
 -- CICLO I
-('sistemas_energia', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY['{}']),
-('sistemas_energia', 'QU-0100', 'Química General I', 3, 1, ARRAY['{}']),
-('sistemas_energia', 'QU-0101', 'Laboratorio de Química General I', 1, 1, ARRAY['{}']),
-('sistemas_energia', 'MA-1101', 'Cálculo I', 3, 1, ARRAY['{}']),
-('sistemas_energia', 'MA-1004', 'Álgebra Lineal', 3, 1, ARRAY['{}']),
-('sistemas_energia', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY['{}']),
-('sistemas_energia', 'EG-', 'Curso de Arte', 2, 1, ARRAY['{}']),
+('sistemas_energia', 'EG-I', 'Curso Integrado de Humanidades I', 6, 1, ARRAY[]::text[]),
+('sistemas_energia', 'QU-0100', 'Química General I', 3, 1, ARRAY[]::text[]),
+('sistemas_energia', 'QU-0101', 'Laboratorio de Química General I', 1, 1, ARRAY[]::text[]),
+('sistemas_energia', 'MA-1101', 'Cálculo I', 3, 1, ARRAY[]::text[]),
+('sistemas_energia', 'MA-1004', 'Álgebra Lineal', 3, 1, ARRAY[]::text[]),
+('sistemas_energia', 'EF-', 'Actividad Deportiva', 0, 1, ARRAY[]::text[]),
+('sistemas_energia', 'EG-', 'Curso de Arte', 2, 1, ARRAY[]::text[]),
 
 -- CICLO II
 ('sistemas_energia', 'EG-II', 'Curso Integrado de Humanidades II', 6, 2, 
@@ -1396,7 +1396,7 @@ ARRAY['FS-0410','FS-0411','IE-0247','IE-0313','MA-1003']::text[]),
 ARRAY['IE-0309','IE-0313']::text[]),
 
 -- CICLO VI
-('sistemas_energia', 'RP-', 'Repertorio', 3, 6, ARRAY['{}']),
+('sistemas_energia', 'RP-', 'Repertorio', 3, 6, ARRAY[]::text[]),
 ('sistemas_energia', 'IE-0281', 'Termofluidos', 3, 6, 
 ARRAY['FS-0310','FS-0311','QU-0100','QU-0101']::text[]),
 ('sistemas_energia', 'IE-0405', 'Modelos Probabilísticos de Señales y Sistemas', 3, 6, 
@@ -1411,7 +1411,7 @@ ARRAY['IE-0308','IE-0413']::text[]),
 ARRAY['IE-0307']::text[]),
 
 -- CICLO VII
-('sistemas_energia', 'IE-Optativa_I', 'Optativa I', 3, 7, ARRAY['{}']),
+('sistemas_energia', 'IE-Optativa_I', 'Optativa I', 3, 7, ARRAY[]::text[]),
 ('sistemas_energia', 'IE-0365', 'Transmisión de Potencia', 3, 7, 
 ARRAY['IE-0315','IE-0316']::text[]),
 ('sistemas_energia', 'IE-0431', 'Sistemas de Control', 3, 7, ARRAY['IE-0347']::text[]),
@@ -1425,7 +1425,7 @@ ARRAY['FS-0410','FS-0411','QU-0100','QU-0101']::text[]),
 ARRAY['SR-I']::text[]),
 
 -- CICLO VIII
-('sistemas_energia', 'IE-Optativa_II', 'Optativa II', 3, 8, ARRAY['{}']),
+('sistemas_energia', 'IE-Optativa_II', 'Optativa II', 3, 8, ARRAY[]::text[]),
 ('sistemas_energia', 'IE-0469', 'Sistemas de Potencia I', 3, 8, 
 ARRAY['IE-0365','IE-0615']::text[]),
 ('sistemas_energia', 'IE-0499', 'Proyecto Eléctrico', 3, 8, ARRAY['IE-0431']::text[]),
