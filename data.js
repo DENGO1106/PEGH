@@ -181,7 +181,8 @@ function puedeEstarEnEstado(carreraId, codigoCurso, nuevoEstado) {
 
   // REGLAS:
   // 1. Para APROBADO (1) o CURSANDO (2): Requisitos deben estar APROBADOS (1).
-  // 2. Para PROYECCIÓN (3-7): Requisitos deben estar en un estado ANTERIOR y ACTIVO (0 < estado_req < nuevoEstado).
+  // 2. Para PROYECCIÓN (3-7): Basta con que los requisitos tengan CUALQUIER estado > 0
+  //    (no importa si están cursando, proyectados, etc. — es una planificación futura).
 
   return curso.requisitos.every(reqString => {
     // Soporte para requisitos OR usando ||
@@ -192,9 +193,11 @@ function puedeEstarEnEstado(carreraId, codigoCurso, nuevoEstado) {
       if (!reqCurso) return true; // Si no existe el req, no bloqueamos
 
       if (nuevoEstado === 1 || nuevoEstado === 2) {
+        // Para aprobar/cursar: el requisito DEBE estar aprobado
         return reqCurso.estado === 1;
       } else if (nuevoEstado >= 3) {
-        return reqCurso.estado > 0 && reqCurso.estado < nuevoEstado;
+        // Para proyecciones: basta con que el requisito tenga ALGÚN plan asignado
+        return reqCurso.estado > 0;
       }
       return false;
     });
