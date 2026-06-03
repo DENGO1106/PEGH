@@ -267,27 +267,164 @@ function siguienteEstado(estadoActual) {
 // ===================================
 
 /**
- * Devuelve true si el curso pertenece a un grupo de sincronización.
- * (Dinámico: revisa si el mismo código existe en otras carreras)
+ * Normaliza un código de curso para comparaciones:
+ * quita guiones interiores y pasa a minúsculas.
+ * Ej: "MA-1004" => "ma1004", "EG-I" => "egi", "EG-1" => "eg1"
+ * Nota: EG-I y EG-1 son distintos (I vs 1), se tratan por el mapa de equivalencias.
+ */
+function normalizarCodigo(codigo) {
+  return (codigo || '').replace(/-/g, '').toLowerCase().trim();
+}
+
+/**
+ * Mapa de equivalencias para cursos que son el mismo contenido
+ * pero tienen códigos genuinamente distintos entre carreras.
+ * Formato: cada grupo es un array de códigos equivalentes.
+ * Se generó analizando la BD (40 grupos inconsistentes encontrados).
+ */
+const GRUPOS_EQUIVALENTES = [
+  // Humanidades / Estudios Generales
+  ['EG-I', 'EG-1'],
+  ['EG-II', 'EG-2'],
+  ['SR-I', 'SR-1'],
+  ['SR-II', 'SR-2'],
+  ['RP-', 'RP-1'],
+
+  // Cálculo I — distintas escuelas usan distintos códigos
+  ['MA1001', 'MA1210', 'MA-1101'],
+  // Cálculo II
+  ['MA1002', 'MA-1002'],
+  // Cálculo III
+  ['MA1003', 'MA-1003'],
+  // Álgebra Lineal
+  ['MA1004', 'MA-1004'],
+  // Ecuaciones Diferenciales
+  ['MA1005', 'MA-1005'],
+  // Cálculo para Ciencias Económicas I
+  ['MA-1021', 'MA1021'],
+
+  // Física
+  ['FS0210', 'FS-0210'],
+  ['FS0211', 'FS-0211'],
+  ['FS0310', 'FS-0310'],
+  ['FS0311', 'FS-0311'],
+  ['FS0410', 'FS-0410'],
+  ['FS0411', 'FS-0411'],
+
+  // Química
+  ['QU0100', 'QU-0100'],
+  ['QU0101', 'QU-0101'],
+
+  // Informática / Computación
+  ['CI0202', 'CI-0202', 'C10202'],
+
+  // Gráfica
+  ['IM0101', 'IM-0101'],
+
+  // Responsabilidad Profesional
+  ['IE0501', 'IE-0501'],
+
+  // Introducción a la Economía
+  ['XE-0156', 'XE0156', 'EC1100'],
+
+  // Investigaciones Dirigidas
+  ['II9500', 'IQ9500', 'XP9500', 'G9500', 'IT9500'],
+  ['MA9500', 'FA9500', 'IC9500'],
+  ['MA9501', 'FA9501', 'IC9501'],
+  ['FA9502', 'IC9502'],
+  ['XP9501', 'G9501', 'IT9501'],
+  ['XP9502', 'G9502', 'IT9502'],
+
+  // Prácticas Dirigidas
+  ['FA9700', 'IQ9700', 'G9700', 'IT9700'],
+  ['FA9701', 'G9701', 'IT9701'],
+  ['G9702', 'FA9702', 'IT9702'],
+  ['MA9700', 'XP9700'],
+
+  // Proyectos / Seminarios de Graduación
+  ['FA9800', 'IQ9800', 'G9800', 'IT9800'],
+  ['FA9801', 'G9801', 'IT9801'],
+  ['FA9802', 'G9802', 'IT9802'],
+  ['MA9600', 'IC9600', 'XP9600'],
+  ['IC9601', 'G9601', 'IT9601'],
+  ['G9602', 'IT9602'],
+  ['NU9601', 'XP9601'],
+
+  // Biología
+  ['B0106', 'B0103'],
+
+  // Mecánica
+  ['IQ0312', 'IM-0207'],
+];
+
+// Lookup precalculado: código -> array de todos sus equivalentes (incluyéndose)
+const _equivalenciasLookup = (() => {
+  const map = {};
+  GRUPOS_EQUIVALENTES.forEach(grupo => {
+    grupo.forEach(codigo => {
+      map[codigo] = grupo;
+    });
+  });
+  return map;
+})();
+
+/**
+ * Obtiene todos los códigos equivalentes a un código dado (incluye al propio).
+ */
+function getCodigosEquivalentes(codigo) {
+  // 1. Primero intentar match exacto en el mapa
+  if (_equivalenciasLookup[codigo]) return _equivalenciasLookup[codigo];
+
+  // 2. Buscar por código normalizado (para cubrir variaciones de guión no listadas)
+  const norm = normalizarCodigo(codigo);
+  for (const [clave, grupo] of Object.entries(_equivalenciasLookup)) {
+    if (normalizarCodigo(clave) === norm) return grupo;
+  }
+
+  // 3. Sin equivalentes: devolver solo el propio
+  return [codigo];
+}
+
+/**
+ * Devuelve true si el curso pertenece a un grupo de sincronización
+ * (mismo código en otra carrera, o equivalente conocido).
  */
 function esCompartido(carreraId, codigo) {
+  const equivalentes = getCodigosEquivalentes(codigo);
   let compartidos = 0;
   Object.keys(CARRERAS).forEach(cId => {
-    if (getCursoByCodigo(cId, codigo)) {
-      compartidos++;
-    }
+    const encontrado = equivalentes.some(eq => getCursoByCodigo(cId, eq));
+    if (encontrado) compartidos++;
   });
   return compartidos > 1;
 }
 
 /**
- * Propaga el nuevo estado a todos los cursos hermanos (mismo código) en otras carreras.
- * No modifica el curso origen.
+ * Propaga el nuevo estado a todos los cursos hermanos en otras carreras.
+ * Usa getCodigosEquivalentes para cubrir variaciones de código y
+ * equivalencias definidas en GRUPOS_EQUIVALENTES.
  */
 function propagarEstadoCurso(sourceCarreraId, codigoCurso, nuevoEstado) {
+  const equivalentes = getCodigosEquivalentes(codigoCurso);
+
   Object.keys(CARRERAS).forEach(carreraId => {
     if (carreraId === sourceCarreraId) return; // Saltamos el origen
-    const cursoHermano = getCursoByCodigo(carreraId, codigoCurso);
+
+    // Buscar el curso usando cualquier código equivalente
+    let cursoHermano = null;
+    for (const eq of equivalentes) {
+      cursoHermano = getCursoByCodigo(carreraId, eq);
+      if (cursoHermano) break;
+    }
+
+    // También buscar por normalización de guiones
+    if (!cursoHermano) {
+      const normOrigen = normalizarCodigo(codigoCurso);
+      cursoHermano = CARRERAS[carreraId].cursos?.find(
+        c => normalizarCodigo(c.codigo) === normOrigen
+      ) || null;
+    }
+
     if (cursoHermano) {
       cursoHermano.estado = nuevoEstado;
     }
