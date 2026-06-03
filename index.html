@@ -42,7 +42,7 @@
   <!-- NAVEGACIÓN PRINCIPAL -->
   <nav class="main-nav hidden" id="app-nav">
     <div class="nav-container !justify-between px-6">
-      <button onclick="navigateTo('home')"
+      <button data-navigate="home"
         class="flex items-center gap-3 text-gray-300 hover:text-white transition-all font-black group bg-white/5 hover:bg-white/10 px-6 py-3.5 rounded-xl border border-white/10 active:scale-95">
         <i data-lucide="arrow-left" class="w-6 h-6 group-hover:-translate-x-1 transition-transform"></i>
         <span class="text-base md:text-lg hidden sm:inline">Regresar al Inicio</span>
@@ -64,7 +64,7 @@
   </nav>
 
   <!-- PANTALLA DE ACCESO OBLIGATORIO (LOGIN) -->
-  <section id="login-section" class="tab-content hidden flex-col md:flex-row w-full min-h-screen bg-black fixed inset-0 z-[200] flex">
+  <section id="login-section" class="tab-content hidden flex-col md:flex-row w-full min-h-[100dvh] bg-black fixed inset-0 z-[200] flex overflow-y-auto">
       <!-- Mitad branding (Oculto en móviles muy pequeños) -->
       <div class="hidden md:flex md:w-1/2 relative flex-col justify-center items-center overflow-hidden p-12 bg-zinc-950">
           <div class="absolute inset-0 bg-gradient-to-br from-red-600/20 via-transparent to-blue-900/20 opacity-50"></div>
@@ -140,7 +140,7 @@
 
   <!-- PANTALLA DE INICIO (HOME) -->
   <section id="home-section"
-    class="tab-content flex flex-col min-h-screen px-4 animate-fade-in">
+    class="tab-content flex flex-col min-h-[100dvh] px-4 animate-fade-in">
 
     <!-- Top bar con info del usuario -->
     <div class="flex items-center justify-between py-5 max-w-4xl w-full mx-auto flex-wrap gap-2">
@@ -172,7 +172,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
         <!-- Tarjeta: Plan de Estudios -->
-        <button onclick="navigateTo('plan')"
+        <button data-navigate="plan"
           class="group relative overflow-hidden rounded-3xl bg-zinc-900 border border-white/10 p-1 transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(59,130,246,0.15)]">
           <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <div class="relative bg-zinc-950 rounded-[22px] p-8 h-full flex flex-col items-center gap-6">
@@ -187,7 +187,7 @@
         </button>
 
         <!-- Tarjeta: Generador de Horarios -->
-        <button onclick="navigateTo('horario')"
+        <button data-navigate="horario"
           class="group relative overflow-hidden rounded-3xl bg-zinc-900 border border-white/10 p-1 transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(220,38,38,0.15)]">
           <div class="absolute inset-0 bg-gradient-to-br from-red-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <div class="relative bg-zinc-950 rounded-[22px] p-8 h-full flex flex-col items-center gap-6">
@@ -202,7 +202,7 @@
         </button>
 
         <!-- Tarjeta: Calculadora Ponderado -->
-        <button onclick="navigateTo('calculator')"
+        <button data-navigate="calculator"
           class="group relative overflow-hidden rounded-3xl bg-zinc-900 border border-white/10 p-1 transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(234,179,8,0.15)]">
           <div class="absolute inset-0 bg-gradient-to-br from-yellow-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <div class="relative bg-zinc-950 rounded-[22px] p-8 h-full flex flex-col items-center gap-6">
@@ -952,11 +952,11 @@
   </button>
 
   <!-- CALCULADORA PONDERADO SECTION -->
-  <section id="calculator-section" class="tab-content hidden flex flex-col min-h-screen">
+  <section id="calculator-section" class="tab-content hidden flex flex-col min-h-[100dvh]">
     <!-- NAVEGACIÓN -->
     <nav class="main-nav">
       <div class="nav-container px-4 md:px-6">
-        <button onclick="navigateTo('home')"
+        <button data-navigate="home"
           class="flex items-center gap-3 text-gray-300 hover:text-white transition-all font-black group bg-white/5 hover:bg-white/10 px-4 py-2.5 rounded-xl border border-white/10 active:scale-95">
           <i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i>
           <span class="text-sm md:text-base hidden sm:inline">Regresar al Inicio</span>
@@ -1309,6 +1309,36 @@
   <script>
     // Inicializar iconos de Lucide
     lucide.createIcons();
+
+    // ==========================================
+    // PROTECCIÓN BÁSICA ANTI-INSPECCIÓN
+    // ==========================================
+    // Deshabilitar click derecho (menú contextual)
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // Deshabilitar atajos de teclado comunes para herramientas de desarrollador
+    document.addEventListener('keydown', function(e) {
+        // F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+        }
+        // Ctrl+Shift+I (Consola), Ctrl+Shift+J (Consola), Ctrl+Shift+C (Inspector)
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+            e.preventDefault();
+        }
+        // Ctrl+U (Ver código fuente)
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+            e.preventDefault();
+        }
+    });
+
+    // Trampa de Debugger Activa (Anti-Inspección Avanzada)
+    // Si alguien abre las DevTools mediante un menú, la pestaña se congelará repetidamente
+    setInterval(function() {
+        (function() {
+            return false;
+        }['constructor']('debugger')());
+    }, 100);
   </script>
 
 </body>

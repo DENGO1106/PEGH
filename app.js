@@ -55,7 +55,11 @@ window.navigateTo = (target, pushToHistory = true) => {
         if (appNav) appNav.classList.remove('hidden');
         // Aplicar filtro de carreras del perfil del usuario
         const _perfil = window.supaAuth?.getCurrentProfile?.();
-        if (_perfil?.selected_carreras?.length > 0) filtrarCarrerasPorPerfil(_perfil.selected_carreras);
+        if (_perfil?.selected_carreras?.length > 0) {
+            filtrarCarrerasPorPerfil(_perfil.selected_carreras);
+            // Asegurar que la UI de la carrera activa se renderice inmediatamente
+            cambiarCarrera(carreraActual);
+        }
     } else if (target === 'horario') {
         const hSection = document.getElementById('horarios-section');
         if (hSection) hSection.classList.remove('hidden');
@@ -85,6 +89,15 @@ window.navigateTo = (target, pushToHistory = true) => {
 
     if (window.lucide) lucide.createIcons();
 };
+
+// Delegación global de eventos para navegación
+document.addEventListener('click', (e) => {
+    const navBtn = e.target.closest('[data-navigate]');
+    if (navBtn) {
+        e.preventDefault();
+        window.navigateTo(navBtn.dataset.navigate);
+    }
+});
 
 /**
  * Guarda el estado actual en localStorage y en Supabase
@@ -153,39 +166,33 @@ async function cargarEstado() {
     const session = window.supaAuth?.getCurrentSession();
     const storageKey = session ? `ucr_estado_${session.user.id}` : APP_STORAGE_KEY;
 
-    // SIEMPRE resetear todos los cursos a 0 antes de cargar
-    // Esto evita que el progreso de otro usuario quede visible
-    Object.keys(CARRERAS).forEach(carreraId => {
-        CARRERAS[carreraId].cursos.forEach(curso => { curso.estado = 0; });
-    });
-
-    // 1. Carga rápida desde localStorage del usuario actual
+    // 1. Determinar carrera activa del usuario (del perfil de Supabase o localStorage)
     const estadoGuardado = localStorage.getItem(storageKey);
     if (estadoGuardado) {
         try {
             const estado = JSON.parse(estadoGuardado);
-            Object.keys(CARRERAS).forEach(carreraId => {
-                const cursos = CARRERAS[carreraId].cursos;
-                const estadoCarrera = estado[carreraId];
-                if (estadoCarrera) {
-                    cursos.forEach(curso => {
-                        const guardado = estadoCarrera.find(c => c.codigo === curso.codigo || _COMPAT_CODIGOS[c.codigo] === curso.codigo);
-                        if (guardado !== undefined) {
-                            const val = guardado.estado;
-                            curso.estado = typeof val === 'number' ? val : (val === 'aprobado' ? 1 : (val === 'cursando' ? 2 : 0));
-                        }
-                    });
-                }
-            });
             if (estado.carreraActual) carreraActual = estado.carreraActual;
-        } catch (error) {
-            console.error('Error al cargar estado local:', error);
-            localStorage.removeItem(storageKey);
-        }
+        } catch (e) { /* Ignorar error de parseo */ }
     }
 
-    // 2. Supabase SIEMPRE sobreescribe el estado local (fuente de verdad)
-    if (session) {
+    // 2. Obtener carreras activas del perfil para precargar las necesarias
+    let activeCareers = window.supaAuth?.getCurrentProfile()?.selected_carreras || [];
+    if (activeCareers.length === 0) activeCareers = [carreraActual];
+
+    // 3. Cargar cursos de Supabase para todas las carreras activas del usuario (paralelo)
+    if (session && window.supaAuth?.supabase) {
+        await Promise.all(activeCareers.map(cId => {
+            if (CARRERAS[cId]) return cargarCursosDeSupabase(cId);
+        }));
+    }
+
+    // 4. Resetear estados a 0
+    Object.keys(CARRERAS).forEach(carreraId => {
+        CARRERAS[carreraId].cursos.forEach(curso => { curso.estado = 0; });
+    });
+
+    // 5. Supabase como fuente de verdad: carga estados del usuario
+    if (session && window.supaAuth?.supabase) {
         try {
             const { data, error } = await window.supaAuth.supabase
                 .from('user_courses')
@@ -199,7 +206,6 @@ async function cargarEstado() {
                     remoteMap[row.carrera_id][row.course_id] = parseInt(row.status);
                 });
 
-                // Resetear de nuevo y aplicar solo lo de Supabase
                 Object.keys(CARRERAS).forEach(carreraId => {
                     const carreraMap = remoteMap[carreraId] || {};
                     CARRERAS[carreraId].cursos.forEach(curso => {
@@ -208,26 +214,20 @@ async function cargarEstado() {
                 });
 
                 console.log('✅ Plan cargado desde Supabase');
-                // Actualizar localStorage del usuario con los datos de Supabase
                 const newLocalState = { carreraActual };
                 Object.keys(CARRERAS).forEach(carreraId => {
                     newLocalState[carreraId] = CARRERAS[carreraId].cursos.map(c => ({ codigo: c.codigo, estado: c.estado }));
                 });
                 localStorage.setItem(storageKey, JSON.stringify(newLocalState));
-
-                if (typeof renderizarCarrera === 'function') renderizarCarrera();
             } else if (error) {
                 console.error('Error al cargar desde Supabase:', error);
             }
         } catch(err) {
             console.error('Error al sincronizar con Supabase:', err);
         }
-    } else {
-        // Si no hay sesión (se cargó de localStorage), forzamos renderización
-        if (typeof renderizarCarrera === 'function') renderizarCarrera();
     }
-    
-    // También cargar horarios sincronizados
+
+    if (typeof renderizarCarrera === 'function') renderizarCarrera();
     if (typeof cargarHorarios === 'function') cargarHorarios();
 }
 
@@ -542,9 +542,9 @@ function actualizarProgreso() {
 }
 
 /**
- * Cambia entre carreras
+ * Cambia entre carreras (ahora async: descarga cursos de Supabase si aún no están en memoria)
  */
-function cambiarCarrera(carreraId) {
+async function cambiarCarrera(carreraId) {
     if (!carreraId || !CARRERAS[carreraId]) {
         console.warn(`[App] Intento de cambiar a carrera inválida: ${carreraId}`);
         return;
@@ -580,6 +580,34 @@ function cambiarCarrera(carreraId) {
         if (panel) panel.classList.remove('active');
     }
 
+    // === DESCARGA LAZY DE CURSOS DESDE SUPABASE ===
+    if (CARRERAS[carreraId].cursos.length === 0) {
+        const planEl = document.getElementById('plan-container') || document.getElementById('cursos-container');
+        if (planEl) planEl.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-16 gap-4">
+                <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-gray-400 text-sm animate-pulse">Cargando plan de estudios...</p>
+            </div>`;
+        
+        const ok = await cargarCursosDeSupabase(carreraId);
+        if (ok) {
+            // Aplicar estados guardados en Supabase para esta carrera
+            const session = window.supaAuth?.getCurrentSession();
+            if (session && window.supaAuth?.supabase) {
+                const { data } = await window.supaAuth.supabase
+                    .from('user_courses')
+                    .select('course_id, status')
+                    .eq('user_id', session.user.id)
+                    .eq('carrera_id', carreraId);
+                if (data && data.length > 0) {
+                    const map = {};
+                    data.forEach(r => { map[r.course_id] = parseInt(r.status); });
+                    CARRERAS[carreraId].cursos.forEach(c => { c.estado = map[c.codigo] ?? 0; });
+                }
+            }
+        }
+    }
+
     guardarEstado();
     renderizarCarrera();
 
@@ -588,6 +616,7 @@ function cambiarCarrera(carreraId) {
         renderizarTablaConvalidaciones();
     }
 }
+
 
 // ===================================
 // ANIMACIONES Y EFECTOS
@@ -1164,7 +1193,8 @@ let _adminFeedbackAll = [];
 let _adminCurrentTab = 'pending';
 
 function esAdmin() {
-    return window.supaAuth?.getStoredUsername()?.toUpperCase() === 'DENGO1106';
+    const perfil = window.supaAuth?.getCurrentProfile?.();
+    return perfil && perfil.is_admin === true;
 }
 
 function initAdminBtn() {

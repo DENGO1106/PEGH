@@ -105,8 +105,22 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
-  min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+input, textarea {
+  -webkit-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Soporte de Scroll Suave en Móviles iOS */
+* {
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ===================================
@@ -117,7 +131,7 @@ body {
   max-width: 1600px;
   margin: 0 auto;
   padding: var(--spacing-lg);
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Header */

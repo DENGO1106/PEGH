@@ -24,7 +24,6 @@ function _getStoredUsername() {
     if (currentSession && currentSession.user && currentSession.user.email) {
         const email = currentSession.user.email;
         if (email.endsWith('@campus-ucr.app')) return email.split('@')[0];
-        if (email === 'diegodengosoto@gmail.com') return 'DENGO1106'; // Soporte cuenta vieja
     }
     return ''; 
 }
