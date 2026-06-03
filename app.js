@@ -1983,21 +1983,15 @@ async function eliminarSnapshotPlan(snapshotId) {
     try {
         const { error } = await window.supaAuth.supabase
             .from('user_plan_snapshots')
-            }
-        });
-    });
+            .delete()
+            .eq('id', snapshotId);
 
-    // Luego, aplicar ese estado más alto a todos los hermanos
-    Object.keys(CARRERAS).forEach(cId => {
-        const cursos = CARRERAS[cId].cursos;
-        if (!cursos) return;
-        cursos.forEach(curso => {
-            const maxEstado = mejorEstadoPorCodigo[curso.codigo];
-            if (maxEstado && curso.estado < maxEstado) {
-                curso.estado = maxEstado;
-            }
-        });
-    });
+        if (error) throw error;
+        cargarHistorialPlanes(); // Recargar la lista
+    } catch (err) {
+        console.error("Error al eliminar snapshot:", err);
+        alert("Error al eliminar el respaldo.");
+    }
 }
 
 // ===================================
