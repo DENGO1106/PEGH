@@ -242,31 +242,78 @@ window.addEventListener('supabase_auth_changed', () => {
     if (selectionList) selectionList.innerHTML = '';
     if (tabsContainer) tabsContainer.innerHTML = '';
 
+    // Agrupación por facultades y colores aleatorios
+    const colorPalettes = [
+        { accent: 'accent-red-600', border: 'hover:border-red-500/40 has-[:checked]:border-red-500/60', bg: 'has-[:checked]:bg-red-950/20' },
+        { accent: 'accent-blue-500', border: 'hover:border-blue-500/40 has-[:checked]:border-blue-500/60', bg: 'has-[:checked]:bg-blue-950/20' },
+        { accent: 'accent-emerald-500', border: 'hover:border-emerald-500/40 has-[:checked]:border-emerald-500/60', bg: 'has-[:checked]:bg-emerald-950/20' },
+        { accent: 'accent-purple-500', border: 'hover:border-purple-500/40 has-[:checked]:border-purple-500/60', bg: 'has-[:checked]:bg-purple-950/20' },
+        { accent: 'accent-amber-500', border: 'hover:border-amber-500/40 has-[:checked]:border-amber-500/60', bg: 'has-[:checked]:bg-amber-950/20' },
+        { accent: 'accent-cyan-500', border: 'hover:border-cyan-500/40 has-[:checked]:border-cyan-500/60', bg: 'has-[:checked]:bg-cyan-950/20' },
+        { accent: 'accent-rose-500', border: 'hover:border-rose-500/40 has-[:checked]:border-rose-500/60', bg: 'has-[:checked]:bg-rose-950/20' },
+        { accent: 'accent-fuchsia-500', border: 'hover:border-fuchsia-500/40 has-[:checked]:border-fuchsia-500/60', bg: 'has-[:checked]:bg-fuchsia-950/20' }
+    ];
+
+    const facultiesMap = {};
+    let colorIndex = 0;
+
     Object.keys(CARRERAS).forEach(cId => {
         const c = CARRERAS[cId];
-        // 1. Checkboxes en el modal
-        if (selectionList) {
-            const lbl = document.createElement('label');
-            lbl.className = "flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-red-500/40 transition-all has-[:checked]:border-red-500/60 has-[:checked]:bg-red-950/20";
-            lbl.innerHTML = `
-              <input type="checkbox" value="${cId}" class="carrera-check w-5 h-5 accent-red-600">
-              <div class="text-left">
-                <div class="text-white font-bold">${c.nombre}</div>
-                <div class="text-gray-500 text-xs mt-0.5">${c.descripcion}</div>
-              </div>
-            `;
-            selectionList.appendChild(lbl);
-        }
-        // 2. Tabs en la vista de plan
+        const fac = c.facultad || 'Otras Disciplinas';
+        if (!facultiesMap[fac]) facultiesMap[fac] = [];
+        facultiesMap[fac].push(cId);
+        
+        // 2. Tabs en la vista de plan (igual que antes)
         if (tabsContainer) {
             const btn = document.createElement('button');
-            btn.className = "tab-btn hidden"; // hidden by default, unhidden by filtrarCarrerasPorPerfil
+            btn.className = "tab-btn hidden";
             btn.dataset.carrera = cId;
             btn.textContent = c.nombre;
             btn.addEventListener('click', () => cambiarCarrera(cId));
             tabsContainer.appendChild(btn);
         }
     });
+
+    // 1. Checkboxes en el modal (agrupados)
+    if (selectionList) {
+        Object.keys(facultiesMap).forEach(facName => {
+            // Contenedor de Facultad
+            const facDiv = document.createElement('div');
+            facDiv.className = "mb-6";
+            
+            // Título de Facultad
+            const facTitle = document.createElement('h3');
+            facTitle.className = "text-emerald-400 font-bold text-sm uppercase tracking-widest mb-3 flex items-center gap-2";
+            facTitle.innerHTML = `<i data-lucide="building" class="w-4 h-4"></i> ${facName}`;
+            facDiv.appendChild(facTitle);
+            
+            // Grid de carreras de esta facultad
+            const gridDiv = document.createElement('div');
+            gridDiv.className = "space-y-3";
+            
+            facultiesMap[facName].forEach(cId => {
+                const c = CARRERAS[cId];
+                const color = colorPalettes[colorIndex % colorPalettes.length];
+                colorIndex++;
+                
+                const lbl = document.createElement('label');
+                lbl.className = `flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer transition-all ${color.border} ${color.bg}`;
+                lbl.innerHTML = `
+                  <input type="checkbox" value="${cId}" class="carrera-check w-5 h-5 ${color.accent}">
+                  <div class="text-left">
+                    <div class="text-white font-bold">${c.nombre}</div>
+                    <div class="text-gray-500 text-xs mt-0.5">${c.descripcion}</div>
+                  </div>
+                `;
+                gridDiv.appendChild(lbl);
+            });
+            facDiv.appendChild(gridDiv);
+            selectionList.appendChild(facDiv);
+        });
+        
+        // Instanciar iconos si existe lucide (para el building icon)
+        if (window.lucide) lucide.createIcons();
+    }
 
 });
 
@@ -794,31 +841,78 @@ function inicializar() {
     if (selectionList) selectionList.innerHTML = '';
     if (tabsContainer) tabsContainer.innerHTML = '';
 
+    // Agrupación por facultades y colores aleatorios
+    const colorPalettes = [
+        { accent: 'accent-red-600', border: 'hover:border-red-500/40 has-[:checked]:border-red-500/60', bg: 'has-[:checked]:bg-red-950/20' },
+        { accent: 'accent-blue-500', border: 'hover:border-blue-500/40 has-[:checked]:border-blue-500/60', bg: 'has-[:checked]:bg-blue-950/20' },
+        { accent: 'accent-emerald-500', border: 'hover:border-emerald-500/40 has-[:checked]:border-emerald-500/60', bg: 'has-[:checked]:bg-emerald-950/20' },
+        { accent: 'accent-purple-500', border: 'hover:border-purple-500/40 has-[:checked]:border-purple-500/60', bg: 'has-[:checked]:bg-purple-950/20' },
+        { accent: 'accent-amber-500', border: 'hover:border-amber-500/40 has-[:checked]:border-amber-500/60', bg: 'has-[:checked]:bg-amber-950/20' },
+        { accent: 'accent-cyan-500', border: 'hover:border-cyan-500/40 has-[:checked]:border-cyan-500/60', bg: 'has-[:checked]:bg-cyan-950/20' },
+        { accent: 'accent-rose-500', border: 'hover:border-rose-500/40 has-[:checked]:border-rose-500/60', bg: 'has-[:checked]:bg-rose-950/20' },
+        { accent: 'accent-fuchsia-500', border: 'hover:border-fuchsia-500/40 has-[:checked]:border-fuchsia-500/60', bg: 'has-[:checked]:bg-fuchsia-950/20' }
+    ];
+
+    const facultiesMap = {};
+    let colorIndex = 0;
+
     Object.keys(CARRERAS).forEach(cId => {
         const c = CARRERAS[cId];
-        // 1. Checkboxes en el modal
-        if (selectionList) {
-            const lbl = document.createElement('label');
-            lbl.className = "flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer hover:border-red-500/40 transition-all has-[:checked]:border-red-500/60 has-[:checked]:bg-red-950/20";
-            lbl.innerHTML = `
-              <input type="checkbox" value="${cId}" class="carrera-check w-5 h-5 accent-red-600">
-              <div class="text-left">
-                <div class="text-white font-bold">${c.nombre}</div>
-                <div class="text-gray-500 text-xs mt-0.5">${c.descripcion}</div>
-              </div>
-            `;
-            selectionList.appendChild(lbl);
-        }
-        // 2. Tabs en la vista de plan
+        const fac = c.facultad || 'Otras Disciplinas';
+        if (!facultiesMap[fac]) facultiesMap[fac] = [];
+        facultiesMap[fac].push(cId);
+        
+        // 2. Tabs en la vista de plan (igual que antes)
         if (tabsContainer) {
             const btn = document.createElement('button');
-            btn.className = "tab-btn hidden"; // hidden by default, unhidden by filtrarCarrerasPorPerfil
+            btn.className = "tab-btn hidden";
             btn.dataset.carrera = cId;
             btn.textContent = c.nombre;
             btn.addEventListener('click', () => cambiarCarrera(cId));
             tabsContainer.appendChild(btn);
         }
     });
+
+    // 1. Checkboxes en el modal (agrupados)
+    if (selectionList) {
+        Object.keys(facultiesMap).forEach(facName => {
+            // Contenedor de Facultad
+            const facDiv = document.createElement('div');
+            facDiv.className = "mb-6";
+            
+            // Título de Facultad
+            const facTitle = document.createElement('h3');
+            facTitle.className = "text-emerald-400 font-bold text-sm uppercase tracking-widest mb-3 flex items-center gap-2";
+            facTitle.innerHTML = `<i data-lucide="building" class="w-4 h-4"></i> ${facName}`;
+            facDiv.appendChild(facTitle);
+            
+            // Grid de carreras de esta facultad
+            const gridDiv = document.createElement('div');
+            gridDiv.className = "space-y-3";
+            
+            facultiesMap[facName].forEach(cId => {
+                const c = CARRERAS[cId];
+                const color = colorPalettes[colorIndex % colorPalettes.length];
+                colorIndex++;
+                
+                const lbl = document.createElement('label');
+                lbl.className = `flex items-center gap-4 p-5 bg-zinc-900 border border-white/10 rounded-2xl cursor-pointer transition-all ${color.border} ${color.bg}`;
+                lbl.innerHTML = `
+                  <input type="checkbox" value="${cId}" class="carrera-check w-5 h-5 ${color.accent}">
+                  <div class="text-left">
+                    <div class="text-white font-bold">${c.nombre}</div>
+                    <div class="text-gray-500 text-xs mt-0.5">${c.descripcion}</div>
+                  </div>
+                `;
+                gridDiv.appendChild(lbl);
+            });
+            facDiv.appendChild(gridDiv);
+            selectionList.appendChild(facDiv);
+        });
+        
+        // Instanciar iconos si existe lucide (para el building icon)
+        if (window.lucide) lucide.createIcons();
+    }
 
 
     // Event listeners for tab-btn are now attached dynamically
@@ -1644,3 +1738,36 @@ window.addEventListener('popstate', (e) => {
         }
     }
 });
+
+/**
+ * Busca todos los cursos compartidos y replica el estado más avanzado en todas las carreras.
+ */
+function sincronizarCompartidosGlobal() {
+    let compartidosRevisados = new Set();
+    
+    // Primero, encontrar el estado más alto para cada código de curso (ej: EG-1)
+    let mejorEstadoPorCodigo = {};
+    
+    Object.keys(CARRERAS).forEach(cId => {
+        const cursos = CARRERAS[cId].cursos;
+        if (!cursos) return;
+        cursos.forEach(curso => {
+            const currentHighest = mejorEstadoPorCodigo[curso.codigo] || 0;
+            if (curso.estado > currentHighest) {
+                mejorEstadoPorCodigo[curso.codigo] = curso.estado;
+            }
+        });
+    });
+
+    // Luego, aplicar ese estado más alto a todos los hermanos
+    Object.keys(CARRERAS).forEach(cId => {
+        const cursos = CARRERAS[cId].cursos;
+        if (!cursos) return;
+        cursos.forEach(curso => {
+            const maxEstado = mejorEstadoPorCodigo[curso.codigo];
+            if (maxEstado && curso.estado < maxEstado) {
+                curso.estado = maxEstado;
+            }
+        });
+    });
+}
