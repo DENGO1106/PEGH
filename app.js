@@ -35,7 +35,11 @@ window.navigateTo = (target, pushToHistory = true) => {
 
     // Historial de navegación para botón "Atrás" en móviles
     if (pushToHistory && target !== 'login') {
-        history.pushState({ page: target }, '', '#' + target);
+        try {
+            history.pushState({ page: target }, '', '#' + target);
+        } catch (e) {
+            console.warn("history.pushState no soportado en este entorno (posible file://)", e);
+        }
     }
 
     // Asegurar que al cambiar de sección, volvemos arriba (útil en móviles)
@@ -1746,7 +1750,11 @@ if (document.readyState === 'loading') {
 // Establecer estado inicial en el historial para evitar que el primer "Atrás" cierre la app
 if (!history.state || !history.state.page) {
     const currentPage = document.documentElement.getAttribute('data-initial-page') || 'home';
-    history.replaceState({ page: currentPage }, '', '#' + currentPage);
+    try {
+        history.replaceState({ page: currentPage }, '', '#' + currentPage);
+    } catch(e) {
+        console.warn("history.replaceState falló", e);
+    }
 }
 
 // Manejar el botón "Atrás" del navegador/móvil
