@@ -1,4 +1,4 @@
-﻿// ===================================================
+// ===================================================
 // ADMIN.JS — Panel de Administración UCR Uplan
 // Solo accesible si currentProfile.is_admin === true
 // ===================================================
@@ -553,39 +553,82 @@ window.adminDeleteUser = adminDeleteUser;
 
 console.log('[Admin] Módulo de administración cargado.');
 
+// ===================================================
+// REQUISITOS — carga desde Supabase, agrupa por nivel
+// ===================================================
 
-function adminRenderRequisitosCheckboxes(carreraId, requisitosActuales, currentCourseId) {
+let allPreexistingCoursesCache = [];
+
+async function adminRenderRequisitosCheckboxes(carreraId, requisitosActuales, currentCourseId) {
     const container = document.getElementById('admin-curso-requisitos-container');
     if (!container) return;
-    
-    // Obtener todos los cursos de esta carrera
-    let cursos = [];
-    if (carreraId && CARRERAS[carreraId] && CARRERAS[carreraId].cursos) {
-        cursos = CARRERAS[carreraId].cursos;
+
+    const nivelActual = parseInt(document.getElementById('admin-curso-nivel')?.value || '99', 10);
+    container.innerHTML = '<p class="text-xs text-gray-500 animate-pulse">Cargando cursos disponibles...</p>';
+
+    // 1. Cursos de esta carrera desde Supabase
+    let cursosDeCarrera = [];
+    if (carreraId && window.supaAuth?.supabase) {
+        try {
+            const { data, error } = await window.supaAuth.supabase
+                .from('courses_catalog')
+                .select('id, codigo, nombre, nivel, creditos')
+                .eq('carrera_id', carreraId)
+                .order('nivel', { ascending: true });
+            if (!error && data) cursosDeCarrera = data;
+        } catch(e) { console.error(e); }
     }
 
-    if (cursos.length === 0) {
-        container.innerHTML = '<p class="text-xs text-gray-500">No hay otros cursos cargados en esta carrera.</p>';
-        return;
+    // 2. Cursos preexistentes de otras carreras (único por código)
+    if (allPreexistingCoursesCache.length === 0 && window.supaAuth?.supabase) {
+        try {
+            const { data, error } = await window.supaAuth.supabase
+                .from('courses_catalog')
+                .select('id, codigo, nombre, nivel, creditos')
+                .order('nombre', { ascending: true });
+            if (!error && data) {
+                const seen = new Set();
+                allPreexistingCoursesCache = data.filter(c => {
+                    if (seen.has(c.codigo)) return false;
+                    seen.add(c.codigo);
+                    return true;
+                });
+            }
+        } catch(e) { console.error(e); }
     }
 
-    // Filtrar el curso actual (no puede ser requisito de sí mismo)
-    const opciones = cursos.filter(c => c.id !== currentCourseId && c.codigo !== document.getElementById('admin-curso-codigo').value);
-    
+    // 3. Combinar sin duplicar
+    const codigosCarrera = new Set(cursosDeCarrera.map(c => c.codigo));
+    const extras = allPreexistingCoursesCache.filter(c => !codigosCarrera.has(c.codigo));
+    const todosCursos = [...cursosDeCarrera, ...extras];
+
+    // 4. Solo cursos de NIVEL INFERIOR al actual, excluir el curso mismo
+    const currentCodigo = document.getElementById('admin-curso-codigo')?.value || '';
+    const opciones = todosCursos.filter(c =>
+        c.codigo !== currentCodigo &&
+        c.id !== currentCourseId &&
+        (c.nivel === null || c.nivel === undefined || parseInt(c.nivel, 10) < nivelActual)
+    );
+
     if (opciones.length === 0) {
-        container.innerHTML = '<p class="text-xs text-gray-500">No hay otros cursos disponibles para seleccionar como requisito.</p>';
+        container.innerHTML = '<p class="text-xs text-gray-500">No hay cursos de nivel inferior disponibles. Asegurate de poner un Nivel mayor que 1.</p>';
         return;
     }
 
-    // Agrupar por nivel
+    // 5. Agrupar por nivel y renderizar
     const niveles = {};
     opciones.forEach(c => {
-        if (!niveles[c.nivel]) niveles[c.nivel] = [];
-        niveles[c.nivel].push(c);
+        const key = c.nivel != null ? c.nivel : 'Sin nivel';
+        if (!niveles[key]) niveles[key] = [];
+        niveles[key].push(c);
     });
 
     let html = '';
-    Object.keys(niveles).sort((a, b) => a - b).forEach(nivel => {
+    Object.keys(niveles).sort((a, b) => {
+        if (a === 'Sin nivel') return 1;
+        if (b === 'Sin nivel') return -1;
+        return a - b;
+    }).forEach(nivel => {
         html += `<h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-3 mb-1 pl-1">Nivel ${nivel}</h4>`;
         html += niveles[nivel].map(c => {
             const isChecked = requisitosActuales.includes(c.codigo) ? 'checked' : '';
@@ -594,7 +637,7 @@ function adminRenderRequisitosCheckboxes(carreraId, requisitosActuales, currentC
                     <input type="checkbox" value="${c.codigo}" class="admin-req-checkbox w-4 h-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900 bg-gray-700" ${isChecked}>
                     <div class="flex flex-col">
                         <span class="text-xs font-bold text-white">${c.codigo}</span>
-                        <span class="text-[10px] text-gray-400">${c.nombre} (Nivel ${c.nivel})</span>
+                        <span class="text-[10px] text-gray-400">${c.nombre} (Nivel ${c.nivel ?? '?'})</span>
                     </div>
                 </label>
             `;
@@ -604,7 +647,15 @@ function adminRenderRequisitosCheckboxes(carreraId, requisitosActuales, currentC
     container.innerHTML = html;
 }
 
-
-
-
-
+// Recargar requisitos cuando cambia el nivel del curso
+document.addEventListener('DOMContentLoaded', () => {
+    const nivelInput = document.getElementById('admin-curso-nivel');
+    if (nivelInput) {
+        nivelInput.addEventListener('change', () => {
+            const carreraId = document.getElementById('admin-curso-carrera')?.value || '';
+            const cursoId = document.getElementById('admin-curso-id')?.value || null;
+            const checkedNow = Array.from(document.querySelectorAll('.admin-req-checkbox:checked')).map(c => c.value);
+            adminRenderRequisitosCheckboxes(carreraId, checkedNow, cursoId);
+        });
+    }
+});
