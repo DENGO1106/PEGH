@@ -56,7 +56,7 @@ window.navigateTo = (target, pushToHistory = true) => {
 
     try { saveScrollForPage(window._currentPage); } catch (e) { /* ignore */ }
 
-    // ”’ Control de Acceso: Redirigir a login si no hay sesión
+    // Control de Acceso: Redirigir a login si no hay sesión
 
     const isAuthenticated = window.supaAuth && window.supaAuth.getCurrentSession();
 
@@ -884,7 +884,7 @@ function clickCurso(event, carreraId, codigoCurso) {
 
             opcion.disabled = true;
 
-            opcion.title = '”’ Requiere cumplir requisitos en un semestre anterior';
+            opcion.title = 'Requiere cumplir requisitos en un semestre anterior';
 
         }
 
@@ -1142,8 +1142,6 @@ function renderizarCarrera() {
 
             <div class="nivel-header-left">
 
-              <span>“…</span>
-
               <span class="nivel-titulo">Semestre ${nivel} <span class="nivel-año-badge">(Año ${Math.ceil(nivel / 2)})</span></span>
 
             </div>
@@ -1250,7 +1248,7 @@ function renderizarCarrera() {
 
             const tooltipBloqueado = esBloqueado
 
-                ? `title="”’ Bloqueado para aprobación — Requisitos pendientes: ${requisitosTexto}"`
+                ? `title="Bloqueado para aprobación — Requisitos pendientes: ${requisitosTexto}"`
 
                 : '';
 
@@ -1282,13 +1280,13 @@ function renderizarCarrera() {
 
           <div class="curso-requisitos">
 
-            ${curso.requisitos.length > 0 ? '“‹ ' + requisitosTexto : '✓ Sin requisitos'}
+            ${curso.requisitos.length > 0 ? requisitosTexto : 'Sin requisitos'}
 
           </div>
 
           <div class="curso-estado-badge">
 
-            ${esBloqueado ? '”’ Bloqueado' : infoEstado.etiqueta}
+            ${esBloqueado ? 'Bloqueado' : infoEstado.etiqueta}
 
           </div>
 
@@ -2004,6 +2002,16 @@ function inicializar() {
 
     });
 
+    // Restore last visited page when the app initializes.
+    const savedPage = localStorage.getItem(UCR_LAST_PAGE_KEY);
+    const hashPage = window.location.hash ? window.location.hash.replace('#', '') : '';
+    const pageToOpen = hashPage || (savedPage && savedPage !== 'login' ? savedPage : null);
+    if (pageToOpen && pageToOpen !== window._currentPage) {
+        window.navigateTo(pageToOpen, false);
+    } else if (pageToOpen === window._currentPage) {
+        try { restoreScrollForPage(pageToOpen); } catch (e) {}
+    }
+
 
 
     // Removido navigateTo('login') forzado para evitar parpadeos (FOUC).
@@ -2052,7 +2060,7 @@ function mostrarMensajeSoporte() {
 
         mostrarToastNotificacion(
 
-            "‘‹ Hola, la plataforma funciona perfectamente con o sin adblocker. Sin embargo, no usamos anuncios molestos y tu apoyo desactivándolo o no usándolo nos ayudaría muchísimo a mantener este proyecto vivo. ¡Gracias y disfrutá la app!",
+            "Hola, la plataforma funciona perfectamente con o sin adblocker. Sin embargo, no usamos anuncios molestos y tu apoyo desactivándolo o no usándolo nos ayudaría muchísimo a mantener este proyecto vivo. ¡Gracias y disfrutá la app!",
 
             "info"
 
@@ -2950,11 +2958,11 @@ async function loadNoticias() {
 
             const map = {
 
-                general: { icon: '“¢', color: 'purple' },
+                general: { icon: 'General', color: 'purple' },
 
-                matricula: { icon: '“…', color: 'blue' },
+                matricula: { icon: 'Matrícula', color: 'blue' },
 
-                actualizacion: { icon: '”„', color: 'emerald' },
+                actualizacion: { icon: 'Actualización', color: 'emerald' },
 
                 aviso: { icon: '⚠️', color: 'red' },
 
@@ -5186,7 +5194,7 @@ function iniciarTutorial() {
 
             {
 
-                intro: "‘‹ ¡Bienvenido! Te daré un recorrido rápido de 30 segundos para que saqués el máximo provecho a la plataforma."
+                intro: "¡Bienvenido! Te daré un recorrido rápido de 30 segundos para que saqués el máximo provecho a la plataforma."
 
             },
 
@@ -5194,7 +5202,7 @@ function iniciarTutorial() {
 
                 element: document.querySelector('.malla-container') || document.querySelector('#plan-section'),
 
-                intro: "’¡ **Tu Plan de Estudios:** Dale clic a cualquier curso para cambiarlo de color (Aprobado, Cursando, Pendiente).",
+                intro: "¡Tu Plan de Estudios: Dale clic a cualquier curso para cambiarlo de color (Aprobado, Cursando, Pendiente).",
 
                 position: 'top'
 
@@ -5204,7 +5212,7 @@ function iniciarTutorial() {
 
                 element: document.querySelector('.controls-left') || document.querySelector('.controls-container'),
 
-                intro: "’¾ **Respaldos y Exportación:** Guardá tu progreso en la nube o descargá tu plan en formato imagen desde aquí.",
+                intro: "Respaldos y Exportación: Guardá tu progreso en la nube o descargá tu plan en formato imagen desde aquí.",
 
                 position: 'top'
 
@@ -5214,7 +5222,7 @@ function iniciarTutorial() {
 
                 element: document.querySelector('button[data-navigate="calculator"]') || document.querySelector('.mobile-nav'),
 
-                intro: "”¢ **Herramientas Extra:** Accedé a la Calculadora de Ponderado y al Generador de Horarios desde la navegación inferior.",
+                intro: "Herramientas Extra: Accedé a la Calculadora de Ponderado y al Generador de Horarios desde la navegación inferior.",
 
                 position: 'top'
 
