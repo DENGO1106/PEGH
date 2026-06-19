@@ -360,6 +360,7 @@ CREATE TABLE IF NOT EXISTS public.user_feedback (
   status      text DEFAULT 'pending', -- pending, reviewed, implemented
   conversation jsonb DEFAULT '[]'::jsonb,
   has_unread_reply boolean DEFAULT false,
+  archived_at timestamp with time zone DEFAULT NULL,
   created_at  timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -369,6 +370,7 @@ CREATE TABLE IF NOT EXISTS public.user_feedback (
 -- ALTER TABLE public.user_feedback 
 -- ADD COLUMN IF NOT EXISTS conversation jsonb DEFAULT '[]'::jsonb,
 -- ADD COLUMN IF NOT EXISTS has_unread_reply boolean DEFAULT false;
+-- ADD COLUMN IF NOT EXISTS archived_at timestamp with time zone DEFAULT NULL;
 -- ============================================================
 
 -- Habilitar RLS (Seguridad a Nivel de Fila)
@@ -396,6 +398,7 @@ SELECT
   p.email AS correo,
   f.message AS mensaje,
   f.status AS estado,
+  f.archived_at AS archived_at,
   f.conversation AS conversation,
   f.has_unread_reply AS has_unread_reply,
   f.created_at AS fecha

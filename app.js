@@ -1496,7 +1496,7 @@ async function loadAdminFeedbackData() {
         // 1. Obtener todos los feedbacks
         const { data: feedbacks, error: fbError } = await supabase
             .from('user_feedback')
-            .select('id, user_id, message, status, created_at, conversation, has_unread_reply')
+            .select('id, user_id, message, status, created_at, archived_at, conversation, has_unread_reply')
             .order('created_at', { ascending: false });
 
         if (fbError) throw fbError;
@@ -1623,6 +1623,9 @@ function renderAdminFeedback(tab) {
         const statusLabels = { pending: '⏳ Pendiente', important: '⭐ Importante', implemented: '🚀 Resuelto', reviewed: '✅ Visto' };
         const labelStr = statusLabels[f.status] || 'Visto';
 
+        // Mostrar fecha de archivado si existe
+        const archivedInfo = f.archived_at ? `<div class="text-[11px] text-gray-400 mt-2">Archivado: ${new Date(f.archived_at).toLocaleString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' })}</div>` : '';
+
         return `
             <div class="bg-black/40 border border-${borderColor} rounded-2xl p-5 transition-all" id="feedback-card-${f.id}">
                 <div class="flex items-center justify-between gap-3 mb-4">
@@ -1693,6 +1696,7 @@ function renderAdminFeedback(tab) {
                         <i data-lucide="trash-2" class="w-3 h-3"></i> Eliminar
                     </button>` : ''}
                 </div>
+                ${archivedInfo}
             </div>
         `;
     }).join('');
@@ -1788,9 +1792,13 @@ async function markFeedbackStatus(feedbackId, newStatus) {
     }
 
     try {
+        const payload = { status: newStatus };
+        if (newStatus === 'archived') payload.archived_at = new Date().toISOString();
+        else payload.archived_at = null;
+
         const { error } = await window.supaAuth.supabase
             .from('user_feedback')
-            .update({ status: newStatus })
+            .update(payload)
             .eq('id', feedbackId);
 
         if (error) throw error;
