@@ -1,4 +1,4 @@
-// ===================================================
+﻿// ===================================================
 // ADMIN.JS — Panel de Administración UCR Uplan
 // Solo accesible si currentProfile.is_admin === true
 // ===================================================
@@ -208,22 +208,36 @@ async function adminLoadCursosByCarrera() {
             return;
         }
 
-        listEl.innerHTML = data.map(c => `
-            <div class="flex items-center justify-between p-3 bg-zinc-800/50 rounded-xl border border-white/5 gap-3">
-                <div class="min-w-0 flex-1">
-                    <p class="text-white font-bold text-sm truncate">${c.nombre}</p>
-                    <p class="text-xs text-gray-400">${c.codigo} · Nivel ${c.nivel} · ${c.creditos} cr · Reqs: ${(c.requisitos || []).join(', ') || 'Ninguno'}</p>
+        const niveles = {};
+        data.forEach(c => {
+            if (!niveles[c.nivel]) niveles[c.nivel] = [];
+            niveles[c.nivel].push(c);
+        });
+
+        let html = '';
+        Object.keys(niveles).sort((a, b) => a - b).forEach(nivel => {
+            html += `<h4 class="text-xs font-black text-yellow-500 uppercase tracking-widest mt-6 mb-2 pb-2 border-b border-white/10">Nivel ${nivel}</h4>`;
+            html += `<div class="space-y-2">`;
+            html += niveles[nivel].map(c => `
+                <div class="flex items-center justify-between p-3 bg-zinc-800/50 rounded-xl border border-white/5 gap-3">
+                    <div class="min-w-0 flex-1">
+                        <p class="text-white font-bold text-sm truncate">${c.nombre}</p>
+                        <p class="text-xs text-gray-400">${c.codigo} · Nivel ${c.nivel} · ${c.creditos} cr · Reqs: ${(c.requisitos || []).join(', ') || 'Ninguno'}</p>
+                    </div>
+                    <div class="flex gap-2 flex-shrink-0">
+                        <button onclick="adminEditCurso('${c.id}', '${carreraId}')" class="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-all border border-blue-500/20">
+                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="adminDeleteCurso('${c.id}', '${c.nombre.replace(/'/g, "\\'")}')" class="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-all border border-red-500/20">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="flex gap-2 flex-shrink-0">
-                    <button onclick="adminEditCurso('${c.id}', '${carreraId}')" class="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-all border border-blue-500/20">
-                        <i data-lucide="pencil" class="w-4 h-4"></i>
-                    </button>
-                    <button onclick="adminDeleteCurso('${c.id}', '${c.nombre.replace(/'/g, '')}')" class="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-all border border-red-500/20">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                </div>
-            </div>
-        `).join('');
+            `).join('');
+            html += `</div>`;
+        });
+
+        listEl.innerHTML = html;
         lucide.createIcons();
     } catch (e) {
         listEl.innerHTML = '<div class="text-red-400 p-4">Error: ' + e.message + '</div>';
@@ -245,6 +259,8 @@ async function adminEditCurso(id, carreraId) {
     document.getElementById('admin-curso-creditos').value = data.creditos;
     document.getElementById('admin-curso-nivel').value = data.nivel;
     adminRenderRequisitosCheckboxes(carreraId, data.requisitos || [], id);
+    const preSelector = document.getElementById('admin-cursos-preexistentes-container');
+    if (preSelector) preSelector.classList.add('hidden');
     document.getElementById('admin-curso-form').classList.remove('hidden');
     document.getElementById('admin-curso-form').scrollIntoView({ behavior: 'smooth' });
 }
@@ -260,6 +276,8 @@ function adminNewCurso() {
     document.getElementById('admin-curso-creditos').value = '3';
     document.getElementById('admin-curso-nivel').value = '1';
     adminRenderRequisitosCheckboxes(carreraId, [], null);
+    const preSelector = document.getElementById('admin-cursos-preexistentes-container');
+    if (preSelector) preSelector.classList.add('hidden');
     document.getElementById('admin-curso-form').classList.remove('hidden');
     document.getElementById('admin-curso-form').scrollIntoView({ behavior: 'smooth' });
 }
@@ -522,6 +540,7 @@ window.adminNewCurso = adminNewCurso;
 window.adminEditCurso = adminEditCurso;
 window.adminSaveCurso = adminSaveCurso;
 window.adminCancelCursoForm = adminCancelCursoForm;
+window.adminRellenarCursoPreexistente = adminRellenarCursoPreexistente;
 window.adminDeleteCurso = adminDeleteCurso;
 window.adminLoadConvalidaciones = adminLoadConvalidaciones;
 window.adminShowConvForm = adminShowConvForm;
@@ -558,21 +577,34 @@ function adminRenderRequisitosCheckboxes(carreraId, requisitosActuales, currentC
         return;
     }
 
-    // Ordenar por nivel
-    opciones.sort((a, b) => a.nivel - b.nivel);
+    // Agrupar por nivel
+    const niveles = {};
+    opciones.forEach(c => {
+        if (!niveles[c.nivel]) niveles[c.nivel] = [];
+        niveles[c.nivel].push(c);
+    });
 
-    container.innerHTML = opciones.map(c => {
-        const isChecked = requisitosActuales.includes(c.codigo) ? 'checked' : '';
-        return `
-            <label class="flex items-center gap-3 p-2 bg-black/30 border border-white/5 rounded-lg cursor-pointer hover:bg-black/50 transition-colors">
-                <input type="checkbox" value="${c.codigo}" class="admin-req-checkbox w-4 h-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900 bg-gray-700" ${isChecked}>
-                <div class="flex flex-col">
-                    <span class="text-xs font-bold text-white">${c.codigo}</span>
-                    <span class="text-[10px] text-gray-400">${c.nombre} (Nivel ${c.nivel})</span>
-                </div>
-            </label>
-        `;
-    }).join('');
+    let html = '';
+    Object.keys(niveles).sort((a, b) => a - b).forEach(nivel => {
+        html += `<h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-3 mb-1 pl-1">Nivel ${nivel}</h4>`;
+        html += niveles[nivel].map(c => {
+            const isChecked = requisitosActuales.includes(c.codigo) ? 'checked' : '';
+            return `
+                <label class="flex items-center gap-3 p-2 bg-black/30 border border-white/5 rounded-lg cursor-pointer hover:bg-black/50 transition-colors">
+                    <input type="checkbox" value="${c.codigo}" class="admin-req-checkbox w-4 h-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900 bg-gray-700" ${isChecked}>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-white">${c.codigo}</span>
+                        <span class="text-[10px] text-gray-400">${c.nombre} (Nivel ${c.nivel})</span>
+                    </div>
+                </label>
+            `;
+        }).join('');
+    });
+
+    container.innerHTML = html;
 }
+
+
+
 
 
