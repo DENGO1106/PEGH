@@ -596,11 +596,9 @@ async function cargarEstado() {
 
 
 
-    // Iniciar realtime y tutorial al finalizar carga
-
+    // Iniciar realtime (tutorial desactivado por ahora)
     setupRealtimeSubscription();
-
-    iniciarTutorial();
+    // iniciarTutorial(); // DESACTIVADO: El tutorial molesta al usuario
 
 }
 
