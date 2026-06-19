@@ -1,4 +1,4 @@
-﻿// ===================================================
+// ===================================================
 // ADMIN.JS — Panel de Administración UCR Uplan
 // Solo accesible si currentProfile.is_admin === true
 // ===================================================
@@ -563,15 +563,15 @@ function adminRenderRequisitosCheckboxes(carreraId, requisitosActuales, currentC
 
     container.innerHTML = opciones.map(c => {
         const isChecked = requisitosActuales.includes(c.codigo) ? 'checked' : '';
-        return 
+        return `
             <label class="flex items-center gap-3 p-2 bg-black/30 border border-white/5 rounded-lg cursor-pointer hover:bg-black/50 transition-colors">
-                <input type="checkbox" value=" + c.codigo + " class="admin-req-checkbox w-4 h-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900 bg-gray-700"  + isChecked + >
+                <input type="checkbox" value="${c.codigo}" class="admin-req-checkbox w-4 h-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900 bg-gray-700" ${isChecked}>
                 <div class="flex flex-col">
-                    <span class="text-xs font-bold text-white"> + c.codigo + </span>
-                    <span class="text-[10px] text-gray-400"> + c.nombre +  (Nivel  + c.nivel + )</span>
+                    <span class="text-xs font-bold text-white">${c.codigo}</span>
+                    <span class="text-[10px] text-gray-400">${c.nombre} (Nivel ${c.nivel})</span>
                 </div>
             </label>
-        ;
+        `;
     }).join('');
 }
 
