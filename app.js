@@ -1483,8 +1483,13 @@ async function loadNoticias() {
 }
 
 async function loadAdminFeedbackData() {
-    const session = window.supaAuth?.getCurrentSession();
-    if (!session || !esAdmin() || !window.supaAuth?.supabase) return;
+    // Don't require session object; just ensure we are admin and supabase client exists.
+    if (!esAdmin() || !window.supaAuth?.supabase) {
+        const listEl = document.getElementById('admin-feedback-list');
+        if (listEl) listEl.innerHTML = '<div class="text-center text-gray-500 py-8">No autorizado o sin conexión a Supabase.</div>';
+        console.warn('loadAdminFeedbackData: no es admin o no hay supabase client');
+        return;
+    }
 
     // modal is already open via admin.js
     const listEl = document.getElementById('admin-feedback-list');
