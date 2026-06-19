@@ -47,6 +47,18 @@ function adminSwitchTab(tab) {
     else if (tab === 'noticias') adminLoadNoticias();
 }
 
+function showAdminToast(message, type = 'success') {
+    if (typeof window.mostrarToastNotificacion === 'function') {
+        window.mostrarToastNotificacion(message, type);
+        return;
+    }
+    if (typeof window.mostrarToast === 'function') {
+        window.mostrarToast(message, type);
+        return;
+    }
+    alert(message);
+}
+
 // ===================================================
 // TAB 1: GESTIÓN DE CARRERAS
 // ===================================================

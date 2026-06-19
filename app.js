@@ -1040,6 +1040,14 @@ function mostrarToastNotificacion(mensaje, tipo) {
     }, 12000);
 }
 
+window.showAdminToast = function(message, type = 'success') {
+    if (typeof window.mostrarToastNotificacion === 'function') {
+        window.mostrarToastNotificacion(message, type);
+        return;
+    }
+    alert(message);
+};
+
 
 // Filtra las pestaÃ±as de carrera segÃºn lo que el usuario eligiÃ³ en su perfil
 function filtrarCarrerasPorPerfil(selectedCarreras) {
