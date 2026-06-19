@@ -43,6 +43,7 @@ function adminSwitchTab(tab) {
     else if (tab === 'cursos') adminLoadCursosByCarrera();
     else if (tab === 'convalidaciones') adminLoadConvalidaciones();
     else if (tab === 'usuarios') adminLoadUsuarios();
+    else if (tab === 'feedback') { if(typeof loadAdminFeedbackData === 'function') loadAdminFeedbackData(); }
 }
 
 // ===================================================
@@ -507,3 +508,4 @@ window.adminToggleAdmin = adminToggleAdmin;
 window.adminDeleteUser = adminDeleteUser;
 
 console.log('[Admin] Módulo de administración cargado.');
+

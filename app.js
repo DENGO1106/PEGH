@@ -1395,11 +1395,11 @@ function initAdminBtn() {
     }
 }
 
-async function openAdminPanel() {
+async function loadAdminFeedbackData() {
     const session = window.supaAuth?.getCurrentSession();
     if (!session || !esAdmin() || !window.supaAuth?.supabase) return;
 
-    document.getElementById('admin-modal').classList.remove('hidden');
+    // modal is already open via admin.js
     const listEl = document.getElementById('admin-feedback-list');
     listEl.innerHTML = '<div class="flex items-center justify-center py-12"><p class="text-gray-400 text-sm animate-pulse">Cargando feedback...</p></div>';
 
@@ -2320,3 +2320,5 @@ function iniciarTutorial() {
         }
     }, 1000);
 }
+
+

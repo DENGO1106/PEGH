@@ -1,4 +1,4 @@
-// auth.js - Módulo de Autenticación de Supabase
+﻿// auth.js - Módulo de Autenticación de Supabase
 
 const SUPABASE_URL = 'https://ynqwmbjpznmywrxpftte.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucXdtYmpwem5teXdyeHBmdHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MTg1NTUsImV4cCI6MjA5Mjk5NDU1NX0.to4VGnDTIcFyuvVPp2vVI0D15gt0M7dejbB7HP2vINo';
@@ -312,7 +312,7 @@ async function guardarSeleccionCarreras() {
     }
 
     const user = currentSession?.user;
-    if (!user || !_db) return;
+    if (!user || !_db) { alert('Error: Sesión no válida o no hay conexión. Recarga la página.'); return; }
 
     try {
         const { error } = await _db.from('profiles')
@@ -325,6 +325,7 @@ async function guardarSeleccionCarreras() {
         if (typeof window.navigateTo === 'function') window.navigateTo('home');
     } catch (err) {
         console.error('[Auth] Error guardando carreras:', err);
+        alert('Error al guardar tus carreras: ' + (err.message || JSON.stringify(err)));
     }
 }
 
@@ -472,3 +473,5 @@ window.guardarSeleccionCarreras = guardarSeleccionCarreras;
 window.editarCarreras = editarCarreras;
 
 console.log('[Auth] Inicializado. Cliente Supabase:', !!_db);
+
+
