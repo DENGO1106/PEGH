@@ -312,11 +312,7 @@ function cerrarSeleccionCarreras() {
     const sec = document.getElementById('career-selection-section');
     if (sec) sec.classList.add('hidden');
     if (typeof window.navigateTo === 'function') {
-        if (currentSession?.user) {
-            window.navigateTo('home', false);
-        } else {
-            window.navigateTo('login', false);
-        }
+        window.navigateTo('home', false);
     }
 }
 
@@ -488,6 +484,7 @@ window.supaAuth = {
     handleSignIn: handleSignIn,
     handleSignOut: handleSignOut,
     guardarSeleccionCarreras: guardarSeleccionCarreras,
+    cerrarSeleccionCarreras: cerrarSeleccionCarreras,
     editarCarreras: editarCarreras,
     actualizarPerfilData: actualizarPerfilData,
     showProfileMenu: showProfileMenu,
@@ -500,6 +497,7 @@ window.supaAuth = {
 };
 // Acceso directo desde HTML onclick
 window.guardarSeleccionCarreras = guardarSeleccionCarreras;
+window.cerrarSeleccionCarreras = cerrarSeleccionCarreras;
 window.editarCarreras = editarCarreras;
 
 console.log('[Auth] Inicializado. Cliente Supabase:', !!_db);
