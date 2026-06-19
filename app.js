@@ -43,7 +43,11 @@ window.navigateTo = (target, pushToHistory = true) => {
     }
 
     // Asegurar que al cambiar de secciÃ³n, volvemos arriba (Ãºtil en mÃ³viles)
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    // Sólo hacer scroll-to-top cuando realmente vamos a una página diferente.
+    const _currentPage = localStorage.getItem(UCR_LAST_PAGE_KEY) || document.documentElement.getAttribute('data-initial-page');
+    if (_currentPage !== target) {
+        try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch(e) { /* noop */ }
+    }
 
     document.documentElement.removeAttribute('data-initial-page');
     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
