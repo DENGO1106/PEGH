@@ -356,6 +356,15 @@ function showProfileMenu() {
         if (fullNameInput) fullNameInput.value = currentProfile?.full_name || '';
         if (studentIdInput) studentIdInput.value = currentProfile?.student_id || '';
         if (usernameDisplay) usernameDisplay.innerText = currentProfile?.username || _getStoredUsername() || 'Usuario';
+        const adminBadge = document.getElementById('profile-admin-badge');
+        const adminBtnPanel = document.getElementById('profile-admin-panel-btn-container');
+        if (currentProfile?.is_admin) {
+            if (adminBadge) adminBadge.classList.remove('hidden');
+            if (adminBtnPanel) adminBtnPanel.classList.remove('hidden');
+        } else {
+            if (adminBadge) adminBadge.classList.add('hidden');
+            if (adminBtnPanel) adminBtnPanel.classList.add('hidden');
+        }
         
         modal.classList.remove('hidden');
     } else {
@@ -473,5 +482,6 @@ window.guardarSeleccionCarreras = guardarSeleccionCarreras;
 window.editarCarreras = editarCarreras;
 
 console.log('[Auth] Inicializado. Cliente Supabase:', !!_db);
+
 
 
