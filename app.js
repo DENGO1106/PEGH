@@ -48,9 +48,12 @@ window._currentPage = document.documentElement.getAttribute('data-initial-page')
 
 window.navigateTo = (target, pushToHistory = true) => {
 
-    // If navigating to the same page, do nothing to avoid UI blinking
+    // If navigating to the same page and it is already visible, do nothing to avoid UI blinking
 
-    if (target === window._currentPage) return;
+    if (target === window._currentPage) {
+        const currentSection = document.getElementById(`${target}-section`);
+        if (currentSection && !currentSection.classList.contains('hidden')) return;
+    }
 
     // Save current scroll position before leaving the page
 
