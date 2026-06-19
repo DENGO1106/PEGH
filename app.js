@@ -158,6 +158,13 @@ async function guardarEstado() {
     }
 }
 
+function openNoticiasModal() {
+    // Ensure noticias are loaded into the modal
+    if (typeof loadNoticias === 'function') loadNoticias();
+    const modal = document.getElementById('noticias-modal');
+    if (modal) modal.classList.remove('hidden');
+}
+
 /**
  * Mapa de retrocompatibilidad: cÃ³digos viejos â†’ cÃ³digos nuevos.
  * Necesario porque renombramos REPOâ†’RP-, MA-0001â†’MA0001, OPT-1â†’OPT-ING, OPT-S3â†’OPT-ING.
@@ -1438,9 +1445,9 @@ async function loadNoticias() {
         };
 
         // Render Home (max 2)
-        if (homeList) {
+                if (homeList) {
             homeList.innerHTML = data.slice(0, 2).map(n => `
-                <div class="bg-zinc-900 border border-white/5 p-4 rounded-2xl hover:border-purple-500/30 transition-colors cursor-pointer" onclick="navigateTo('noticias')">
+                <div class="bg-zinc-900 border border-white/5 p-4 rounded-2xl hover:border-purple-500/30 transition-colors cursor-pointer" onclick="openNoticiasModal()">
                     <div class="flex items-center gap-2 mb-2">
                         ${getCatBadge(n.categoria)}
                         <span class="text-xs text-gray-500">${new Date(n.created_at).toLocaleDateString()}</span>
@@ -1466,6 +1473,9 @@ async function loadNoticias() {
                 </div>
             `).join('');
             lucide.createIcons();
+            // Also populate the noticias modal if present
+            const modalList = document.getElementById('noticias-modal-list');
+            if (modalList) modalList.innerHTML = fullList.innerHTML;
         }
     } catch (e) {
         console.error('ExcepciÃ³n al cargar noticias:', e);
