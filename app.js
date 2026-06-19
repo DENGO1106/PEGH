@@ -1581,6 +1581,8 @@ function renderAdminFeedback(tab) {
     });
 
     if (filtered.length === 0) {
+        const toolbar = document.getElementById('admin-feedback-toolbar');
+        if (toolbar) toolbar.classList.add('hidden');
         listEl.innerHTML = `
             <div class="flex flex-col items-center justify-center py-16 text-center">
                 <div class="text-5xl mb-4">${tab === 'pending' ? '🎉' : '📭'}</div>
@@ -1590,6 +1592,10 @@ function renderAdminFeedback(tab) {
         `;
         return;
     }
+
+    // Show toolbar when there are items
+    const toolbar = document.getElementById('admin-feedback-toolbar');
+    if (toolbar) toolbar.classList.remove('hidden');
 
     listEl.innerHTML = filtered.map(f => {
         const nombre = f.profile?.full_name || 'Usuario Anónimo';
@@ -1630,6 +1636,9 @@ function renderAdminFeedback(tab) {
             <div class="bg-black/40 border border-${borderColor} rounded-2xl p-5 transition-all" id="feedback-card-${f.id}">
                 <div class="flex items-center justify-between gap-3 mb-4">
                     <div class="flex items-center gap-3">
+                            <label class="inline-flex items-center mr-2">
+                                <input type="checkbox" class="admin-feedback-checkbox" data-id="${f.id}" onchange="setAdminBulkState()">
+                            </label>
                         <div class="w-10 h-10 bg-zinc-700 rounded-xl flex items-center justify-center font-black text-white text-sm flex-shrink-0 border border-white/10">
                             ${inicial}
                         </div>
@@ -1888,6 +1897,84 @@ function confirmRestore(feedbackId) {
 
 function confirmDelete(feedbackId) {
     showConfirm('¿Eliminar permanentemente este feedback? Esta acción no se puede deshacer.', () => deleteFeedback(feedbackId));
+}
+
+// -------------------------
+// Bulk actions helpers
+// -------------------------
+function toggleAdminSelectAll(chk) {
+    const boxes = Array.from(document.querySelectorAll('.admin-feedback-checkbox'));
+    boxes.forEach(b => { b.checked = chk.checked; });
+    setAdminBulkState();
+}
+
+function setAdminBulkState() {
+    const any = document.querySelectorAll('.admin-feedback-checkbox:checked').length > 0;
+    const toolbar = document.getElementById('admin-feedback-toolbar');
+    if (toolbar) {
+        // keep toolbar visible; optionally could hide when none selected
+    }
+    const selectAll = document.getElementById('admin-feedback-select-all');
+    if (selectAll) {
+        const boxes = document.querySelectorAll('.admin-feedback-checkbox');
+        selectAll.checked = boxes.length > 0 && Array.from(boxes).every(b => b.checked);
+    }
+}
+
+function getSelectedFeedbackIds() {
+    return Array.from(document.querySelectorAll('.admin-feedback-checkbox:checked')).map(c => c.getAttribute('data-id'));
+}
+
+async function bulkUpdateStatus(newStatus) {
+    const ids = getSelectedFeedbackIds();
+    if (!ids || ids.length === 0) return alert('No hay items seleccionados');
+    if (!confirm(`Aplicar '${newStatus}' a ${ids.length} items?`)) return;
+
+    try {
+        const payload = { status: newStatus };
+        if (newStatus === 'archived') payload.archived_at = new Date().toISOString();
+        else payload.archived_at = null;
+
+        const { error } = await window.supaAuth.supabase
+            .from('user_feedback')
+            .update(payload)
+            .in('id', ids);
+
+        if (error) throw error;
+
+        // update local cache
+        _adminFeedbackAll.forEach(f => { if (ids.includes(f.id)) { f.status = newStatus; f.archived_at = payload.archived_at; } });
+        _actualizarContadoresAdmin();
+        renderAdminFeedback(_adminCurrentTab);
+        document.getElementById('admin-feedback-select-all').checked = false;
+    } catch (err) {
+        console.error('Error bulk updating:', err);
+        alert('Error al aplicar cambio en lote: ' + err.message);
+    }
+}
+
+function bulkDeleteConfirm() {
+    const ids = getSelectedFeedbackIds();
+    if (!ids || ids.length === 0) return alert('No hay items seleccionados');
+    showConfirm(`¿Eliminar permanentemente ${ids.length} mensajes? Esta acción no se puede deshacer.`, () => bulkDelete(ids));
+}
+
+async function bulkDelete(ids) {
+    try {
+        const { error } = await window.supaAuth.supabase
+            .from('user_feedback')
+            .delete()
+            .in('id', ids);
+        if (error) throw error;
+
+        _adminFeedbackAll = _adminFeedbackAll.filter(f => !ids.includes(f.id));
+        _actualizarContadoresAdmin();
+        renderAdminFeedback(_adminCurrentTab);
+        document.getElementById('admin-feedback-select-all').checked = false;
+    } catch (err) {
+        console.error('Error bulk delete:', err);
+        alert('Error al eliminar en lote: ' + err.message);
+    }
 }
 
 // ===================================

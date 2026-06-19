@@ -1532,6 +1532,18 @@ CREATE POLICY "public_read_conv" ON public.convalidaciones FOR SELECT USING (tru
             <span id="admin-archived-count" class="bg-white/10 text-gray-400 text-xs font-black px-2 py-0.5 rounded-full">0</span>
           </button>
         </div>
+        <div id="admin-feedback-toolbar" class="hidden items-center gap-2 mb-3">
+          <label class="flex items-center gap-2 text-sm text-gray-300">
+            <input type="checkbox" id="admin-feedback-select-all" onchange="toggleAdminSelectAll(this)"> Seleccionar todo
+          </label>
+          <div class="flex items-center gap-2 ml-auto">
+            <button onclick="bulkUpdateStatus('reviewed')" class="px-3 py-1.5 bg-purple-500/15 text-purple-300 rounded-lg text-sm">Marcar Visto</button>
+            <button onclick="bulkUpdateStatus('important')" class="px-3 py-1.5 bg-red-500/15 text-red-300 rounded-lg text-sm">Marcar Importante</button>
+            <button onclick="bulkUpdateStatus('implemented')" class="px-3 py-1.5 bg-emerald-500/15 text-emerald-300 rounded-lg text-sm">Marcar Resuelto</button>
+            <button onclick="bulkUpdateStatus('archived')" class="px-3 py-1.5 bg-gray-700/15 text-gray-200 rounded-lg text-sm">Archivar</button>
+            <button onclick="bulkDeleteConfirm()" class="px-3 py-1.5 bg-gray-500/15 text-gray-300 rounded-lg text-sm">Eliminar</button>
+          </div>
+        </div>
         <div id="admin-feedback-list" class="overflow-y-auto space-y-3 max-h-[60vh] custom-scrollbar"></div>
       </div>
         <!-- SQL Helper para politica admin -->
