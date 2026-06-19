@@ -186,18 +186,19 @@ function puedeEstarEnEstado(carreraId, codigoCurso, nuevoEstado) {
 
   return curso.requisitos.every(reqString => {
     // Soporte para requisitos OR usando ||
-    const opciones = reqString.split('||');
+    const opciones = reqString.split('||').map(s => s.trim());
 
     return opciones.some(reqCodigo => {
       const reqCurso = getCursoByCodigo(carreraId, reqCodigo);
       if (!reqCurso) return true; // Si no existe el req, no bloqueamos
 
+      const reqEstado = Number(reqCurso.estado) || 0;
       if (nuevoEstado === 1 || nuevoEstado === 2) {
         // Para aprobar/cursar: el requisito DEBE estar aprobado
-        return reqCurso.estado === 1;
+        return reqEstado === 1;
       } else if (nuevoEstado >= 3) {
         // Para proyecciones: basta con que el requisito tenga ALGÚN plan asignado
-        return reqCurso.estado > 0;
+        return reqEstado > 0;
       }
       return false;
     });
@@ -224,12 +225,12 @@ function getCursosDisponibles(carreraId) {
     // Un curso es elegible SOLO si sus requisitos previos están APROBADOS (Estado 1)
     // O si no tiene requisitos del todo.
     // Además, no debe estar ya aprobado (Estado 1).
-    const yaAprobado = curso.estado === 1;
+    const yaAprobado = Number(curso.estado) === 1;
     const requisitosListos = curso.requisitos.every(reqString => {
-      const opciones = reqString.split('||');
+      const opciones = reqString.split('||').map(s => s.trim());
       return opciones.some(reqCodigo => {
         const reqCurso = getCursoByCodigo(carreraId, reqCodigo);
-        return reqCurso && reqCurso.estado === 1;
+        return reqCurso && Number(reqCurso.estado) === 1;
       });
     });
 

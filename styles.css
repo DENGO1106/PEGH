@@ -98,6 +98,7 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -107,6 +108,7 @@ body {
   line-height: 1.6;
   min-height: 100dvh;
   overflow-x: hidden;
+  overscroll-behavior-y: none;
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */

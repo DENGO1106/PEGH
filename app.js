@@ -182,6 +182,18 @@ async function cargarEstado() {
         try {
             const estado = JSON.parse(estadoGuardado);
             if (estado.carreraActual) carreraActual = estado.carreraActual;
+            
+            // Cargar estados de los cursos desde localStorage
+            Object.keys(CARRERAS).forEach(cId => {
+                if (estado[cId]) {
+                    estado[cId].forEach(savedCurso => {
+                        const curso = CARRERAS[cId].cursos.find(c => c.codigo === savedCurso.codigo);
+                        if (curso) {
+                            curso.estado = Number(savedCurso.estado);
+                        }
+                    });
+                }
+            });
         } catch (e) { /* Ignorar error de parseo */ }
     }
 
@@ -196,10 +208,7 @@ async function cargarEstado() {
         }));
     }
 
-    // 4. Resetear estados a 0
-    Object.keys(CARRERAS).forEach(carreraId => {
-        CARRERAS[carreraId].cursos.forEach(curso => { curso.estado = 0; });
-    });
+    // 4. Resetear estados a 0 (eliminado: se gestiona mediante la lógica de precarga)
 
     // 5. Supabase como fuente de verdad: carga estados del usuario
     if (session && window.supaAuth?.supabase) {
@@ -219,7 +228,7 @@ async function cargarEstado() {
                 Object.keys(CARRERAS).forEach(carreraId => {
                     const carreraMap = remoteMap[carreraId] || {};
                     CARRERAS[carreraId].cursos.forEach(curso => {
-                        curso.estado = carreraMap[curso.codigo] ?? 0;
+                        curso.estado = carreraMap[curso.codigo] ?? curso.estado;
                     });
                 });
 
@@ -1759,16 +1768,21 @@ if (!history.state || !history.state.page) {
 
 // Manejar el botón "Atrás" del navegador/móvil
 window.addEventListener('popstate', (e) => {
+    // Si hay un modal abierto, lo cerramos en lugar de navegar
+    const modales = document.querySelectorAll('.modal-overlay:not(.hidden)');
+    if (modales.length > 0) {
+        modales.forEach(m => m.classList.add('hidden'));
+        // Evitamos que retroceda la página visualmente
+        history.pushState({ page: e.state ? e.state.page : 'home' }, '', window.location.hash);
+        return;
+    }
+
     if (e.state && e.state.page) {
         window.navigateTo(e.state.page, false);
     } else {
-        // Si no hay estado, asume que es home o sale
-        const isAuthenticated = window.supaAuth && window.supaAuth.getCurrentSession();
-        if (isAuthenticated) {
-            window.navigateTo('home', false);
-        } else {
-            window.navigateTo('login', false);
-        }
+        // En lugar de salir, nos quedamos
+        history.pushState({ page: 'home' }, '', '#home');
+        window.navigateTo('home', false);
     }
 });
 
@@ -2005,7 +2019,18 @@ async function guardarSnapshotPlan() {
         return;
     }
 
-    const nombre = document.getElementById('plan-save-name').value.trim() || 'Mi Respaldo Automático';
+    const nombreInput = document.getElementById('plan-save-name');
+    const nombre = nombreInput.value.trim() || 'Mi Respaldo Automático';
+    
+    // Check if we are updating an existing snapshot
+    const currentSnapshotId = window.currentLoadedSnapshotId || null;
+    
+    if (currentSnapshotId) {
+        const confirmarUpdate = confirm("Estás editando un plan previamente guardado. ¿Deseas sobreescribir ese plan?\n\n[Aceptar] para Sobreescribir\n[Cancelar] para Guardar como un Plan Nuevo");
+        if (!confirmarUpdate) {
+            window.currentLoadedSnapshotId = null; // Guardar como nuevo
+        }
+    }
     
     // Preparar el estado completo de todas las carreras activas (estado > 0)
     const estado = {};
@@ -2022,13 +2047,27 @@ async function guardarSnapshotPlan() {
     btn.disabled = true;
 
     try {
-        const { error } = await window.supaAuth.supabase
-            .from('user_plan_snapshots')
-            .insert([{
-                user_id: session.user.id,
-                nombre: nombre,
-                datos_json: estado
-            }]);
+        if (window.currentLoadedSnapshotId) {
+            // Actualizar existente
+            const { error } = await window.supaAuth.supabase
+                .from('user_plan_snapshots')
+                .update({
+                    nombre: nombre,
+                    datos_json: estado
+                })
+                .eq('id', window.currentLoadedSnapshotId);
+            if (error) throw error;
+        } else {
+            // Guardar nuevo
+            const { error } = await window.supaAuth.supabase
+                .from('user_plan_snapshots')
+                .insert([{
+                    user_id: session.user.id,
+                    nombre: nombre,
+                    datos_json: estado
+                }]);
+            if (error) throw error;
+        }
 
         if (error) throw error;
         
@@ -2158,6 +2197,10 @@ async function abrirSnapshotPlan(snapshotId) {
         // 5. Renderizar interfaz y cerrar modal
         renderizarCarrera();
         document.getElementById('plan-history-modal').classList.add('hidden');
+        
+        // Registrar globalmente el id cargado
+        window.currentLoadedSnapshotId = snapshotId;
+        
         alert("¡Progreso cargado y sincronizado exitosamente!");
 
     } catch (err) {

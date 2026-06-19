@@ -1248,7 +1248,7 @@
 
         <div>
             <h4 class="text-white font-bold mb-2">4. Limitación de Responsabilidad</h4>
-            <p>La plataforma se ofrece "tal como está". No garantizamos la exactitud absoluta de los planes de estudio, ya que pueden variar según modificaciones oficiales de la UCR. El desarrollador ("Diego Alberto Dengo Soto" / equipo Uplan) no es responsable por decisiones académicas tomadas con base únicamente en la información aquí mostrada.</p>
+            <p>La plataforma se ofrece "tal como está". No garantizamos la exactitud absoluta de los planes de estudio, ya que pueden variar según modificaciones oficiales de la UCR. El desarrollador (equipo Uplan) no es responsable por decisiones académicas tomadas con base únicamente en la información aquí mostrada.</p>
         </div>
         
       </div>
@@ -1299,11 +1299,24 @@
 
     // Trampa de Debugger Activa (Anti-Inspección Avanzada)
     // Si alguien abre las DevTools mediante un menú, la pestaña se congelará repetidamente
-    setInterval(function() {
-        (function() {
-            return false;
-        }['constructor']('debugger')());
-    }, 100);
+    const checkDevTools = () => {
+        let before = performance.now();
+        debugger;
+        let after = performance.now();
+        if (after - before > 100) {
+            // DevTools están abiertas
+            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%; font-family:sans-serif;'>Acceso Denegado</h1>";
+            window.location.reload();
+        }
+    };
+    setInterval(checkDevTools, 500);
+
+    // Evitar consola
+    console.log("%c¡Detente!", "color: red; font-size: 50px; font-weight: bold; text-shadow: 2px 2px 0px black;");
+    console.log("%cEsta es una función del navegador pensada para desarrolladores. Si alguien te indicó que copiaras y pegaras algo aquí para habilitar una función, se trata de un fraude.", "font-size: 16px;");
+    
+    // Anular variables globales en consola si intentan inspeccionar
+    Object.defineProperty(window, 'CARRERAS', { configurable: false, writable: false });
   </script>
 
 </body>
