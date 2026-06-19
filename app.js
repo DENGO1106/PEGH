@@ -1749,7 +1749,7 @@ async function markFeedbackStatus(feedbackId, newStatus) {
     if (!session || !esAdmin() || !window.supaAuth?.supabase) return;
 
     // Feedback visual inmediato
-    const card = document.getElementById(eedback-card-);
+    const card = document.getElementById(`feedback-card-${feedbackId}`);
     if (card) {
         const btns = card.querySelectorAll('button');
         btns.forEach(b => { if(b.title?.startsWith('Marcar')) { b.disabled = true; b.innerHTML = '...'; } });
