@@ -277,12 +277,8 @@ async function fetchUserProfile(userId) {
         } else {
             if (typeof filtrarCarrerasPorPerfil === 'function') filtrarCarrerasPorPerfil(selected);
             if (typeof window.navigateTo === 'function') {
-                // Siempre restauramos la última página visitada al cargar el perfil
-                const UCR_LAST_PAGE_KEY = 'ucr_last_page';
-                const paginasValidas = ['home', 'plan', 'horario', 'calculator'];
-                const ultimaPagina = localStorage.getItem(UCR_LAST_PAGE_KEY);
-                const destino = (ultimaPagina && paginasValidas.includes(ultimaPagina)) ? ultimaPagina : 'home';
-                window.navigateTo(destino);
+                // Al iniciar sesión, siempre ir a home
+                window.navigateTo('home');
             }
             if (typeof cargarEstado === 'function') cargarEstado();
         }
@@ -483,7 +479,11 @@ window.guardarSeleccionCarreras = guardarSeleccionCarreras;
 window.editarCarreras = editarCarreras;
 
 console.log('[Auth] Inicializado. Cliente Supabase:', !!_db);
-
-
-
-
+
+
+
+
+
+
+
+
