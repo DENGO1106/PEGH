@@ -5282,19 +5282,3 @@ function iniciarTutorial() {
 
 
 
-
-// Exponer funciones globalmente para onclick handlers
-window.openAdminFeedbackChat = typeof openAdminFeedbackChat !== 'undefined' ? openAdminFeedbackChat : null;
-window.markFeedbackStatus = typeof markFeedbackStatus !== 'undefined' ? markFeedbackStatus : null;
-window.confirmArchive = typeof confirmArchive !== 'undefined' ? confirmArchive : null;
-window.confirmDelete = typeof confirmDelete !== 'undefined' ? confirmDelete : null;
-window.confirmRestore = typeof confirmRestore !== 'undefined' ? confirmRestore : null;
-window.bulkUpdateStatus = typeof bulkUpdateStatus !== 'undefined' ? bulkUpdateStatus : null;
-window.bulkDeleteConfirm = typeof bulkDeleteConfirm !== 'undefined' ? bulkDeleteConfirm : null;
-window.setAdminBulkState = typeof setAdminBulkState !== 'undefined' ? setAdminBulkState : null;
-window.sendAdminChatReply = typeof sendAdminChatReply !== 'undefined' ? sendAdminChatReply : null;
-window.eliminarSnapshotPlan = typeof eliminarSnapshotPlan !== 'undefined' ? eliminarSnapshotPlan : null;
-window.abrirSnapshotPlan = typeof abrirSnapshotPlan !== 'undefined' ? abrirSnapshotPlan : null;
-window.loadAdminFeedbackData = typeof loadAdminFeedbackData !== 'undefined' ? loadAdminFeedbackData : null;
-window.renderAdminFeedback = typeof renderAdminFeedback !== 'undefined' ? renderAdminFeedback : null;
-window.guardarSeleccionCarreras = typeof guardarSeleccionCarreras !== 'undefined' ? guardarSeleccionCarreras : null;

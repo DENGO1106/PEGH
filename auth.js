@@ -499,9 +499,3 @@ console.log('[Auth] Inicializado. Cliente Supabase:', !!_db);
 
 
 
-
-// Exponer funciones globalmente para onclick handlers
-window.guardarSeleccionCarreras = typeof guardarSeleccionCarreras !== 'undefined' ? guardarSeleccionCarreras : null;
-window.editarCarreras = typeof editarCarreras !== 'undefined' ? editarCarreras : null;
-window.showAuthLoading = typeof showAuthLoading !== 'undefined' ? showAuthLoading : null;
-window.showProfileMenu = typeof showProfileMenu !== 'undefined' ? showProfileMenu : null;
