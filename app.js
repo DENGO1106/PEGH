@@ -1,4 +1,4 @@
-// ===================================
+﻿// ===================================
 // GESTIÓN DE ESTADO Y PERSISTENCIA
 // ===================================
 
@@ -1823,52 +1823,8 @@ function sincronizarCompartidosGlobal() {
 // LÓGICA DE SNAPSHOTS DEL PLAN
 // ===================================
 
-async function guardarSnapshotPlan() {
-    const session = window.supaAuth?.getCurrentSession();
-    if (!session) {
-        alert("Debes iniciar sesión para guardar tu progreso en la nube.");
-        return;
-    }
+// guardarSnapshotPlan — definida mas abajo con soporte completo
 
-    const nombre = document.getElementById('plan-save-name').value.trim() || 'Mi Respaldo Automático';
-    
-    // Preparar el estado completo de todas las carreras activas (estado > 0)
-    const estado = {};
-    Object.keys(CARRERAS).forEach(cId => {
-        const cursosGuardar = CARRERAS[cId].cursos.filter(c => c.estado > 0).map(c => ({ codigo: c.codigo, estado: c.estado }));
-        if (cursosGuardar.length > 0) {
-            estado[cId] = cursosGuardar;
-        }
-    });
-
-    const btn = document.querySelector('#plan-save-modal button.bg-yellow-500');
-    const oldText = btn.innerHTML;
-    btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
-    btn.disabled = true;
-
-    try {
-        const { error } = await window.supaAuth.supabase
-            .from('user_plan_snapshots')
-            .insert([{
-                user_id: session.user.id,
-                nombre: nombre,
-                datos_json: estado
-            }]);
-
-        if (error) throw error;
-        
-        alert("¡Respaldo guardado exitosamente!");
-        document.getElementById('plan-save-modal').classList.add('hidden');
-        document.getElementById('plan-save-name').value = '';
-    } catch (err) {
-        console.error("Error al guardar snapshot:", err);
-        alert("Hubo un error al guardar tu progreso.");
-    } finally {
-        btn.innerHTML = oldText;
-        btn.disabled = false;
-        if (window.lucide) lucide.createIcons();
-    }
-}
 
 async function abrirModalHistorialPlanes() {
     const session = window.supaAuth?.getCurrentSession();
@@ -2066,10 +2022,15 @@ async function guardarSnapshotPlan(isNuevaCopia = false) {
         }
     });
 
-    const btn = document.querySelector('#plan-save-modal button.bg-yellow-500');
-    const oldText = btn.innerHTML;
-    btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
-    btn.disabled = true;
+    // Obtener el botón que disparó la acción (cualquier botón activo del modal)
+    const btn = document.querySelector('#plan-save-modal button[onclick*="guardarSnapshotPlan"]') ||
+                 document.querySelector('#plan-save-modal button.bg-yellow-500');
+    let oldText = '';
+    if (btn) {
+        oldText = btn.innerHTML;
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
+        btn.disabled = true;
+    }
 
     try {
         if (currentSnapshotId) {
@@ -2101,8 +2062,10 @@ async function guardarSnapshotPlan(isNuevaCopia = false) {
         console.error("Error al guardar snapshot:", err);
         alert("Hubo un error al guardar tu progreso.");
     } finally {
-        btn.innerHTML = oldText;
-        btn.disabled = false;
+        if (btn) {
+            btn.innerHTML = oldText;
+            btn.disabled = false;
+        }
         if (window.lucide) lucide.createIcons();
     }
 }
