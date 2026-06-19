@@ -56,7 +56,7 @@ window.navigateTo = (target, pushToHistory = true) => {
 
     try { saveScrollForPage(window._currentPage); } catch (e) { /* ignore */ }
 
-    // ðŸ”’ Control de Acceso: Redirigir a login si no hay sesión
+    // ”’ Control de Acceso: Redirigir a login si no hay sesión
 
     const isAuthenticated = window.supaAuth && window.supaAuth.getCurrentSession();
 
@@ -202,7 +202,7 @@ window.navigateTo = (target, pushToHistory = true) => {
 
         document.getElementById('home-section').classList.remove('hidden');
 
-        if (appNav) appNav.classList.add('hidden'); // Home tiene su propio layout
+        if (appNav) appNav.classList.remove('hidden'); // Mostrar nav para permitir navegación desde home
 
     }
 
@@ -886,7 +886,7 @@ function clickCurso(event, carreraId, codigoCurso) {
 
             opcion.disabled = true;
 
-            opcion.title = 'ðŸ”’ Requiere cumplir requisitos en un semestre anterior';
+            opcion.title = '”’ Requiere cumplir requisitos en un semestre anterior';
 
         }
 
@@ -1144,7 +1144,7 @@ function renderizarCarrera() {
 
             <div class="nivel-header-left">
 
-              <span>ðŸ“…</span>
+              <span>“…</span>
 
               <span class="nivel-titulo">Semestre ${nivel} <span class="nivel-año-badge">(Año ${Math.ceil(nivel / 2)})</span></span>
 
@@ -1252,7 +1252,7 @@ function renderizarCarrera() {
 
             const tooltipBloqueado = esBloqueado
 
-                ? `title="ðŸ”’ Bloqueado para aprobación — Requisitos pendientes: ${requisitosTexto}"`
+                ? `title="”’ Bloqueado para aprobación — Requisitos pendientes: ${requisitosTexto}"`
 
                 : '';
 
@@ -1284,13 +1284,13 @@ function renderizarCarrera() {
 
           <div class="curso-requisitos">
 
-            ${curso.requisitos.length > 0 ? 'ðŸ“‹ ' + requisitosTexto : '✓ Sin requisitos'}
+            ${curso.requisitos.length > 0 ? '“‹ ' + requisitosTexto : '✓ Sin requisitos'}
 
           </div>
 
           <div class="curso-estado-badge">
 
-            ${esBloqueado ? 'ðŸ”’ Bloqueado' : infoEstado.etiqueta}
+            ${esBloqueado ? '”’ Bloqueado' : infoEstado.etiqueta}
 
           </div>
 
@@ -1718,7 +1718,7 @@ function renderizarTablaConvalidaciones() {
 
             statusClass = 'status-pending'; // Usamos la misma base pero podrías crear una nueva
 
-            statusText = 'âš ️ Posible a completar';
+            statusText = '⚠️ Posible a completar';
 
         }
 
@@ -1774,7 +1774,7 @@ function renderizarTablaConvalidaciones() {
 
                                     ${nombreFinal}${extLabel}
 
-                                    ${compartido ? '<span class="badge-compartido" title="Este curso es compartido, se sincroniza solo">ðŸ”—</span>' : ''}
+                                    ${compartido ? '<span class="badge-compartido" title="Este curso es compartido, se sincroniza solo">”—</span>' : ''}
 
                                 </div>`;
 
@@ -1800,7 +1800,7 @@ function renderizarTablaConvalidaciones() {
 
         <p class="conv-nota" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
 
-            âš ️ <strong>Importante:</strong> Las convalidaciones que no tienen el ícono ðŸ”— requieren trámite de convalidación manual en la UCR. 
+            ️ <strong>Importante:</strong> Las convalidaciones que no tienen el ícono ”— requieren trámite de convalidación manual en la UCR. 
 
             Esta tabla es informativa basada en la resolución EAN-269-2023.
 
@@ -2054,7 +2054,7 @@ function mostrarMensajeSoporte() {
 
         mostrarToastNotificacion(
 
-            "ðŸ‘‹ Hola, la plataforma funciona perfectamente con o sin adblocker. Sin embargo, no usamos anuncios molestos y tu apoyo desactivándolo o no usándolo nos ayudaría muchísimo a mantener este proyecto vivo. ¡Gracias y disfrutá la app!",
+            "‘‹ Hola, la plataforma funciona perfectamente con o sin adblocker. Sin embargo, no usamos anuncios molestos y tu apoyo desactivándolo o no usándolo nos ayudaría muchísimo a mantener este proyecto vivo. ¡Gracias y disfrutá la app!",
 
             "info"
 
@@ -2354,7 +2354,7 @@ async function descargarPlan() {
 
     const originalText = btn.innerHTML;
 
-    btn.innerHTML = 'âŒ› Generando...';
+    btn.innerHTML = '⏳ Generando...';
 
     btn.disabled = true;
 
@@ -2952,15 +2952,15 @@ async function loadNoticias() {
 
             const map = {
 
-                general: { icon: 'ðŸ“¢', color: 'purple' },
+                general: { icon: '“¢', color: 'purple' },
 
-                matricula: { icon: 'ðŸ“…', color: 'blue' },
+                matricula: { icon: '“…', color: 'blue' },
 
-                actualizacion: { icon: 'ðŸ”„', color: 'emerald' },
+                actualizacion: { icon: '”„', color: 'emerald' },
 
-                aviso: { icon: 'âš ️', color: 'red' },
+                aviso: { icon: '⚠️', color: 'red' },
 
-                nuevo: { icon: 'ðŸ†•', color: 'yellow' }
+                nuevo: { icon: '🆕', color: 'yellow' }
 
             };
 
@@ -5188,7 +5188,7 @@ function iniciarTutorial() {
 
             {
 
-                intro: "ðŸ‘‹ ¡Bienvenido! Te daré un recorrido rápido de 30 segundos para que saqués el máximo provecho a la plataforma."
+                intro: "‘‹ ¡Bienvenido! Te daré un recorrido rápido de 30 segundos para que saqués el máximo provecho a la plataforma."
 
             },
 
@@ -5196,7 +5196,7 @@ function iniciarTutorial() {
 
                 element: document.querySelector('.malla-container') || document.querySelector('#plan-section'),
 
-                intro: "ðŸ’¡ **Tu Plan de Estudios:** Dale clic a cualquier curso para cambiarlo de color (Aprobado, Cursando, Pendiente).",
+                intro: "’¡ **Tu Plan de Estudios:** Dale clic a cualquier curso para cambiarlo de color (Aprobado, Cursando, Pendiente).",
 
                 position: 'top'
 
@@ -5206,7 +5206,7 @@ function iniciarTutorial() {
 
                 element: document.querySelector('.controls-left') || document.querySelector('.controls-container'),
 
-                intro: "ðŸ’¾ **Respaldos y Exportación:** Guardá tu progreso en la nube o descargá tu plan en formato imagen desde aquí.",
+                intro: "’¾ **Respaldos y Exportación:** Guardá tu progreso en la nube o descargá tu plan en formato imagen desde aquí.",
 
                 position: 'top'
 
@@ -5216,7 +5216,7 @@ function iniciarTutorial() {
 
                 element: document.querySelector('button[data-navigate="calculator"]') || document.querySelector('.mobile-nav'),
 
-                intro: "ðŸ”¢ **Herramientas Extra:** Accedé a la Calculadora de Ponderado y al Generador de Horarios desde la navegación inferior.",
+                intro: "”¢ **Herramientas Extra:** Accedé a la Calculadora de Ponderado y al Generador de Horarios desde la navegación inferior.",
 
                 position: 'top'
 
