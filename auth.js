@@ -483,7 +483,7 @@ window.guardarSeleccionCarreras = guardarSeleccionCarreras;
 window.editarCarreras = editarCarreras;
 
 console.log('[Auth] Inicializado. Cliente Supabase:', !!_db);
-
-
-
-
+
+
+
+
