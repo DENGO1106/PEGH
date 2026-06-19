@@ -38,7 +38,8 @@ function adminSwitchTab(tab) {
     }
     document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
     if (tab === 'noticias') {
-        // 'noticias' tab repurposed to show admin feedback management
+        document.getElementById('admin-content-noticias')?.classList.remove('hidden');
+    } else if (tab === 'feedback') {
         document.getElementById('admin-content-feedback')?.classList.remove('hidden');
     } else {
         document.getElementById('admin-content-' + tab)?.classList.remove('hidden');
@@ -48,7 +49,8 @@ function adminSwitchTab(tab) {
     else if (tab === 'cursos') adminLoadCursosByCarrera();
     else if (tab === 'convalidaciones') adminLoadConvalidaciones();
     else if (tab === 'usuarios') adminLoadUsuarios();
-    else if (tab === 'noticias') { if(typeof loadAdminFeedbackData === 'function') loadAdminFeedbackData(); }
+    else if (tab === 'noticias') { if(typeof adminLoadNoticias === 'function') adminLoadNoticias(); }
+    else if (tab === 'feedback') { if(typeof loadAdminFeedbackData === 'function') loadAdminFeedbackData(); }
 }
 
 function showAdminToast(message, type = 'success') {
