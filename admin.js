@@ -123,8 +123,8 @@ function adminCancelCarreraForm() {
 }
 
 async function adminSaveCarrera() {
-    const key = document.getElementById('admin-carrera-key').value.trim() ||
-        document.getElementById('admin-carrera-nombre').value.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    const originalKey = document.getElementById('admin-carrera-key').value.trim();
+    const key = originalKey || document.getElementById('admin-carrera-nombre').value.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
     const nombre = document.getElementById('admin-carrera-nombre').value.trim();
     const codigo = document.getElementById('admin-carrera-codigo').value.trim();
     const descripcion = document.getElementById('admin-carrera-descripcion').value.trim();
@@ -132,15 +132,40 @@ async function adminSaveCarrera() {
 
     if (!nombre || !codigo) { alert('Nombre y código son obligatorios.'); return; }
 
-    if (!CARRERAS[key]) CARRERAS[key] = { cursos: [] };
-    CARRERAS[key].nombre = nombre;
-    CARRERAS[key].codigo = codigo;
-    CARRERAS[key].descripcion = descripcion;
-    CARRERAS[key].facultad = facultad;
+    const isUpdate = !!originalKey;
+    const payload = {
+        id: key,
+        nombre: nombre,
+        codigo: codigo,
+        descripcion: descripcion,
+        facultad: facultad
+    };
 
-    adminCancelCarreraForm();
-    adminLoadCarreras();
-    showAdminToast('✅ Carrera "' + nombre + '" guardada. Recargá la app para que aparezca en el selector.');
+    try {
+        if (!window.supaAuth?.supabase) throw new Error("No hay conexión a Supabase.");
+
+        let resp;
+        if (isUpdate) {
+            resp = await window.supaAuth.supabase.from('careers_catalog').update(payload).eq('id', key);
+        } else {
+            resp = await window.supaAuth.supabase.from('careers_catalog').insert([payload]);
+        }
+        
+        if (resp.error) throw resp.error;
+
+        // Update local memory so UI refreshes immediately
+        if (!CARRERAS[key]) CARRERAS[key] = { cursos: [] };
+        CARRERAS[key].nombre = nombre;
+        CARRERAS[key].codigo = codigo;
+        CARRERAS[key].descripcion = descripcion;
+        CARRERAS[key].facultad = facultad;
+
+        adminCancelCarreraForm();
+        adminLoadCarreras();
+        showAdminToast('✅ Carrera "' + nombre + '" guardada en Supabase.');
+    } catch (err) {
+        alert('Error al guardar la carrera en Supabase: ' + err.message);
+    }
 }
 
 // ===================================================
@@ -219,7 +244,7 @@ async function adminEditCurso(id, carreraId) {
     document.getElementById('admin-curso-nombre').value = data.nombre;
     document.getElementById('admin-curso-creditos').value = data.creditos;
     document.getElementById('admin-curso-nivel').value = data.nivel;
-    document.getElementById('admin-curso-requisitos').value = (data.requisitos || []).join(', ');
+    adminRenderRequisitosCheckboxes(carreraId, data.requisitos || [], id);
     document.getElementById('admin-curso-form').classList.remove('hidden');
     document.getElementById('admin-curso-form').scrollIntoView({ behavior: 'smooth' });
 }
@@ -234,7 +259,7 @@ function adminNewCurso() {
     document.getElementById('admin-curso-nombre').value = '';
     document.getElementById('admin-curso-creditos').value = '3';
     document.getElementById('admin-curso-nivel').value = '1';
-    document.getElementById('admin-curso-requisitos').value = '';
+    adminRenderRequisitosCheckboxes(carreraId, [], null);
     document.getElementById('admin-curso-form').classList.remove('hidden');
     document.getElementById('admin-curso-form').scrollIntoView({ behavior: 'smooth' });
 }
@@ -251,8 +276,8 @@ async function adminSaveCurso() {
     const nombre = document.getElementById('admin-curso-nombre').value.trim();
     const creditos = parseInt(document.getElementById('admin-curso-creditos').value) || 0;
     const nivel = parseInt(document.getElementById('admin-curso-nivel').value) || 1;
-    const requisitosRaw = document.getElementById('admin-curso-requisitos').value.trim();
-    const requisitos = requisitosRaw ? requisitosRaw.split(',').map(r => r.trim().toUpperCase()).filter(Boolean) : [];
+    const checkboxes = document.querySelectorAll('.admin-req-checkbox:checked');
+    const requisitos = Array.from(checkboxes).map(cb => cb.value);
 
     if (!carreraId || !codigo || !nombre) { alert('Carrera, código y nombre son obligatorios.'); return; }
 
@@ -508,4 +533,46 @@ window.adminToggleAdmin = adminToggleAdmin;
 window.adminDeleteUser = adminDeleteUser;
 
 console.log('[Admin] Módulo de administración cargado.');
+
+
+function adminRenderRequisitosCheckboxes(carreraId, requisitosActuales, currentCourseId) {
+    const container = document.getElementById('admin-curso-requisitos-container');
+    if (!container) return;
+    
+    // Obtener todos los cursos de esta carrera
+    let cursos = [];
+    if (carreraId && CARRERAS[carreraId] && CARRERAS[carreraId].cursos) {
+        cursos = CARRERAS[carreraId].cursos;
+    }
+
+    if (cursos.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-500">No hay otros cursos cargados en esta carrera.</p>';
+        return;
+    }
+
+    // Filtrar el curso actual (no puede ser requisito de sí mismo)
+    const opciones = cursos.filter(c => c.id !== currentCourseId && c.codigo !== document.getElementById('admin-curso-codigo').value);
+    
+    if (opciones.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-500">No hay otros cursos disponibles para seleccionar como requisito.</p>';
+        return;
+    }
+
+    // Ordenar por nivel
+    opciones.sort((a, b) => a.nivel - b.nivel);
+
+    container.innerHTML = opciones.map(c => {
+        const isChecked = requisitosActuales.includes(c.codigo) ? 'checked' : '';
+        return 
+            <label class="flex items-center gap-3 p-2 bg-black/30 border border-white/5 rounded-lg cursor-pointer hover:bg-black/50 transition-colors">
+                <input type="checkbox" value=" + c.codigo + " class="admin-req-checkbox w-4 h-4 rounded border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900 bg-gray-700"  + isChecked + >
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-white"> + c.codigo + </span>
+                    <span class="text-[10px] text-gray-400"> + c.nombre +  (Nivel  + c.nivel + )</span>
+                </div>
+            </label>
+        ;
+    }).join('');
+}
+
 

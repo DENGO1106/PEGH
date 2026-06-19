@@ -255,7 +255,8 @@ async function cargarEstado() {
 }
 
 // Escuchar cambios de autenticación para recargar el plan (Definido globalmente)
-window.addEventListener('supabase_auth_changed', () => {
+window.addEventListener('supabase_auth_changed', async () => {
+    await cargarCarrerasDeSupabase();
     cargarEstado();
 
     // Generar UI dinámicamente desde CARRERAS
@@ -2320,5 +2321,6 @@ function iniciarTutorial() {
         }
     }, 1000);
 }
+
 
 

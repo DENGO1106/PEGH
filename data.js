@@ -48,6 +48,42 @@ const DATA_STORAGE_KEY = 'planes-estudio-ucr-v2';
 // ===================================
 // DATA FETCHING (Supabase)
 // ===================================
+let carrerasCargadas = false;
+async function cargarCarrerasDeSupabase() {
+    if (carrerasCargadas) return true;
+    if (!window.supaAuth?.supabase) return false;
+
+    try {
+        const { data, error } = await window.supaAuth.supabase
+            .from('careers_catalog')
+            .select('*');
+
+        if (error) {
+            // Es posible que la tabla no exista todavía
+            if (error.code === '42P01') {
+                console.warn("La tabla careers_catalog aún no existe en Supabase.");
+                return false;
+            }
+            throw error;
+        }
+
+        if (data && data.length > 0) {
+            data.forEach(c => {
+                if (!CARRERAS[c.id]) CARRERAS[c.id] = { cursos: [] };
+                CARRERAS[c.id].nombre = c.nombre;
+                CARRERAS[c.id].codigo = c.codigo;
+                CARRERAS[c.id].descripcion = c.descripcion;
+                CARRERAS[c.id].facultad = c.facultad;
+            });
+            carrerasCargadas = true;
+            return true;
+        }
+    } catch (e) {
+        console.error("Error cargando carreras desde Supabase:", e);
+    }
+    return false;
+}
+
 async function cargarCursosDeSupabase(carreraId) {
     if (CARRERAS[carreraId]?.cursos?.length > 0) return true; // Ya esta cargado
     if (!window.supaAuth?.supabase) return false;
@@ -534,3 +570,4 @@ const TABLA_CONVALIDACIONES = {
     }
   ]
 };
+

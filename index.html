@@ -1336,11 +1336,7 @@
               <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Nivel / Ciclo</label>
               <input type="number" id="admin-curso-nivel" min="1" max="12" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50" value="1">
             </div>
-            <div class="sm:col-span-2">
-              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Requisitos (códigos separados por coma)</label>
-              <input type="text" id="admin-curso-requisitos" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50" placeholder="Ej: II1100, MA1001">
-              <p class="text-xs text-gray-500 mt-1">Para requisitos OR, usá || entre códigos. Ej: II1100 || MA1001</p>
-            </div>
+            <div class="sm:col-span-2">`n              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Requisitos</label>`n              <div id="admin-curso-requisitos-container" class="w-full bg-black/50 border border-white/10 rounded-xl p-4 max-h-48 overflow-y-auto space-y-2 custom-scrollbar">`n                <p class="text-xs text-gray-500">Cargando cursos...</p>`n              </div>`n              <p class="text-[10px] text-gray-500 mt-1">Seleccioná los cursos que son requisitos para este.</p>`n            </div>
           </div>
           <div class="flex gap-3 pt-2">
             <button onclick="adminSaveCurso()" class="bg-blue-500 hover:bg-blue-400 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all">Guardar Curso</button>
@@ -1523,6 +1519,7 @@ UPDATE public.profiles SET is_admin = true WHERE username = 'DENGO1106';</pre>
 </body>
 
 </html>
+
 
 
 

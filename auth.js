@@ -257,6 +257,7 @@ async function deleteAccount() {
 // ==========================================
 
 async function fetchUserProfile(userId) {
+    if(typeof cargarCarrerasDeSupabase === 'function') await cargarCarrerasDeSupabase();
     try {
         const { data, error } = await _db
             .from('profiles')
@@ -482,6 +483,7 @@ window.guardarSeleccionCarreras = guardarSeleccionCarreras;
 window.editarCarreras = editarCarreras;
 
 console.log('[Auth] Inicializado. Cliente Supabase:', !!_db);
+
 
 
 
