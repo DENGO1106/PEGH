@@ -197,8 +197,15 @@ function puedeEstarEnEstado(carreraId, codigoCurso, nuevoEstado) {
         // Para aprobar/cursar: el requisito DEBE estar aprobado
         return reqEstado === 1;
       } else if (nuevoEstado >= 3) {
-        // Para proyecciones: basta con que el requisito tenga ALGÚN plan asignado
-        return reqEstado > 0;
+        // Para proyecciones: debe respetar orden cronológico
+        if (reqEstado === 1) return true; // Si ya está aprobado, todo bien
+        if (reqEstado === 0) return false; // Si no está planeado, no se puede
+        
+        // Si el requisito está planeado (estado >= 2), el dependiente debe ir DESPUÉS
+        if (nuevoEstado > reqEstado || (nuevoEstado === 7 && reqEstado === 7)) {
+            return true;
+        }
+        return false;
       }
       return false;
     });

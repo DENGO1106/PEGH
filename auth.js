@@ -113,6 +113,18 @@ function _actualizarNombreHome() {
     }
 }
 
+function initAdminBtn() {
+    const btn = document.getElementById('btn-admin-panel');
+    if (!btn) return;
+    if (currentProfile?.is_admin) {
+        btn.classList.remove('hidden');
+        btn.classList.add('flex');
+    } else {
+        btn.classList.add('hidden');
+        btn.classList.remove('flex');
+    }
+}
+
 // ==========================================
 // MÉTODOS DE AUTENTICACIÓN
 // ==========================================

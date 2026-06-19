@@ -1732,3 +1732,42 @@ input, textarea {
   background-color: rgba(255, 255, 255, 0.04);
   transform: translateX(4px);
 }
+
+/* ===================================
+   ADMIN PANEL STYLES
+   =================================== */
+
+.active-admin-tab {
+  background-color: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.inactive-admin-tab {
+  background-color: transparent;
+  color: #71717a;
+  border: 1px solid transparent;
+}
+
+.inactive-admin-tab:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+#admin-panel-modal pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: 'Courier New', monospace;
+  background: rgba(0,0,0,0.4);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.05);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+#admin-panel-modal input,
+#admin-panel-modal select {
+  user-select: text;
+  -webkit-user-select: text;
+}

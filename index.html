@@ -271,7 +271,7 @@
         <button class="btn btn-success" onclick="descargarPlan()">
           📸 Guardar Imagen (PNG)
         </button>
-        <button class="btn" style="border:1px solid rgba(234,179,8,0.5); background:rgba(234,179,8,0.1); color:#eab308" onclick="document.getElementById('plan-save-modal').classList.remove('hidden')">
+        <button class="btn" style="border:1px solid rgba(234,179,8,0.5); background:rgba(234,179,8,0.1); color:#eab308" onclick="abrirModalGuardarPlan()">
           💾 Guardar Progreso
         </button>
         <button class="btn" style="border:1px solid rgba(59,130,246,0.5); background:rgba(59,130,246,0.1); color:#3b82f6" onclick="abrirModalHistorialPlanes()">
@@ -977,7 +977,11 @@
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
       <h3 class="text-xl font-black text-white mb-2 flex items-center gap-2"><i data-lucide="save" class="text-yellow-500"></i> Guardar Progreso</h3>
-      <p class="text-xs text-gray-400 mb-6">Guardá una versión de tu avance actual en la nube. Útil por si cometés un error luego.</p>
+      
+      <!-- Contenedor dinámico de contexto -->
+      <div id="plan-save-context" class="mb-6">
+        <p class="text-xs text-gray-400">Guardá una versión de tu avance actual en la nube. Útil por si cometés un error luego.</p>
+      </div>
       
       <div class="space-y-4 mb-6">
         <div>
@@ -986,9 +990,13 @@
         </div>
       </div>
       
-      <button onclick="guardarSnapshotPlan()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
-        <i data-lucide="cloud-upload" class="w-4 h-4"></i> Guardar en Supabase
-      </button>
+      <!-- Botones de Acción Dinámicos -->
+      <div id="plan-save-actions" class="flex flex-col gap-3">
+        <!-- Se llenará desde app.js -->
+        <button onclick="guardarSnapshotPlan(false)" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="cloud-upload" class="w-4 h-4"></i> Guardar en Supabase
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1262,6 +1270,216 @@
     </div>
   </div>
 
+  <!-- PANEL DE ADMINISTRACIÓN (MODAL FULLSCREEN) -->
+  <div id="admin-panel-modal" class="hidden fixed inset-0 z-[500] bg-black/95 backdrop-blur-sm overflow-y-auto">
+    <div class="min-h-full flex flex-col max-w-5xl mx-auto px-4 py-6">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-yellow-500/20 border border-yellow-500/30 rounded-xl flex items-center justify-center">
+            <i data-lucide="shield" class="w-5 h-5 text-yellow-400"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-black text-white">Panel de Administración</h2>
+            <p class="text-xs text-gray-500">Solo visible para administradores del sistema</p>
+          </div>
+        </div>
+        <button onclick="closeAdminPanel()" class="text-gray-400 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-all">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex gap-1 p-1 bg-zinc-900 rounded-xl border border-white/10 mb-6 flex-wrap">
+        <button id="admin-tab-carreras" onclick="adminSwitchTab('carreras')" class="admin-tab-btn active-admin-tab flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all flex-1">
+          <i data-lucide="graduation-cap" class="w-4 h-4"></i><span class="hidden sm:inline">Carreras</span>
+        </button>
+        <button id="admin-tab-cursos" onclick="adminSwitchTab('cursos')" class="admin-tab-btn inactive-admin-tab flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all flex-1">
+          <i data-lucide="book-open" class="w-4 h-4"></i><span class="hidden sm:inline">Cursos</span>
+        </button>
+        <button id="admin-tab-convalidaciones" onclick="adminSwitchTab('convalidaciones')" class="admin-tab-btn inactive-admin-tab flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all flex-1">
+          <i data-lucide="arrow-left-right" class="w-4 h-4"></i><span class="hidden sm:inline">Convalidaciones</span>
+        </button>
+        <button id="admin-tab-usuarios" onclick="adminSwitchTab('usuarios')" class="admin-tab-btn inactive-admin-tab flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all flex-1">
+          <i data-lucide="users" class="w-4 h-4"></i><span class="hidden sm:inline">Usuarios</span>
+        </button>
+      </div>
+
+      <!-- TAB: CARRERAS -->
+      <div id="admin-content-carreras" class="admin-tab-content space-y-4">
+        <div class="flex justify-between items-center">
+          <h3 class="text-white font-bold">Planes de Estudio Activos</h3>
+          <button onclick="adminNewCarrera()" class="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition-all">
+            <i data-lucide="plus" class="w-4 h-4"></i> Nueva Carrera
+          </button>
+        </div>
+        <div id="admin-carreras-list" class="space-y-2"></div>
+        <!-- Formulario Carrera -->
+        <div id="admin-carrera-form" class="hidden mt-4 p-5 bg-zinc-900 border border-yellow-500/20 rounded-2xl space-y-4">
+          <h4 id="admin-carrera-form-title" class="text-white font-bold text-lg">Nueva Carrera</h4>
+          <input type="hidden" id="admin-carrera-key">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Nombre de la Carrera *</label>
+              <input type="text" id="admin-carrera-nombre" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500/50" placeholder="Ej: Ingeniería Industrial">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Código *</label>
+              <input type="text" id="admin-carrera-codigo" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500/50" placeholder="Ej: II">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Facultad</label>
+              <input type="text" id="admin-carrera-facultad" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500/50" placeholder="Ej: Facultad de Ingeniería">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Descripción</label>
+              <input type="text" id="admin-carrera-descripcion" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500/50" placeholder="Ej: Plan 2025">
+            </div>
+          </div>
+          <div class="flex gap-3 pt-2">
+            <button onclick="adminSaveCarrera()" class="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-6 py-2.5 rounded-xl text-sm transition-all">Guardar Carrera</button>
+            <button onclick="adminCancelCarreraForm()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-2.5 rounded-xl text-sm transition-all">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: CURSOS -->
+      <div id="admin-content-cursos" class="admin-tab-content hidden space-y-4">
+        <div class="flex gap-3 items-center flex-wrap">
+          <select id="admin-cursos-carrera-selector" onchange="adminLoadCursosByCarrera()" class="flex-1 bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50 min-w-[200px]">
+            <option value="">— Seleccioná una carrera —</option>
+          </select>
+          <button onclick="adminNewCurso()" class="flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-all">
+            <i data-lucide="plus" class="w-4 h-4"></i> Nuevo Curso
+          </button>
+        </div>
+        <div id="admin-cursos-list" class="space-y-2"></div>
+        <!-- Formulario Curso -->
+        <div id="admin-curso-form" class="hidden mt-4 p-5 bg-zinc-900 border border-blue-500/20 rounded-2xl space-y-4">
+          <h4 id="admin-curso-form-title" class="text-white font-bold text-lg">Nuevo Curso</h4>
+          <input type="hidden" id="admin-curso-id">
+          <input type="hidden" id="admin-curso-carrera">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Código del Curso *</label>
+              <input type="text" id="admin-curso-codigo" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50" placeholder="Ej: II1100">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Nombre del Curso *</label>
+              <input type="text" id="admin-curso-nombre" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50" placeholder="Ej: Cálculo Diferencial">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Créditos</label>
+              <input type="number" id="admin-curso-creditos" min="0" max="20" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50" value="3">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Nivel / Ciclo</label>
+              <input type="number" id="admin-curso-nivel" min="1" max="12" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50" value="1">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Requisitos (códigos separados por coma)</label>
+              <input type="text" id="admin-curso-requisitos" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500/50" placeholder="Ej: II1100, MA1001">
+              <p class="text-xs text-gray-500 mt-1">Para requisitos OR, usá || entre códigos. Ej: II1100 || MA1001</p>
+            </div>
+          </div>
+          <div class="flex gap-3 pt-2">
+            <button onclick="adminSaveCurso()" class="bg-blue-500 hover:bg-blue-400 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all">Guardar Curso</button>
+            <button onclick="adminCancelCursoForm()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-2.5 rounded-xl text-sm transition-all">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: CONVALIDACIONES -->
+      <div id="admin-content-convalidaciones" class="admin-tab-content hidden space-y-4">
+        <div class="flex justify-between items-center">
+          <h3 class="text-white font-bold">Reglas de Convalidación</h3>
+          <button onclick="adminShowConvForm()" class="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-4 py-2 rounded-xl text-sm transition-all">
+            <i data-lucide="plus" class="w-4 h-4"></i> Nueva Regla
+          </button>
+        </div>
+        <div id="admin-conv-list" class="space-y-2"></div>
+        <!-- Formulario Convalidación -->
+        <div id="admin-conv-form" class="hidden mt-4 p-5 bg-zinc-900 border border-emerald-500/20 rounded-2xl space-y-4">
+          <h4 class="text-white font-bold">Nueva Convalidación</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Carrera Origen</label>
+              <select id="admin-conv-carrera-origen" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none">
+                <option value="">— Seleccioná —</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Código Origen *</label>
+              <input type="text" id="admin-conv-codigo-origen" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none" placeholder="Ej: II1100">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Carrera Destino</label>
+              <select id="admin-conv-carrera-destino" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none">
+                <option value="">— Seleccioná —</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Código Destino *</label>
+              <input type="text" id="admin-conv-codigo-destino" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none" placeholder="Ej: MA1001">
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="adminSaveConvalidacion()" class="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-6 py-2.5 rounded-xl text-sm transition-all">Guardar Regla</button>
+            <button onclick="adminHideConvForm()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-2.5 rounded-xl text-sm transition-all">Cancelar</button>
+          </div>
+        </div>
+        <!-- SQL Helper -->
+        <div class="p-4 bg-zinc-900/50 border border-white/5 rounded-xl text-xs">
+          <p class="text-gray-400 font-bold mb-2">SQL necesario (ejecutar una sola vez en Supabase):</p>
+          <pre class="text-gray-500 overflow-x-auto text-[10px] leading-relaxed">CREATE TABLE IF NOT EXISTS public.convalidaciones (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  carrera_origen text NOT NULL,
+  codigo_origen text NOT NULL,
+  carrera_destino text NOT NULL,
+  codigo_destino text NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE public.convalidaciones ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "admin_manage_conv" ON public.convalidaciones FOR ALL
+  USING ((SELECT is_admin FROM profiles WHERE id = auth.uid()) = true)
+  WITH CHECK ((SELECT is_admin FROM profiles WHERE id = auth.uid()) = true);
+CREATE POLICY "public_read_conv" ON public.convalidaciones FOR SELECT USING (true);</pre>
+        </div>
+      </div>
+
+      <!-- TAB: USUARIOS -->
+      <div id="admin-content-usuarios" class="admin-tab-content hidden space-y-4">
+        <div class="flex gap-3 items-center flex-wrap">
+          <input type="text" id="admin-user-search" placeholder="Buscar por username..." class="flex-1 bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-white/30 min-w-[200px]">
+          <button onclick="adminLoadUsuarios(document.getElementById('admin-user-search').value)" class="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-5 py-3 rounded-xl text-sm transition-all border border-white/10">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <div id="admin-users-list" class="space-y-2"></div>
+        <!-- SQL Helper para politica admin -->
+        <div class="p-4 bg-zinc-900/50 border border-white/5 rounded-xl text-xs">
+          <p class="text-gray-400 font-bold mb-2">SQL para ver todos los usuarios (ejecutar una sola vez):</p>
+          <pre class="text-gray-500 overflow-x-auto text-[10px] leading-relaxed">-- Política de admin para leer todos los perfiles
+CREATE POLICY "admin_read_all_profiles" ON public.profiles
+  FOR SELECT USING (
+    auth.uid() = id OR
+    (SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true
+  );
+-- Política de admin para modificar catálogo
+CREATE POLICY "admin_write_catalog" ON public.courses_catalog
+  FOR ALL USING (
+    (SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true
+  ) WITH CHECK (
+    (SELECT is_admin FROM public.profiles WHERE id = auth.uid()) = true
+  );
+-- Activar tu cuenta como admin (reemplazá el username)
+UPDATE public.profiles SET is_admin = true WHERE username = 'DENGO1106';</pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- CONTENEDOR TOAST (NOTIFICACIONES) -->
   <div id="adblock-toast-container" class="fixed bottom-6 left-6 z-[1000] flex flex-col gap-3"></div>
 
@@ -1271,6 +1489,7 @@
   <script src="app.js"></script>
   <script src="scheduler.js"></script>
   <script src="calculator.js"></script>
+  <script src="admin.js"></script>
   <script>
     // Inicializar iconos de Lucide
     lucide.createIcons();

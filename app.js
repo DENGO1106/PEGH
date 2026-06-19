@@ -2012,7 +2012,39 @@ async function eliminarSnapshotPlan(snapshotId) {
 // LÓGICA DE SNAPSHOTS DEL PLAN
 // ===================================
 
-async function guardarSnapshotPlan() {
+function abrirModalGuardarPlan() {
+    const modal = document.getElementById('plan-save-modal');
+    const contextContainer = document.getElementById('plan-save-context');
+    const actionsContainer = document.getElementById('plan-save-actions');
+    const nameInput = document.getElementById('plan-save-name');
+    
+    // Si hay un plan previamente cargado, mostramos UI de "Actualización"
+    if (window.currentLoadedSnapshotId) {
+        contextContainer.innerHTML = `<p class="text-xs text-yellow-500 font-bold mb-1">¡Estás editando un plan existente!</p><p class="text-xs text-gray-400">Puedes sobreescribir este plan con los nuevos cambios, o guardarlo como una copia nueva.</p>`;
+        
+        actionsContainer.innerHTML = `
+            <button onclick="guardarSnapshotPlan(false)" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Actualizar Plan Actual
+            </button>
+            <button onclick="guardarSnapshotPlan(true)" class="w-full bg-transparent border border-white/20 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                <i data-lucide="copy" class="w-4 h-4"></i> Guardar como Copia Nueva
+            </button>
+        `;
+    } else {
+        contextContainer.innerHTML = `<p class="text-xs text-gray-400">Guardá una versión de tu avance actual en la nube. Útil por si cometés un error luego.</p>`;
+        
+        actionsContainer.innerHTML = `
+            <button onclick="guardarSnapshotPlan(false)" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                <i data-lucide="cloud-upload" class="w-4 h-4"></i> Guardar en Supabase
+            </button>
+        `;
+    }
+    
+    if (window.lucide) lucide.createIcons();
+    modal.classList.remove('hidden');
+}
+
+async function guardarSnapshotPlan(isNuevaCopia = false) {
     const session = window.supaAuth?.getCurrentSession();
     if (!session) {
         alert("Debes iniciar sesión para guardar tu progreso en la nube.");
@@ -2023,14 +2055,7 @@ async function guardarSnapshotPlan() {
     const nombre = nombreInput.value.trim() || 'Mi Respaldo Automático';
     
     // Check if we are updating an existing snapshot
-    const currentSnapshotId = window.currentLoadedSnapshotId || null;
-    
-    if (currentSnapshotId) {
-        const confirmarUpdate = confirm("Estás editando un plan previamente guardado. ¿Deseas sobreescribir ese plan?\n\n[Aceptar] para Sobreescribir\n[Cancelar] para Guardar como un Plan Nuevo");
-        if (!confirmarUpdate) {
-            window.currentLoadedSnapshotId = null; // Guardar como nuevo
-        }
-    }
+    const currentSnapshotId = isNuevaCopia ? null : (window.currentLoadedSnapshotId || null);
     
     // Preparar el estado completo de todas las carreras activas (estado > 0)
     const estado = {};
@@ -2047,7 +2072,7 @@ async function guardarSnapshotPlan() {
     btn.disabled = true;
 
     try {
-        if (window.currentLoadedSnapshotId) {
+        if (currentSnapshotId) {
             // Actualizar existente
             const { error } = await window.supaAuth.supabase
                 .from('user_plan_snapshots')
@@ -2055,8 +2080,9 @@ async function guardarSnapshotPlan() {
                     nombre: nombre,
                     datos_json: estado
                 })
-                .eq('id', window.currentLoadedSnapshotId);
+                .eq('id', currentSnapshotId);
             if (error) throw error;
+            alert("¡Plan actualizado exitosamente!");
         } else {
             // Guardar nuevo
             const { error } = await window.supaAuth.supabase
@@ -2067,11 +2093,8 @@ async function guardarSnapshotPlan() {
                     datos_json: estado
                 }]);
             if (error) throw error;
+            alert("¡Nuevo respaldo guardado exitosamente!");
         }
-
-        if (error) throw error;
-        
-        alert("¡Respaldo guardado exitosamente!");
         document.getElementById('plan-save-modal').classList.add('hidden');
         document.getElementById('plan-save-name').value = '';
     } catch (err) {
