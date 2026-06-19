@@ -20,7 +20,11 @@ const APP_ESTADOS = {
 const UCR_LAST_PAGE_KEY = 'ucr_last_page';
 
 // Función de navegación global simplificada
+// Track current page to avoid unnecessary re-renders when returning
+window._currentPage = document.documentElement.getAttribute('data-initial-page') || 'home';
 window.navigateTo = (target, pushToHistory = true) => {
+    // If navigating to the same page, do nothing to avoid UI blinking
+    if (target === window._currentPage) return;
     // ðŸ”’ Control de Acceso: Redirigir a login si no hay sesión
     const isAuthenticated = window.supaAuth && window.supaAuth.getCurrentSession();
     if (!isAuthenticated && target !== 'login') {
@@ -98,6 +102,9 @@ window.navigateTo = (target, pushToHistory = true) => {
     }
 
     if (window.lucide) lucide.createIcons();
+
+    // update current page
+    window._currentPage = target;
 };
 
 // Delegación global de eventos para navegación
