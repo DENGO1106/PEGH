@@ -1220,18 +1220,14 @@ function switchFeedbackTab(tab) {
     const contentMsgs = document.getElementById('fb-content-messages');
     
     if (tab === 'new') {
-        tabNew.classList.replace('bg-transparent', 'bg-zinc-800');
-        tabNew.classList.replace('text-gray-400', 'text-white');
-        tabMsgs.classList.replace('bg-zinc-800', 'bg-transparent');
-        tabMsgs.classList.replace('text-white', 'text-gray-400');
+        tabNew.className = 'flex-1 py-2 text-sm font-bold bg-zinc-800 text-white rounded-lg transition-all';
+        tabMsgs.className = 'flex-1 py-2 text-sm font-bold bg-transparent text-gray-400 hover:text-white rounded-lg transition-all relative';
         contentNew.classList.remove('hidden');
         contentMsgs.classList.add('hidden');
         contentMsgs.classList.remove('flex');
     } else {
-        tabMsgs.classList.replace('bg-transparent', 'bg-zinc-800');
-        tabMsgs.classList.replace('text-gray-400', 'text-white');
-        tabNew.classList.replace('bg-zinc-800', 'bg-transparent');
-        tabNew.classList.replace('text-white', 'text-gray-400');
+        tabMsgs.className = 'flex-1 py-2 text-sm font-bold bg-zinc-800 text-white rounded-lg transition-all relative';
+        tabNew.className = 'flex-1 py-2 text-sm font-bold bg-transparent text-gray-400 hover:text-white rounded-lg transition-all';
         contentNew.classList.add('hidden');
         contentMsgs.classList.remove('hidden');
         contentMsgs.classList.add('flex');
@@ -2411,6 +2407,7 @@ function iniciarTutorial() {
         }
     }, 1000);
 }
+
 
 
 
