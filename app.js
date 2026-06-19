@@ -1392,7 +1392,8 @@ function initAdminBtn() {
         if (adminBtn) adminBtn.classList.remove('hidden');
     }
 }
-async function loadNoticias() {
+
+async function loadNoticias() {
     if (!window.supaAuth?.supabase) return;
     
     try {
@@ -1545,26 +1546,27 @@ function switchAdminTab(tab) {
 
 function renderAdminFeedback(tab) {
     const listEl = document.getElementById('admin-feedback-list');
+    if (!listEl) return;
 
     const filtered = _adminFeedbackAll.filter(f =>
         tab === 'pending' ? f.status === 'pending' : f.status !== 'pending'
     );
 
     if (filtered.length === 0) {
-        listEl.innerHTML = 
+        listEl.innerHTML = `
             <div class="flex flex-col items-center justify-center py-16 text-center">
-                <div class="text-5xl mb-4">{tab === 'pending' ? '🎉' : '📭'}</div>
-                <p class="text-white font-bold mb-1">{tab === 'pending' ? '¡Sin feedback pendiente!' : 'Sin mensajes revisados'}</p>
-                <p class="text-gray-500 text-sm">{tab === 'pending' ? 'Todo al día, no hay nada nuevo por revisar.' : 'Cuando marques mensajes como vistos aparecerán aquí.'}</p>
+                <div class="text-5xl mb-4">${tab === 'pending' ? '🎉' : '📭'}</div>
+                <p class="text-white font-bold mb-1">${tab === 'pending' ? '¡Sin feedback pendiente!' : 'Sin mensajes revisados'}</p>
+                <p class="text-gray-500 text-sm">${tab === 'pending' ? 'Todo al día, no hay nada nuevo por revisar.' : 'Cuando marques mensajes como vistos aparecerán aquí.'}</p>
             </div>
-        ;
+        `;
         return;
     }
 
     listEl.innerHTML = filtered.map(f => {
         const nombre = f.profile?.full_name || 'Usuario Anónimo';
         const inicial = nombre.charAt(0).toUpperCase();
-        const carnet = f.profile?.student_id ? · Carné: {f.profile.student_id} : '';
+        const carnet = f.profile?.student_id ? ` · Carné: ${f.profile.student_id}` : '';
         const fecha = new Date(f.created_at).toLocaleString('es-CR', {
             day: '2-digit', month: 'short', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
@@ -1573,84 +1575,86 @@ function renderAdminFeedback(tab) {
 
         let statusBadge = '';
         let borderColor = 'white/5';
-        if(f.status === 'pending') { statusBadge = 'bg-yellow-500/15 text-yellow-400 border-yellow-500/25'; borderColor = 'yellow-500/15'; }
-        else if(f.status === 'important') { statusBadge = 'bg-red-500/15 text-red-400 border-red-500/25'; borderColor = 'red-500/15'; }
-        else if(f.status === 'implemented') { statusBadge = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25'; borderColor = 'emerald-500/15'; }
-        else { statusBadge = 'bg-blue-500/15 text-blue-400 border-blue-500/25'; borderColor = 'blue-500/15'; }
+        if (f.status === 'pending') {
+            statusBadge = 'bg-yellow-500/15 text-yellow-400 border-yellow-500/25';
+            borderColor = 'yellow-500/15';
+        } else if (f.status === 'important') {
+            statusBadge = 'bg-red-500/15 text-red-400 border-red-500/25';
+            borderColor = 'red-500/15';
+        } else if (f.status === 'implemented') {
+            statusBadge = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25';
+            borderColor = 'emerald-500/15';
+        } else {
+            statusBadge = 'bg-blue-500/15 text-blue-400 border-blue-500/25';
+            borderColor = 'blue-500/15';
+        }
 
         const statusLabels = { pending: '⏳ Pendiente', important: '⭐ Importante', implemented: '🚀 Resuelto', reviewed: '✅ Visto' };
         const labelStr = statusLabels[f.status] || 'Visto';
 
-        return 
-            <div class="bg-black/40 border border-{borderColor} rounded-2xl p-5 transition-all" id="feedback-card-{f.id}">
-                <!-- Cabecera: avatar + info usuario -->
+        return `
+            <div class="bg-black/40 border border-${borderColor} rounded-2xl p-5 transition-all" id="feedback-card-${f.id}">
                 <div class="flex items-center justify-between gap-3 mb-4">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-zinc-700 rounded-xl flex items-center justify-center font-black text-white text-sm flex-shrink-0 border border-white/10">
-                            {inicial}
+                            ${inicial}
                         </div>
                         <div>
-                            <div class="text-sm font-bold text-white">{nombre}</div>
-                            <div class="text-xs text-gray-500">{fecha} {carnet}</div>
+                            <div class="text-sm font-bold text-white">${nombre}</div>
+                            <div class="text-xs text-gray-500">${fecha}${carnet}</div>
                         </div>
                     </div>
-                    <span class="text-[10px] px-2.5 py-1 rounded-full font-bold flex-shrink-0 border {statusBadge}">
-                        {labelStr}
+                    <span class="text-[10px] px-2.5 py-1 rounded-full font-bold flex-shrink-0 border ${statusBadge}">
+                        ${labelStr}
                     </span>
                 </div>
 
-                <!-- Mensaje -->
                 <div class="bg-black/30 rounded-xl p-4 mb-4 border border-white/5">
-                    <p class="text-sm text-gray-200 leading-relaxed">{f.message}</p>
+                    <p class="text-sm text-gray-200 leading-relaxed">${f.message}</p>
                 </div>
 
-                <!-- Área de Chat Inline (oculta por defecto) -->
-                <div id="admin-chat-area-{f.id}" class="hidden mt-4 pt-4 border-t border-white/5 animate-fade-in">
-                    <div class="space-y-3 mb-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar" id="admin-chat-msgs-{f.id}">
-                        <!-- Se llena dinámicamente al abrir -->
-                    </div>
+                <div id="admin-chat-area-${f.id}" class="hidden mt-4 pt-4 border-t border-white/5 animate-fade-in">
+                    <div class="space-y-3 mb-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar" id="admin-chat-msgs-${f.id}"></div>
                     <div class="flex gap-2">
-                        <input type="text" id="admin-chat-input-{f.id}" 
-                            class="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:border-blue-500/50 outline-none" 
+                        <input type="text" id="admin-chat-input-${f.id}"
+                            class="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:border-blue-500/50 outline-none"
                             placeholder="Escribe tu respuesta..."
-                            onkeydown="if(event.key==='Enter') sendAdminChatReply('{f.id}')">
-                        <button onclick="sendAdminChatReply('{f.id}')" 
+                            onkeydown="if(event.key==='Enter') sendAdminChatReply('${f.id}')">
+                        <button onclick="sendAdminChatReply('${f.id}')"
                             class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl transition-colors">
                             <i data-lucide="send" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Acciones -->
                 <div class="flex gap-2 justify-end flex-wrap mt-4">
-                    <button onclick="openAdminFeedbackChat('{f.id}')" title="Contestar"
+                    <button onclick="openAdminFeedbackChat('${f.id}')" title="Contestar"
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-500/15 hover:bg-blue-500/25 text-blue-400 rounded-lg border border-blue-500/25 transition-all">
                         <i data-lucide="message-square" class="w-3 h-3"></i> Contestar
                     </button>
-                    {f.status !== 'implemented' ? 
-                    <button onclick="markFeedbackStatus('{f.id}', 'implemented')" title="Marcar como Resuelto"
+                    ${f.status !== 'implemented' ? `
+                    <button onclick="markFeedbackStatus('${f.id}', 'implemented')" title="Marcar como Resuelto"
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 rounded-lg border border-emerald-500/25 transition-all">
                         <i data-lucide="check-circle" class="w-3 h-3"></i> Resuelto
-                    </button> : ''}
-                    {f.status !== 'important' ? 
-                    <button onclick="markFeedbackStatus('{f.id}', 'important')" title="Marcar como Importante"
+                    </button>` : ''}
+                    ${f.status !== 'important' ? `
+                    <button onclick="markFeedbackStatus('${f.id}', 'important')" title="Marcar como Importante"
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-red-500/15 hover:bg-red-500/25 text-red-400 rounded-lg border border-red-500/25 transition-all">
                         <i data-lucide="star" class="w-3 h-3"></i> Importante
-                    </button> : ''}
-                    {f.status === 'pending' ? 
-                    <button onclick="markFeedbackStatus('{f.id}', 'reviewed')" title="Marcar como Visto"
+                    </button>` : ''}
+                    ${f.status === 'pending' ? `
+                    <button onclick="markFeedbackStatus('${f.id}', 'reviewed')" title="Marcar como Visto"
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-purple-500/15 hover:bg-purple-500/25 text-purple-400 rounded-lg border border-purple-500/25 transition-all">
                         <i data-lucide="eye" class="w-3 h-3"></i> Visto
-                    </button> : ''}
-                    {!isPending ? 
-                    <button onclick="deleteFeedback('{f.id}')" title="Eliminar"
+                    </button>` : ''}
+                    ${!isPending ? `
+                    <button onclick="deleteFeedback('${f.id}')" title="Eliminar"
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-gray-500/15 hover:bg-gray-500/25 text-gray-400 rounded-lg border border-gray-500/25 transition-all">
                         <i data-lucide="trash-2" class="w-3 h-3"></i> Eliminar
-                    </button>
-                     : ''}
+                    </button>` : ''}
                 </div>
             </div>
-        ;
+        `;
     }).join('');
 
     if (window.lucide) lucide.createIcons();
@@ -1737,7 +1741,7 @@ async function markFeedbackStatus(feedbackId, newStatus) {
     if (!session || !esAdmin() || !window.supaAuth?.supabase) return;
 
     // Feedback visual inmediato
-    const card = document.getElementById(eedback-card-{feedbackId});
+    const card = document.getElementById(eedback-card-);
     if (card) {
         const btns = card.querySelectorAll('button');
         btns.forEach(b => { if(b.title?.startsWith('Marcar')) { b.disabled = true; b.innerHTML = '...'; } });
