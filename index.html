@@ -1088,6 +1088,21 @@
     </div>
   </div>
 
+    <!-- MODAL: CONFIRMACIÓN GLOBAL -->
+    <div id="confirm-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+      <div class="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-md shadow-2xl p-6 relative flex flex-col">
+        <button onclick="document.getElementById('confirm-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <h3 class="text-lg font-bold text-white mb-2">Confirmar acción</h3>
+        <p id="confirm-modal-msg" class="text-sm text-gray-400 mb-6">¿Estás seguro?</p>
+        <div class="flex gap-3 justify-end">
+          <button id="confirm-cancel-btn" onclick="document.getElementById('confirm-modal').classList.add('hidden')" class="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-xl">Cancelar</button>
+          <button id="confirm-confirm-btn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl">Confirmar</button>
+        </div>
+      </div>
+    </div>
+
   <!-- MODAL GUARDAR HORARIO -->
   <div id="sched-save-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
     <div class="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl p-6 relative">

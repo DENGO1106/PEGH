@@ -1679,16 +1679,16 @@ function renderAdminFeedback(tab) {
                         <i data-lucide="eye" class="w-3 h-3"></i> Visto
                     </button>` : ''}
                     ${f.status !== 'archived' ? `
-                    <button onclick="markFeedbackStatus('${f.id}', 'archived')" title="Archivar"
+                    <button onclick="confirmArchive('${f.id}')" title="Archivar"
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-gray-700/15 hover:bg-gray-700/25 text-gray-300 rounded-lg border border-gray-500/25 transition-all">
                         <i data-lucide="archive" class="w-3 h-3"></i> Archivar
                     </button>` : `
-                    <button onclick="markFeedbackStatus('${f.id}', 'reviewed')" title="Restaurar"
+                    <button onclick="confirmRestore('${f.id}')" title="Restaurar"
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-500/15 hover:bg-blue-500/25 text-blue-400 rounded-lg border border-blue-500/25 transition-all">
                         <i data-lucide="refresh-cw" class="w-3 h-3"></i> Restaurar
                     </button>`}
                     ${!isPending ? `
-                    <button onclick="deleteFeedback('${f.id}')" title="Eliminar"
+                    <button onclick="confirmDelete('${f.id}')" title="Eliminar"
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-gray-500/15 hover:bg-gray-500/25 text-gray-400 rounded-lg border border-gray-500/25 transition-all">
                         <i data-lucide="trash-2" class="w-3 h-3"></i> Eliminar
                     </button>` : ''}
@@ -1815,7 +1815,7 @@ async function deleteFeedback(feedbackId) {
     const session = window.supaAuth?.getCurrentSession();
     if (!session || !esAdmin() || !window.supaAuth?.supabase) return;
 
-    if (!confirm('Â¿EstÃ¡s seguro de que querÃ©s eliminar este feedback permanentemente?')) return;
+    // Deletion is confirmed via confirm modal wrapper
 
     // Feedback visual inmediato
     const card = document.getElementById(`feedback-card-${feedbackId}`);
@@ -1843,6 +1843,43 @@ async function deleteFeedback(feedbackId) {
         // Restaurar si fallÃ³
         renderAdminFeedback(_adminCurrentTab);
     }
+}
+
+// -------------------------
+// Confirm modal helper
+// -------------------------
+let __confirmCallback = null;
+function showConfirm(message, callback) {
+    const modal = document.getElementById('confirm-modal');
+    const msgEl = document.getElementById('confirm-modal-msg');
+    const confirmBtn = document.getElementById('confirm-confirm-btn');
+    if (!modal || !msgEl || !confirmBtn) {
+        if (callback) callback(true);
+        return;
+    }
+    msgEl.textContent = message;
+    __confirmCallback = callback;
+    modal.classList.remove('hidden');
+    // remove previous listeners
+    const newConfirm = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirm, confirmBtn);
+    newConfirm.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        if (typeof __confirmCallback === 'function') __confirmCallback(true);
+        __confirmCallback = null;
+    });
+}
+
+function confirmArchive(feedbackId) {
+    showConfirm('¿Archivar este mensaje? Podrás restaurarlo luego.', () => markFeedbackStatus(feedbackId, 'archived'));
+}
+
+function confirmRestore(feedbackId) {
+    showConfirm('¿Restaurar este mensaje de archivados?', () => markFeedbackStatus(feedbackId, 'reviewed'));
+}
+
+function confirmDelete(feedbackId) {
+    showConfirm('¿Eliminar permanentemente este feedback? Esta acción no se puede deshacer.', () => deleteFeedback(feedbackId));
 }
 
 // ===================================
