@@ -44,6 +44,7 @@ function adminSwitchTab(tab) {
     else if (tab === 'convalidaciones') adminLoadConvalidaciones();
     else if (tab === 'usuarios') adminLoadUsuarios();
     else if (tab === 'feedback') { if(typeof loadAdminFeedbackData === 'function') loadAdminFeedbackData(); }
+    else if (tab === 'noticias') adminLoadNoticias();
 }
 
 // ===================================================
@@ -487,50 +488,6 @@ async function adminLoadUsuarios(searchTerm) {
     }
 }
 
-async function adminToggleAdmin(userId, makeAdmin, username) {
-    const action = makeAdmin ? 'promover a administrador' : 'revocar el rol de administrador de';
-    if (!confirm('¿Estás seguro de ' + action + ' "' + username + '"?')) return;
-    try {
-        const { error } = await window.supaAuth.supabase.from('profiles').update({ is_admin: makeAdmin }).eq('id', userId);
-        if (error) throw error;
-        adminLoadUsuarios();
-        showAdminToast('✅ Permisos de "' + username + '" actualizados.');
-    } catch (e) {
-        alert('Error: ' + e.message);
-    }
-}
-
-async function adminDeleteUser(userId, username) {
-    const myId = window.supaAuth?.getCurrentSession()?.user?.id;
-    if (userId === myId) { alert('No podés eliminar tu propia cuenta desde aquí.'); return; }
-    if (!confirm('🛑 ¿Eliminar permanentemente al usuario "' + username + '"?\n\nEsta acción NO se puede deshacer.')) return;
-    try {
-        const { error } = await window.supaAuth.supabase.from('profiles').delete().eq('id', userId);
-        if (error) throw error;
-        adminLoadUsuarios();
-        showAdminToast('🗑️ Usuario "' + username + '" eliminado.');
-    } catch (e) {
-        alert('Error: ' + e.message);
-    }
-}
-
-// ===================================================
-// UTILIDADES
-// ===================================================
-
-function showAdminToast(msg) {
-    const toast = document.createElement('div');
-    toast.className = 'fixed bottom-6 right-6 z-[9999] bg-zinc-800 border border-white/10 text-white text-sm px-5 py-3 rounded-xl shadow-2xl';
-    toast.style.animation = 'fadeIn 0.3s ease';
-    toast.textContent = msg;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3500);
-}
-
-// Exponer globalmente
-window.openAdminPanel = openAdminPanel;
-window.closeAdminPanel = closeAdminPanel;
-window.adminSwitchTab = adminSwitchTab;
 window.adminNewCarrera = adminNewCarrera;
 window.adminEditCarrera = adminEditCarrera;
 window.adminSaveCarrera = adminSaveCarrera;
@@ -550,6 +507,140 @@ window.adminDeleteConvalidacion = adminDeleteConvalidacion;
 window.adminLoadUsuarios = adminLoadUsuarios;
 window.adminToggleAdmin = adminToggleAdmin;
 window.adminDeleteUser = adminDeleteUser;
+
+// ===================================================
+// TAB 5: NOTICIAS
+// ===================================================
+
+async function adminLoadNoticias() {
+    const container = document.getElementById('admin-noticias-list');
+    if (!container) return;
+    container.innerHTML = '<div class="text-center text-gray-500 py-8">Cargando noticias...</div>';
+
+    try {
+        const { data, error } = await window.supaAuth.supabase
+            .from('noticias')
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="text-center text-gray-500 py-8">No hay noticias publicadas.</div>';
+            return;
+        }
+
+        container.innerHTML = data.map(n => `
+            <div class="p-4 bg-zinc-800/50 border border-white/5 rounded-xl hover:border-purple-500/30 transition-colors flex justify-between items-start group">
+                <div>
+                    <h4 class="text-white font-bold">${n.titulo}</h4>
+                    <p class="text-xs text-gray-400 mt-1 line-clamp-2">${n.contenido}</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="text-[10px] uppercase font-black tracking-wider text-purple-400 bg-purple-500/10 px-2 py-1 rounded-md">${n.categoria || 'general'}</span>
+                        <span class="text-xs text-gray-500">${new Date(n.created_at).toLocaleDateString()}</span>
+                    </div>
+                </div>
+                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="adminEditNoticia('${n.id}')" class="p-2 bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 rounded-lg transition-colors"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                    <button onclick="adminDeleteNoticia('${n.id}')" class="p-2 bg-red-500/20 text-red-400 hover:bg-red-500/40 rounded-lg transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    } catch (e) {
+        if (e.message && e.message.includes('relation "public.noticias" does not exist')) {
+            container.innerHTML = '<div class="text-yellow-400 p-4 bg-yellow-500/10 rounded-xl text-sm border border-yellow-500/20">La tabla "noticias" no existe en Supabase. Ejecutá el SQL de creación de noticias.</div>';
+        } else {
+            container.innerHTML = '<div class="text-red-400 p-4">Error: ' + e.message + '</div>';
+        }
+    }
+}
+
+function adminNewNoticia() {
+    document.getElementById('admin-noticias-list').classList.add('hidden');
+    document.getElementById('admin-noticia-form').classList.remove('hidden');
+    document.getElementById('admin-noticia-form-title').innerText = 'Nueva Noticia';
+    document.getElementById('admin-noticia-id').value = '';
+    document.getElementById('admin-noticia-titulo').value = '';
+    document.getElementById('admin-noticia-contenido').value = '';
+    document.getElementById('admin-noticia-categoria').value = 'general';
+    document.getElementById('admin-noticia-imagen').value = '';
+    document.getElementById('admin-noticia-enlace').value = '';
+}
+
+function adminCancelNoticiaForm() {
+    document.getElementById('admin-noticias-list').classList.remove('hidden');
+    document.getElementById('admin-noticia-form').classList.add('hidden');
+}
+
+async function adminSaveNoticia() {
+    const id = document.getElementById('admin-noticia-id').value;
+    const titulo = document.getElementById('admin-noticia-titulo').value.trim();
+    const contenido = document.getElementById('admin-noticia-contenido').value.trim();
+    const categoria = document.getElementById('admin-noticia-categoria').value;
+    const imagen_url = document.getElementById('admin-noticia-imagen').value.trim() || null;
+    const enlace_url = document.getElementById('admin-noticia-enlace').value.trim() || null;
+
+    if (!titulo || !contenido) {
+        alert('Título y contenido son obligatorios.');
+        return;
+    }
+
+    try {
+        const payload = { titulo, contenido, categoria, imagen_url, enlace_url };
+        let result;
+        if (id) {
+            result = await window.supaAuth.supabase.from('noticias').update(payload).eq('id', id);
+        } else {
+            result = await window.supaAuth.supabase.from('noticias').insert([payload]);
+        }
+        
+        if (result.error) throw result.error;
+        showAdminToast(id ? 'Noticia actualizada' : 'Noticia publicada');
+        adminCancelNoticiaForm();
+        adminLoadNoticias();
+        if(typeof loadNoticias === 'function') loadNoticias(); // Refrescar en el cliente
+    } catch (e) {
+        alert('Error guardando noticia: ' + e.message);
+    }
+}
+
+async function adminEditNoticia(id) {
+    try {
+        const { data, error } = await window.supaAuth.supabase.from('noticias').select('*').eq('id', id).single();
+        if (error) throw error;
+        
+        adminNewNoticia();
+        document.getElementById('admin-noticia-form-title').innerText = 'Editar Noticia';
+        document.getElementById('admin-noticia-id').value = data.id;
+        document.getElementById('admin-noticia-titulo').value = data.titulo;
+        document.getElementById('admin-noticia-contenido').value = data.contenido;
+        document.getElementById('admin-noticia-categoria').value = data.categoria || 'general';
+        document.getElementById('admin-noticia-imagen').value = data.imagen_url || '';
+        document.getElementById('admin-noticia-enlace').value = data.enlace_url || '';
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+}
+
+async function adminDeleteNoticia(id) {
+    if (!confirm('¿Eliminar esta noticia?')) return;
+    try {
+        const { error } = await window.supaAuth.supabase.from('noticias').delete().eq('id', id);
+        if (error) throw error;
+        showAdminToast('Noticia eliminada');
+        adminLoadNoticias();
+        if(typeof loadNoticias === 'function') loadNoticias(); // Refrescar en el cliente
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+}
+
+window.adminLoadNoticias = adminLoadNoticias;
+window.adminNewNoticia = adminNewNoticia;
+window.adminCancelNoticiaForm = adminCancelNoticiaForm;
+window.adminSaveNoticia = adminSaveNoticia;
+window.adminEditNoticia = adminEditNoticia;
+window.adminDeleteNoticia = adminDeleteNoticia;
 
 console.log('[Admin] Módulo de administración cargado.');
 

@@ -1,4 +1,4 @@
-﻿// ===================================
+// ===================================
 // GESTIÓN DE ESTADO Y PERSISTENCIA
 // ===================================
 
@@ -867,6 +867,7 @@ function inicializar() {
     console.log('Inicializando aplicación v2 (7 estados)...');
 
     cargarEstado();
+    if (typeof loadNoticias === 'function') loadNoticias();
 
     // Generar UI dinámicamente desde CARRERAS
     const selectionList = document.getElementById('career-selection-list');
@@ -1393,6 +1394,76 @@ function initAdminBtn() {
     if (esAdmin()) {
         const adminBtn = document.getElementById('btn-admin-panel');
         if (adminBtn) adminBtn.classList.remove('hidden');
+    }
+}
+async function loadNoticias() {
+    if (!window.supaAuth?.supabase) return;
+    
+    try {
+        const { data, error } = await window.supaAuth.supabase
+            .from('noticias')
+            .select('*')
+            .order('created_at', { ascending: false });
+            
+        if (error) {
+            // Ignorar el error si la tabla aún no existe (42P01)
+            if(error.code !== '42P01') console.error('Error cargando noticias:', error);
+            return;
+        }
+
+        const homeList = document.getElementById('home-noticias-list');
+        const fullList = document.getElementById('noticias-full-list');
+
+        if (!data || data.length === 0) {
+            if (homeList) homeList.innerHTML = '<div class="text-center text-gray-600 text-sm py-4 col-span-2">No hay noticias recientes.</div>';
+            if (fullList) fullList.innerHTML = '<div class="text-center text-gray-500 py-16">No hay noticias publicadas.</div>';
+            return;
+        }
+
+        const getCatBadge = (cat) => {
+            const map = {
+                general: { icon: '📢', color: 'purple' },
+                matricula: { icon: '📅', color: 'blue' },
+                actualizacion: { icon: '🔄', color: 'emerald' },
+                aviso: { icon: '⚠️', color: 'red' },
+                nuevo: { icon: '🆕', color: 'yellow' }
+            };
+            const m = map[cat || 'general'];
+            return `<span class="text-[10px] uppercase font-black tracking-wider text-${m.color}-400 bg-${m.color}-500/10 px-2 py-1 rounded-md border border-${m.color}-500/20">${m.icon} ${cat || 'general'}</span>`;
+        };
+
+        // Render Home (max 2)
+        if (homeList) {
+            homeList.innerHTML = data.slice(0, 2).map(n => `
+                <div class="bg-zinc-900 border border-white/5 p-4 rounded-2xl hover:border-purple-500/30 transition-colors cursor-pointer" onclick="navigateTo('noticias')">
+                    <div class="flex items-center gap-2 mb-2">
+                        ${getCatBadge(n.categoria)}
+                        <span class="text-xs text-gray-500">${new Date(n.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <h4 class="text-white font-bold text-sm mb-1 line-clamp-1">${n.titulo}</h4>
+                    <p class="text-gray-400 text-xs line-clamp-2">${n.contenido}</p>
+                </div>
+            `).join('');
+        }
+
+        // Render Full List
+        if (fullList) {
+            fullList.innerHTML = data.map(n => `
+                <div class="bg-zinc-900 border border-white/10 p-6 rounded-3xl">
+                    <div class="flex items-center gap-3 mb-4">
+                        ${getCatBadge(n.categoria)}
+                        <span class="text-sm text-gray-500">${new Date(n.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">${n.titulo}</h3>
+                    <p class="text-gray-400 text-sm whitespace-pre-wrap leading-relaxed">${n.contenido}</p>
+                    ${n.imagen_url ? `<img src="${n.imagen_url}" alt="${n.titulo}" class="mt-4 rounded-xl border border-white/10 max-h-64 object-cover w-full">` : ''}
+                    ${n.enlace_url ? `<a href="${n.enlace_url}" target="_blank" class="inline-flex items-center gap-2 mt-4 text-purple-400 hover:text-purple-300 text-sm font-bold transition-colors">Leer más <i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+    } catch (e) {
+        console.error('Excepción al cargar noticias:', e);
     }
 }
 

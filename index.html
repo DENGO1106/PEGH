@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=5.0, user-scalable=yes">
-  <meta name="description" content="Sistema de Gestión de Planes de Estudio - UCR">
-  <meta name="author" content="App Universitaria">
-  <title>Mis Planes de Estudio - UCR</title>
+  <meta name="description" content="UPlan - Gestión de Planes de Estudio Universitario, desarrollado por estudiantes">
+  <meta name="author" content="UPlan App">
+  <title>UPlan – Tu Plan de Estudios</title>
 
   <!-- PREVENIR LAGASO / FLICKER -->
   <script>
@@ -90,7 +90,7 @@
           
           <div class="relative z-10 text-center flex flex-col items-center">
               <div class="w-20 h-20 bg-zinc-800 rounded-3xl flex items-center justify-center font-black text-white text-3xl mb-8 shadow-2xl shadow-zinc-600/30">UP</div>
-              <h1 class="text-4xl lg:text-5xl font-black text-white mb-4 tracking-tighter">Campus Virtual</h1>
+              <h1 class="text-4xl lg:text-5xl font-black text-white mb-4 tracking-tighter">UPlan</h1>
               <p class="text-gray-400 text-lg max-w-md font-light leading-relaxed">Accede a la planificación integral de tus cursos administrativos e ingeniería en un solo ecosistema optimizado.</p>
           </div>
       </div>
@@ -232,12 +232,61 @@
             </div>
           </div>
         </button>
+        <!-- Tarjeta: Noticias -->
+        <button data-navigate="noticias"
+          class="group relative overflow-hidden rounded-3xl bg-zinc-900 border border-white/10 p-1 transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(168,85,247,0.15)]">
+          <div class="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div class="relative bg-zinc-950 rounded-[22px] p-8 h-full flex flex-col items-center gap-6">
+            <div class="p-5 bg-purple-600/10 rounded-2xl group-hover:bg-purple-600/20 transition-colors">
+              <i data-lucide="newspaper" class="text-purple-500 w-10 h-10"></i>
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold text-white mb-2">Noticias</h3>
+              <p class="text-gray-500 text-sm">Actualizaciones, avisos semestral es e información relevante publicada por el equipo.</p>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      <!-- Feed de Noticias recientes (preview en home) -->
+      <div id="home-noticias-preview" class="mt-12 w-full max-w-5xl">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-white font-bold text-lg flex items-center gap-2">
+            <i data-lucide="newspaper" class="w-5 h-5 text-purple-400"></i> Últimas Noticias
+          </h2>
+          <button data-navigate="noticias" class="text-xs text-purple-400 hover:text-purple-300 transition-colors">Ver todas →</button>
+        </div>
+        <div id="home-noticias-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="text-center text-gray-600 text-sm py-4 col-span-2">Cargando noticias...</div>
+        </div>
       </div>
 
       <!-- Adsterra Native Banner (Home) -->
       <div class="mt-16 w-full max-w-5xl flex justify-center bg-black/20 rounded-xl overflow-hidden p-4">
         <script async="async" data-cfasync="false" src="https://pl29323230.profitablecpmratenetwork.com/171a961d65ffe44760617c323b2d258c/invoke.js"></script>
         <div id="container-171a961d65ffe44760617c323b2d258c"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN: NOTICIAS (vista completa) -->
+  <section id="noticias-section" class="tab-content hidden flex flex-col min-h-[100dvh] px-4 animate-fade-in">
+    <div class="max-w-4xl w-full mx-auto py-8">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-3">
+          <button onclick="window.navigateTo && window.navigateTo('home')" class="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl transition-colors">
+            <i data-lucide="arrow-left" class="w-5 h-5 text-white"></i>
+          </button>
+          <div>
+            <h1 class="text-2xl font-black text-white">Noticias</h1>
+            <p class="text-xs text-gray-500">Avisos y actualizaciones del equipo UPlan</p>
+          </div>
+        </div>
+      </div>
+      <!-- Lista de noticias completa -->
+      <div id="noticias-full-list" class="space-y-5">
+        <div class="text-center text-gray-500 py-16 animate-pulse">Cargando noticias...</div>
       </div>
     </div>
   </section>
@@ -293,7 +342,7 @@
     <!-- Panel de Convalidaciones (Se muestra dinámicamente) -->
     <div id="panel-convalidaciones" class="panel-convalidaciones">
       <div class="conv-header">
-        <span class="conv-title">↔ Equivalencias y Convalidaciones Oficiales</span>
+        <span class="conv-title">  Equivalencias y Convalidaciones (Referencial)</span>
       </div>
       <div id="conv-content" class="tabla-conv-container">
         <!-- Inyectado por JS -->
@@ -661,7 +710,7 @@
             // Hack para CSS transition
             setTimeout(() => signupFields.style.opacity = '1', 50);
 
-            title.innerText = "Crear Cuenta UCR";
+            title.innerText = "Crear tu cuenta en UPlan";
             subtitle.innerText = "Registra tus datos para construir tu plan estratégico.";
             submitText.innerText = "Registrarse y Entrar";
         }
@@ -1184,7 +1233,7 @@
           <h3 class="text-xl font-black text-white flex items-center gap-2">
             <i data-lucide="scale" class="w-5 h-5 text-red-500"></i> Términos y Condiciones
           </h3>
-          <p class="text-xs text-gray-500 mt-1">Campus Virtual UCR — Última actualización: Mayo 2026</p>
+          <p class="text-xs text-gray-500 mt-1">UPlan – Herramienta independiente de gestión académica</p>
         </div>
         <button onclick="document.getElementById('terms-modal').classList.add('hidden')" class="text-gray-400 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-xl">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -1194,11 +1243,11 @@
       <!-- Body (Scrollable) -->
       <div class="p-6 overflow-y-auto flex-1 text-sm text-gray-300 space-y-6 custom-scrollbar">
         
-        <p>Al crear una cuenta o utilizar la plataforma <strong>Campus Virtual UCR</strong>, aceptás expresamente los presentes Términos y Condiciones, así como nuestra Política de Privacidad, de conformidad con la legislación vigente en Costa Rica.</p>
+        <p>Al crear una cuenta o utilizar la plataforma <strong>UPlan</strong>, aceptás expresamente los presentes Términos y Condiciones, así como nuestra Política de Privacidad, de conformidad con la legislación vigente en Costa Rica.</p>
         
         <div>
             <h4 class="text-white font-bold mb-2">1. Descripción del Servicio</h4>
-            <p>Campus Virtual UCR es una herramienta de gestión académica personal diseñada para estudiantes universitarios. La plataforma permite visualizar planes de estudio, generar horarios y calcular promedios ponderados.</p>
+            <p>UPlan es una herramienta de gestión académica personal diseñada para estudiantes universitarios. La plataforma permite visualizar planes de estudio, generar horarios y calcular promedios ponderados.</p>
             <div class="mt-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
                 <p class="text-red-400 text-xs font-bold flex gap-2">
                     <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i> 
@@ -1470,6 +1519,56 @@ UPDATE public.profiles SET is_admin = true WHERE username = 'DENGO1106';</pre>
         </div>
       </div>
 
+      <!-- TAB: NOTICIAS (Admin) -->
+      <div id="admin-content-noticias" class="admin-tab-content hidden space-y-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="text-white font-bold">Noticias Publicadas</h3>
+            <p class="text-xs text-gray-500 mt-0.5">Visibles para todos los usuarios</p>
+          </div>
+          <button onclick="adminNewNoticia()" class="flex items-center gap-2 bg-purple-500 hover:bg-purple-400 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all">
+            <i data-lucide="plus" class="w-4 h-4"></i> Nueva Noticia
+          </button>
+        </div>
+        <div id="admin-noticias-list" class="space-y-3"></div>
+        <div id="admin-noticia-form" class="hidden mt-4 p-5 bg-zinc-900 border border-purple-500/20 rounded-2xl space-y-4">
+          <h4 id="admin-noticia-form-title" class="text-white font-bold text-lg">Nueva Noticia</h4>
+          <input type="hidden" id="admin-noticia-id">
+          <div>
+            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Título *</label>
+            <input type="text" id="admin-noticia-titulo" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50" placeholder="Ej: Matrícula Ciclo II">
+          </div>
+          <div>
+            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Contenido *</label>
+            <textarea id="admin-noticia-contenido" rows="5" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50 resize-none" placeholder="Escribí el cuerpo de la noticia..."></textarea>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Categoría</label>
+              <select id="admin-noticia-categoria" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50">
+                <option value="general">📢 General</option>
+                <option value="matricula">📅 Matrícula</option>
+                <option value="actualizacion">🔄 Actualización</option>
+                <option value="aviso">⚠️ Aviso Importante</option>
+                <option value="nuevo">🆕 Novedad</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">URL Imagen (Opcional)</label>
+              <input type="url" id="admin-noticia-imagen" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50" placeholder="https://...">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">URL Enlace (Opcional)</label>
+            <input type="url" id="admin-noticia-enlace" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500/50" placeholder="https://...">
+          </div>
+          <div class="flex gap-3 pt-2">
+            <button onclick="adminSaveNoticia()" class="bg-purple-500 hover:bg-purple-400 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all">Publicar</button>
+            <button onclick="adminCancelNoticiaForm()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-2.5 rounded-xl text-sm transition-all">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1534,6 +1633,7 @@ UPDATE public.profiles SET is_admin = true WHERE username = 'DENGO1106';</pre>
 </body>
 
 </html>
+
 
 
 
