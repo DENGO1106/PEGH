@@ -1053,6 +1053,11 @@ async function adminDeleteUser(userId, username) {
     }
 }
 
+function adminRellenarCursoPreexistente(cursoId) {
+    console.warn('adminRellenarCursoPreexistente called but not implemented. cursoId:', cursoId);
+    // Placeholder for legacy admin course prefill behavior.
+}
+
 window.adminNewCarrera = adminNewCarrera;
 
 window.adminEditCarrera = adminEditCarrera;

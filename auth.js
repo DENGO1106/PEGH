@@ -16,7 +16,7 @@ let currentProfile = null;
 
 // Cache local del username para mostrar siempre el nombre correcto
 const UCR_USERNAME_KEY = 'ucr_last_username';
-const UCR_LAST_PAGE_KEY = 'ucr_last_page';
+const AUTH_UCR_LAST_PAGE_KEY = 'ucr_last_page';
 function _getStoredUsername() { 
     let u = localStorage.getItem(UCR_USERNAME_KEY);
     if (u) return u;
@@ -31,7 +31,7 @@ function _getStoredUsername() {
 function _setStoredUsername(u) { if (u) localStorage.setItem(UCR_USERNAME_KEY, u); }
 function _clearStoredUsername() { localStorage.removeItem(UCR_USERNAME_KEY); }
 function _getSavedLastPage() {
-    const page = localStorage.getItem(UCR_LAST_PAGE_KEY);
+    const page = localStorage.getItem(AUTH_UCR_LAST_PAGE_KEY);
     return page && page !== 'login' ? page : null;
 }
 

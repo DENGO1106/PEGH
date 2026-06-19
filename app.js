@@ -5274,6 +5274,13 @@ function iniciarTutorial() {
 
 
 
+window.openNoticiasModal = openNoticiasModal;
+window.loadNoticias = loadNoticias;
+window.submitFeedback = submitFeedback;
+window.switchFeedbackTab = switchFeedbackTab;
+window.loadUserMessages = loadUserMessages;
+window.navigateTo = navigateTo;
+
 
 
 
