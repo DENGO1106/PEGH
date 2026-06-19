@@ -1512,6 +1512,10 @@ CREATE POLICY "public_read_conv" ON public.convalidaciones FOR SELECT USING (tru
             <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Revisados
             <span id="admin-reviewed-count" class="bg-white/10 text-gray-400 text-xs font-black px-2 py-0.5 rounded-full">0</span>
           </button>
+          <button id="admin-tab-archived" onclick="switchAdminTab('archived')" class="flex-1 py-2 text-sm font-bold text-gray-400 hover:text-white rounded-lg transition-all flex items-center justify-center gap-2">
+            <i data-lucide="archive" class="w-3.5 h-3.5"></i> Archivados
+            <span id="admin-archived-count" class="bg-white/10 text-gray-400 text-xs font-black px-2 py-0.5 rounded-full">0</span>
+          </button>
         </div>
         <div id="admin-feedback-list" class="overflow-y-auto space-y-3 max-h-[60vh] custom-scrollbar"></div>
       </div>

@@ -1537,12 +1537,15 @@ async function loadAdminFeedbackData() {
 
 function _actualizarContadoresAdmin() {
     const pendingCount = _adminFeedbackAll.filter(f => f.status === 'pending').length;
-    const reviewedCount = _adminFeedbackAll.filter(f => f.status !== 'pending').length;
+    const archivedCount = _adminFeedbackAll.filter(f => f.status === 'archived').length;
+    const reviewedCount = _adminFeedbackAll.filter(f => f.status !== 'pending' && f.status !== 'archived').length;
 
     document.getElementById('admin-pending-count').textContent = pendingCount;
     document.getElementById('admin-reviewed-count').textContent = reviewedCount;
+    const archivedEl = document.getElementById('admin-archived-count');
+    if (archivedEl) archivedEl.textContent = archivedCount;
     document.getElementById('admin-feedback-count').textContent =
-        `${_adminFeedbackAll.length} mensajes en total Â· ${pendingCount} sin revisar`;
+        `${_adminFeedbackAll.length} mensajes en total · ${pendingCount} sin revisar`;
 }
 
 function switchAdminTab(tab) {
@@ -1550,13 +1553,17 @@ function switchAdminTab(tab) {
 
     const pendingBtn = document.getElementById('admin-tab-pending');
     const reviewedBtn = document.getElementById('admin-tab-reviewed');
+    const archivedBtn = document.getElementById('admin-tab-archived');
+
+    // Reset classes
+    [pendingBtn, reviewedBtn, archivedBtn].forEach(b => { if(b) b.className = 'flex-1 py-2.5 text-sm font-bold text-gray-500 hover:text-white rounded-xl transition-all flex items-center justify-center gap-2'; });
 
     if (tab === 'pending') {
-        pendingBtn.className = 'flex-1 py-2.5 text-sm font-bold text-white bg-yellow-500/20 rounded-xl border border-yellow-500/30 transition-all flex items-center justify-center gap-2';
-        reviewedBtn.className = 'flex-1 py-2.5 text-sm font-bold text-gray-500 hover:text-white rounded-xl transition-all flex items-center justify-center gap-2';
-    } else {
-        reviewedBtn.className = 'flex-1 py-2.5 text-sm font-bold text-white bg-green-500/20 rounded-xl border border-green-500/30 transition-all flex items-center justify-center gap-2';
-        pendingBtn.className = 'flex-1 py-2.5 text-sm font-bold text-gray-500 hover:text-white rounded-xl transition-all flex items-center justify-center gap-2';
+        if(pendingBtn) pendingBtn.className = 'flex-1 py-2.5 text-sm font-bold text-white bg-yellow-500/20 rounded-xl border border-yellow-500/30 transition-all flex items-center justify-center gap-2';
+    } else if (tab === 'reviewed') {
+        if(reviewedBtn) reviewedBtn.className = 'flex-1 py-2.5 text-sm font-bold text-white bg-green-500/20 rounded-xl border border-green-500/30 transition-all flex items-center justify-center gap-2';
+    } else if (tab === 'archived') {
+        if(archivedBtn) archivedBtn.className = 'flex-1 py-2.5 text-sm font-bold text-white bg-gray-700/20 rounded-xl border border-gray-500/20 transition-all flex items-center justify-center gap-2';
     }
 
     renderAdminFeedback(tab);
@@ -1566,9 +1573,12 @@ function renderAdminFeedback(tab) {
     const listEl = document.getElementById('admin-feedback-list');
     if (!listEl) return;
 
-    const filtered = _adminFeedbackAll.filter(f =>
-        tab === 'pending' ? f.status === 'pending' : f.status !== 'pending'
-    );
+    const filtered = _adminFeedbackAll.filter(f => {
+        if (tab === 'pending') return f.status === 'pending';
+        if (tab === 'reviewed') return f.status !== 'pending' && f.status !== 'archived';
+        if (tab === 'archived') return f.status === 'archived';
+        return true;
+    });
 
     if (filtered.length === 0) {
         listEl.innerHTML = `
@@ -1602,6 +1612,9 @@ function renderAdminFeedback(tab) {
         } else if (f.status === 'implemented') {
             statusBadge = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25';
             borderColor = 'emerald-500/15';
+        } else if (f.status === 'archived') {
+            statusBadge = 'bg-black/15 text-gray-400 border-gray-500/20';
+            borderColor = 'gray-500/20';
         } else {
             statusBadge = 'bg-blue-500/15 text-blue-400 border-blue-500/25';
             borderColor = 'blue-500/15';
@@ -1665,6 +1678,15 @@ function renderAdminFeedback(tab) {
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-purple-500/15 hover:bg-purple-500/25 text-purple-400 rounded-lg border border-purple-500/25 transition-all">
                         <i data-lucide="eye" class="w-3 h-3"></i> Visto
                     </button>` : ''}
+                    ${f.status !== 'archived' ? `
+                    <button onclick="markFeedbackStatus('${f.id}', 'archived')" title="Archivar"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-gray-700/15 hover:bg-gray-700/25 text-gray-300 rounded-lg border border-gray-500/25 transition-all">
+                        <i data-lucide="archive" class="w-3 h-3"></i> Archivar
+                    </button>` : `
+                    <button onclick="markFeedbackStatus('${f.id}', 'reviewed')" title="Restaurar"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-500/15 hover:bg-blue-500/25 text-blue-400 rounded-lg border border-blue-500/25 transition-all">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> Restaurar
+                    </button>`}
                     ${!isPending ? `
                     <button onclick="deleteFeedback('${f.id}')" title="Eliminar"
                         class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-gray-500/15 hover:bg-gray-500/25 text-gray-400 rounded-lg border border-gray-500/25 transition-all">
