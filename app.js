@@ -9,31 +9,31 @@ const APP_ESTADOS = {
     0: { etiqueta: 'Pendiente', clase: 'estado-0' },
     1: { etiqueta: 'Aprobado', clase: 'estado-1' },
     2: { etiqueta: 'Cursando', clase: 'estado-2' },
-    3: { etiqueta: 'PrÃ³ximo Semestre', clase: 'estado-3' },
-    4: { etiqueta: 'AÃ±o +1', clase: 'estado-4' },
-    5: { etiqueta: 'AÃ±o +2', clase: 'estado-5' },
-    6: { etiqueta: 'AÃ±o +3', clase: 'estado-6' },
+    3: { etiqueta: 'Próximo Semestre', clase: 'estado-3' },
+    4: { etiqueta: 'Año +1', clase: 'estado-4' },
+    5: { etiqueta: 'Año +2', clase: 'estado-5' },
+    6: { etiqueta: 'Año +3', clase: 'estado-6' },
     7: { etiqueta: 'Meta Largo Plazo', clase: 'estado-7' }
 };
 
-// Clave de localStorage para recordar la Ãºltima pÃ¡gina visitada
+// Clave de localStorage para recordar la última página visitada
 const UCR_LAST_PAGE_KEY = 'ucr_last_page';
 
-// FunciÃ³n de navegaciÃ³n global simplificada
+// Función de navegación global simplificada
 window.navigateTo = (target, pushToHistory = true) => {
-    // ðŸ”’ Control de Acceso: Redirigir a login si no hay sesiÃ³n
+    // ðŸ”’ Control de Acceso: Redirigir a login si no hay sesión
     const isAuthenticated = window.supaAuth && window.supaAuth.getCurrentSession();
     if (!isAuthenticated && target !== 'login') {
         console.warn("Acceso denegado: redirigiendo a login.");
         target = 'login';
     }
 
-    // Guardar la pÃ¡gina actual en localStorage (excepto login)
+    // Guardar la página actual en localStorage (excepto login)
     if (target !== 'login') {
         localStorage.setItem(UCR_LAST_PAGE_KEY, target);
     }
 
-    // Historial de navegaciÃ³n para botÃ³n "AtrÃ¡s" en mÃ³viles
+    // Historial de navegación para botón "Atrás" en móviles
     if (pushToHistory && target !== 'login') {
         try {
             history.pushState({ page: target }, '', '#' + target);
@@ -42,12 +42,8 @@ window.navigateTo = (target, pushToHistory = true) => {
         }
     }
 
-    // Asegurar que al cambiar de secciÃ³n, volvemos arriba (Ãºtil en mÃ³viles)
-    // Sólo hacer scroll-to-top cuando realmente vamos a una página diferente.
-    const _currentPage = localStorage.getItem(UCR_LAST_PAGE_KEY) || document.documentElement.getAttribute('data-initial-page');
-    if (_currentPage !== target) {
-        try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch(e) { /* noop */ }
-    }
+    // Asegurar que al cambiar de sección, volvemos arriba (útil en móviles)
+    window.scrollTo({ top: 0, behavior: 'instant' });
 
     document.documentElement.removeAttribute('data-initial-page');
     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
@@ -82,15 +78,15 @@ window.navigateTo = (target, pushToHistory = true) => {
         document.querySelector('.controls-container').classList.add('hidden');
         if (appNav) appNav.classList.remove('hidden');
         if (typeof initScheduler === 'function') initScheduler();
-        // Generar horario automÃ¡ticamente al entrar a la secciÃ³n
+        // Generar horario automáticamente al entrar a la sección
         if (typeof generateSchedule === 'function') setTimeout(generateSchedule, 50);
     } else if (target === 'calculator') {
         const calcSection = document.getElementById('calculator-section');
         if (calcSection) calcSection.classList.remove('hidden');
         document.querySelector('.controls-container')?.classList.add('hidden');
-        if (appNav) appNav.classList.add('hidden'); // Calculadora tiene su propia navegaciÃ³n
+        if (appNav) appNav.classList.add('hidden'); // Calculadora tiene su propia navegación
         if (typeof calcLoadAuto === 'function') {
-            // Dar un pequeÃ±o tiempo por si los datos no han cargado aÃºn
+            // Dar un pequeño tiempo por si los datos no han cargado aún
             setTimeout(() => {
                 if (calcAutoCourses.length === 0) calcLoadAuto();
             }, 100);
@@ -104,7 +100,7 @@ window.navigateTo = (target, pushToHistory = true) => {
     if (window.lucide) lucide.createIcons();
 };
 
-// DelegaciÃ³n global de eventos para navegaciÃ³n
+// Delegación global de eventos para navegación
 document.addEventListener('click', (e) => {
     const navBtn = e.target.closest('[data-navigate]');
     if (navBtn) {
@@ -119,7 +115,7 @@ document.addEventListener('click', (e) => {
 async function guardarEstado() {
     try {
         const session = window.supaAuth?.getCurrentSession();
-        // Clave Ãºnica por usuario â€” evita que los datos se mezclen entre cuentas
+        // Clave única por usuario — evita que los datos se mezclen entre cuentas
         const storageKey = session ? `ucr_estado_${session.user.id}` : APP_STORAGE_KEY;
 
         const estado = {
@@ -132,7 +128,7 @@ async function guardarEstado() {
 
         localStorage.setItem(storageKey, JSON.stringify(estado));
 
-        // Sincronizar a Supabase si el usuario estÃ¡ autenticado
+        // Sincronizar a Supabase si el usuario está autenticado
         if (session) {
             const user = session.user;
             const coursesToUpsert = [];
@@ -154,7 +150,7 @@ async function guardarEstado() {
                     .from('user_courses')
                     .upsert(coursesToUpsert, { onConflict: 'user_id,carrera_id,course_id' });
                 if (error) console.error('Error Supabase al guardar:', error);
-                else console.log(`âœ… Progreso sincronizado: ${coursesToUpsert.length} cursos`);
+                else console.log(`✓ Progreso sincronizado: ${coursesToUpsert.length} cursos`);
             }
         }
     } catch (error) {
@@ -170,7 +166,7 @@ function openNoticiasModal() {
 }
 
 /**
- * Mapa de retrocompatibilidad: cÃ³digos viejos â†’ cÃ³digos nuevos.
+ * Mapa de retrocompatibilidad: códigos viejos â†’ códigos nuevos.
  * Necesario porque renombramos REPOâ†’RP-, MA-0001â†’MA0001, OPT-1â†’OPT-ING, OPT-S3â†’OPT-ING.
  */
 const _COMPAT_CODIGOS = {
@@ -181,7 +177,7 @@ const _COMPAT_CODIGOS = {
 };
 
 /**
- * Carga el estado local y asÃ­ncronamente desde Supabase si aplica.
+ * Carga el estado local y asíncronamente desde Supabase si aplica.
  */
 async function cargarEstado() {
     const session = window.supaAuth?.getCurrentSession();
@@ -219,7 +215,7 @@ async function cargarEstado() {
         }));
     }
 
-    // 4. Resetear estados a 0 (eliminado: se gestiona mediante la lÃ³gica de precarga)
+    // 4. Resetear estados a 0 (eliminado: se gestiona mediante la lógica de precarga)
 
     // 5. Supabase como fuente de verdad: carga estados del usuario
     if (session && window.supaAuth?.supabase) {
@@ -243,7 +239,7 @@ async function cargarEstado() {
                     });
                 });
 
-                console.log('âœ… Plan cargado desde Supabase');
+                console.log('✓ Plan cargado desde Supabase');
                 const newLocalState = { carreraActual };
                 Object.keys(CARRERAS).forEach(carreraId => {
                     newLocalState[carreraId] = CARRERAS[carreraId].cursos.map(c => ({ codigo: c.codigo, estado: c.estado }));
@@ -265,18 +261,18 @@ async function cargarEstado() {
     iniciarTutorial();
 }
 
-// Escuchar cambios de autenticaciÃ³n para recargar el plan (Definido globalmente)
+// Escuchar cambios de autenticación para recargar el plan (Definido globalmente)
 window.addEventListener('supabase_auth_changed', async () => {
     await cargarCarrerasDeSupabase();
     cargarEstado();
 
-    // Generar UI dinÃ¡micamente desde CARRERAS
+    // Generar UI dinámicamente desde CARRERAS
     const selectionList = document.getElementById('career-selection-list');
     const tabsContainer = document.getElementById('carrera-tabs-container');
     if (selectionList) selectionList.innerHTML = '';
     if (tabsContainer) tabsContainer.innerHTML = '';
 
-    // AgrupaciÃ³n por facultades y colores aleatorios
+    // Agrupación por facultades y colores aleatorios
     const colorPalettes = [
         { accent: 'accent-red-600', border: 'hover:border-red-500/40 has-[:checked]:border-red-500/60', bg: 'has-[:checked]:bg-red-950/20' },
         { accent: 'accent-blue-500', border: 'hover:border-blue-500/40 has-[:checked]:border-blue-500/60', bg: 'has-[:checked]:bg-blue-950/20' },
@@ -315,7 +311,7 @@ window.addEventListener('supabase_auth_changed', async () => {
             const facDiv = document.createElement('div');
             facDiv.className = "mb-6";
             
-            // TÃ­tulo de Facultad
+            // Título de Facultad
             const facTitle = document.createElement('h3');
             facTitle.className = "text-emerald-400 font-bold text-sm uppercase tracking-widest mb-3 flex items-center gap-2";
             facTitle.innerHTML = `<i data-lucide="building" class="w-4 h-4"></i> ${facName}`;
@@ -352,18 +348,18 @@ window.addEventListener('supabase_auth_changed', async () => {
 });
 
 /**
- * Resetea los datos Ãºnicamente de la carrera actual (con confirmaciÃ³n)
+ * Resetea los datos únicamente de la carrera actual (con confirmación)
  */
 function resetearDatos() {
     const nombreCarrera = getNombreCarrera(carreraActual);
-    if (confirm(`Â¿EstÃ¡s seguro de que querÃ©s borrar todo el progreso de ${nombreCarrera}? Esta acciÃ³n no se puede deshacer.`)) {
+    if (confirm(`¿Estás seguro de que querés borrar todo el progreso de ${nombreCarrera}? Esta acción no se puede deshacer.`)) {
         // Limpiamos solo los cursos de la carrera activa
         CARRERAS[carreraActual].cursos.forEach(curso => {
             curso.estado = 0;
         });
 
         guardarEstado();
-        // Recargar la pÃ¡gina para que la UI quede completamente limpia
+        // Recargar la página para que la UI quede completamente limpia
         location.reload();
     }
 }
@@ -395,13 +391,13 @@ function clickCurso(event, carreraId, codigoCurso) {
     Object.entries(APP_ESTADOS).forEach(([num, info]) => {
         const numInt = parseInt(num);
         // Si el curso tiene requisitos pendientes, no mostrar estados > 0 como disponibles
-        // (pero sÃ­ pueden volver a 0)
+        // (pero sí pueden volver a 0)
         const opcion = document.createElement('button');
         opcion.className = 'picker-opcion' + (curso.estado === numInt ? ' picker-activo' : '');
         opcion.style.setProperty('--opcion-color', `var(--color-estado-${num})`);
         opcion.innerHTML = `<span class="picker-dot"></span>${info.etiqueta}`;
 
-        // Deshabilitar opciones de estado si no se cumplen los requisitos para ese estado especÃ­fico
+        // Deshabilitar opciones de estado si no se cumplen los requisitos para ese estado específico
         const habilitado = puedeEstarEnEstado(carreraId, codigoCurso, numInt);
         if (!habilitado) {
             opcion.disabled = true;
@@ -411,12 +407,12 @@ function clickCurso(event, carreraId, codigoCurso) {
         opcion.addEventListener('click', (e) => {
             e.stopPropagation();
             curso.estado = numInt;
-            // Propagar automÃ¡ticamente a cursos equivalentes en otras carreras
+            // Propagar automáticamente a cursos equivalentes en otras carreras
             propagarEstadoCurso(carreraId, codigoCurso, numInt);
             guardarEstado();
             renderizarCarrera();
 
-            // Si el panel de convalidaciones estÃ¡ abierto, refrescarlo
+            // Si el panel de convalidaciones está abierto, refrescarlo
             const panel = document.getElementById('panel-convalidaciones');
             if (panel && panel.classList.contains('active')) {
                 renderizarTablaConvalidaciones();
@@ -490,16 +486,16 @@ function renderizarCarrera() {
                 <div class="w-20 h-20 bg-yellow-500/20 rounded-full flex items-center justify-center mb-6 border border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.2)]">
                     <i data-lucide="hard-hat" class="w-10 h-10 text-yellow-400"></i>
                 </div>
-                <h3 class="text-3xl font-black text-white mb-3">Plan en ConstrucciÃ³n</h3>
+                <h3 class="text-3xl font-black text-white mb-3">Plan en Construcción</h3>
                 <p class="text-gray-400 max-w-md mx-auto text-sm leading-relaxed mb-6">
-                    Estamos trabajando arduamente en la recolecciÃ³n y validaciÃ³n de todos los cursos y requisitos para <strong class="text-white">${carrera.nombre}</strong>.
+                    Estamos trabajando arduamente en la recolección y validación de todos los cursos y requisitos para <strong class="text-white">${carrera.nombre}</strong>.
                 </p>
                 <div class="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 px-4 py-2 rounded-lg text-xs font-bold border border-blue-500/20">
-                    <i data-lucide="clock" class="w-4 h-4"></i> EstarÃ¡ disponible en la prÃ³xima actualizaciÃ³n
+                    <i data-lucide="clock" class="w-4 h-4"></i> Estará disponible en la próxima actualización
                 </div>
             </div>
         `;
-        actualizarProgreso(); // DejarÃ¡ todo en 0%
+        actualizarProgreso(); // Dejará todo en 0%
         if (window.lucide) lucide.createIcons();
         return;
     }
@@ -535,12 +531,12 @@ function renderizarCarrera() {
           <div class="nivel-header-main">
             <div class="nivel-header-left">
               <span>ðŸ“…</span>
-              <span class="nivel-titulo">Semestre ${nivel} <span class="nivel-aÃ±o-badge">(AÃ±o ${Math.ceil(nivel / 2)})</span></span>
+              <span class="nivel-titulo">Semestre ${nivel} <span class="nivel-año-badge">(Año ${Math.ceil(nivel / 2)})</span></span>
             </div>
             
             <div class="nivel-stats-horizontal">
                 <div class="nivel-stat-item">
-                    <span class="nivel-stat-label">CrÃ©ditos:</span>
+                    <span class="nivel-stat-label">Créditos:</span>
                     <span class="nivel-stat-value">${creditosAprobadosNivel}/${creditosTotalesNivel}</span>
                 </div>
                 <div class="nivel-stat-item">
@@ -575,8 +571,8 @@ function renderizarCarrera() {
             const estadoNum = curso.estado;
             const tieneRequisitos = curso.requisitos.length > 0;
 
-            // Un curso se muestra bloqueado si su estado actual (si es > 0) no es vÃ¡lido segÃºn sus requisitos.
-            // Si estÃ¡ en estado 0, mostramos bloqueado si ni siquiera puede ser "Cursado" (Estado 2).
+            // Un curso se muestra bloqueado si su estado actual (si es > 0) no es válido según sus requisitos.
+            // Si está en estado 0, mostramos bloqueado si ni siquiera puede ser "Cursado" (Estado 2).
             const estadoActualValido = estadoNum === 0 ? puedeSerCursado(carreraActual, curso.codigo) : puedeEstarEnEstado(carreraActual, curso.codigo, estadoNum);
             const esBloqueado = !estadoActualValido && tieneRequisitos;
 
@@ -588,7 +584,7 @@ function renderizarCarrera() {
 
             // Tooltip de bloqueo
             const tooltipBloqueado = esBloqueado
-                ? `title="ðŸ”’ Bloqueado para aprobaciÃ³n â€” Requisitos pendientes: ${requisitosTexto}"`
+                ? `title="ðŸ”’ Bloqueado para aprobación — Requisitos pendientes: ${requisitosTexto}"`
                 : '';
 
             const compartido = typeof esCompartido === 'function' && esCompartido(carreraActual, curso.codigo);
@@ -600,11 +596,11 @@ function renderizarCarrera() {
              onclick="clickCurso(event, '${carreraActual}', '${curso.codigo}')">
           <div class="curso-header">
             <div class="curso-codigo">${curso.codigo}</div>
-            <div class="curso-creditos">${curso.creditos} CR${compartido ? ' <span class="badge-compartido" title="Curso compartido â€” el estado se sincroniza en todas las carreras">\uD83D\uDD17</span>' : ''}</div>
+            <div class="curso-creditos">${curso.creditos} CR${compartido ? ' <span class="badge-compartido" title="Curso compartido — el estado se sincroniza en todas las carreras">\uD83D\uDD17</span>' : ''}</div>
           </div>
           <div class="curso-nombre">${curso.nombre}</div>
           <div class="curso-requisitos">
-            ${curso.requisitos.length > 0 ? 'ðŸ“‹ ' + requisitosTexto : 'âœ… Sin requisitos'}
+            ${curso.requisitos.length > 0 ? 'ðŸ“‹ ' + requisitosTexto : '✓ Sin requisitos'}
           </div>
           <div class="curso-estado-badge">
             ${esBloqueado ? 'ðŸ”’ Bloqueado' : infoEstado.etiqueta}
@@ -667,11 +663,11 @@ function actualizarProgreso() {
 }
 
 /**
- * Cambia entre carreras (ahora async: descarga cursos de Supabase si aÃºn no estÃ¡n en memoria)
+ * Cambia entre carreras (ahora async: descarga cursos de Supabase si aún no están en memoria)
  */
 async function cambiarCarrera(carreraId) {
     if (!carreraId || !CARRERAS[carreraId]) {
-        console.warn(`[App] Intento de cambiar a carrera invÃ¡lida: ${carreraId}`);
+        console.warn(`[App] Intento de cambiar a carrera inválida: ${carreraId}`);
         return;
     }
     carreraActual = carreraId;
@@ -688,7 +684,7 @@ async function cambiarCarrera(carreraId) {
     const titleEl = document.getElementById('nombre-carrera');
     if (titleEl) titleEl.textContent = getNombreCarrera(carreraId);
 
-    // Actualizar visibilidad del botÃ³n de convalidaciones
+    // Actualizar visibilidad del botón de convalidaciones
     const btnContainer = document.getElementById('btn-convalidaciones-container');
     const panel = document.getElementById('panel-convalidaciones');
     
@@ -736,7 +732,7 @@ async function cambiarCarrera(carreraId) {
     guardarEstado();
     renderizarCarrera();
 
-    // Si el panel de convalidaciones estÃ¡ abierto, refrescarlo
+    // Si el panel de convalidaciones está abierto, refrescarlo
     if (panel && panel.classList.contains('active')) {
         renderizarTablaConvalidaciones();
     }
@@ -772,7 +768,7 @@ function togglePanelConvalidaciones() {
 function renderizarTablaConvalidaciones() {
     const content = document.getElementById('conv-content');
     if (!content || !TABLA_CONVALIDACIONES[carreraActual]) {
-        content.innerHTML = '<p class="conv-nota">No hay convalidaciones especÃ­ficas configuradas para esta carrera.</p>';
+        content.innerHTML = '<p class="conv-nota">No hay convalidaciones específicas configuradas para esta carrera.</p>';
         return;
     }
 
@@ -814,14 +810,14 @@ function renderizarTablaConvalidaciones() {
 
         // Determinar clase y texto de estado
         let statusClass = 'status-pending';
-        let statusText = 'âŒ Pendiente';
+        let statusText = '✌ Pendiente';
 
         if (todosAprobados) {
             statusClass = 'status-ok';
-            statusText = 'âœ… Listo para tramitar';
+            statusText = '✓ Listo para tramitar';
         } else if (algunoAprobado) {
-            statusClass = 'status-pending'; // Usamos la misma base pero podrÃ­as crear una nueva
-            statusText = 'âš ï¸ Posible a completar';
+            statusClass = 'status-pending'; // Usamos la misma base pero podrías crear una nueva
+            statusText = 'âš ï¸ Posible a completar';
         }
 
         html += `
@@ -862,8 +858,8 @@ function renderizarTablaConvalidaciones() {
             </tbody>
         </table>
         <p class="conv-nota" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
-            âš ï¸ <strong>Importante:</strong> Las convalidaciones que no tienen el Ã­cono ðŸ”— requieren trÃ¡mite de convalidaciÃ³n manual en la UCR. 
-            Esta tabla es informativa basada en la resoluciÃ³n EAN-269-2023.
+            âš ï¸ <strong>Importante:</strong> Las convalidaciones que no tienen el ícono ðŸ”— requieren trámite de convalidación manual en la UCR. 
+            Esta tabla es informativa basada en la resolución EAN-269-2023.
         </p>
     `;
 
@@ -875,18 +871,18 @@ function renderizarTablaConvalidaciones() {
 // ===================================
 
 function inicializar() {
-    console.log('Inicializando aplicaciÃ³n v2 (7 estados)...');
+    console.log('Inicializando aplicación v2 (7 estados)...');
 
     cargarEstado();
     if (typeof loadNoticias === 'function') loadNoticias();
 
-    // Generar UI dinÃ¡micamente desde CARRERAS
+    // Generar UI dinámicamente desde CARRERAS
     const selectionList = document.getElementById('career-selection-list');
     const tabsContainer = document.getElementById('carrera-tabs-container');
     if (selectionList) selectionList.innerHTML = '';
     if (tabsContainer) tabsContainer.innerHTML = '';
 
-    // AgrupaciÃ³n por facultades y colores aleatorios
+    // Agrupación por facultades y colores aleatorios
     const colorPalettes = [
         { accent: 'accent-red-600', border: 'hover:border-red-500/40 has-[:checked]:border-red-500/60', bg: 'has-[:checked]:bg-red-950/20' },
         { accent: 'accent-blue-500', border: 'hover:border-blue-500/40 has-[:checked]:border-blue-500/60', bg: 'has-[:checked]:bg-blue-950/20' },
@@ -925,7 +921,7 @@ function inicializar() {
             const facDiv = document.createElement('div');
             facDiv.className = "mb-6";
             
-            // TÃ­tulo de Facultad
+            // Título de Facultad
             const facTitle = document.createElement('h3');
             facTitle.className = "text-emerald-400 font-bold text-sm uppercase tracking-widest mb-3 flex items-center gap-2";
             facTitle.innerHTML = `<i data-lucide="building" class="w-4 h-4"></i> ${facName}`;
@@ -967,7 +963,7 @@ function inicializar() {
     });
 
     // Removido navigateTo('login') forzado para evitar parpadeos (FOUC).
-    // auth.js se encarga de llamar a navigateTo('login') o navigateTo('home') segÃºn el estado de la sesiÃ³n.
+    // auth.js se encarga de llamar a navigateTo('login') o navigateTo('home') según el estado de la sesión.
 
     document.querySelector(`[data-carrera="${carreraActual}"]`)?.classList.add('active');
     document.getElementById('nombre-carrera').textContent = getNombreCarrera(carreraActual);
@@ -976,7 +972,7 @@ function inicializar() {
     // Mostrar mensaje de soporte amigable (una vez por usuario)
     setTimeout(mostrarMensajeSoporte, 2000);
 
-    console.log('AplicaciÃ³n inicializada correctamente');
+    console.log('Aplicación inicializada correctamente');
 }
 
 // ===================================
@@ -989,7 +985,7 @@ function mostrarMensajeSoporte() {
     // Solo mostrar este mensaje una vez por dispositivo/navegador
     if (!localStorage.getItem(SUPPORT_MSG_KEY)) {
         mostrarToastNotificacion(
-            "ðŸ‘‹ Hola, la plataforma funciona perfectamente con o sin adblocker. Sin embargo, no usamos anuncios molestos y tu apoyo desactivÃ¡ndolo o no usÃ¡ndolo nos ayudarÃ­a muchÃ­simo a mantener este proyecto vivo. Â¡Gracias y disfrutÃ¡ la app!",
+            "ðŸ‘‹ Hola, la plataforma funciona perfectamente con o sin adblocker. Sin embargo, no usamos anuncios molestos y tu apoyo desactivándolo o no usándolo nos ayudaría muchísimo a mantener este proyecto vivo. ¡Gracias y disfrutá la app!",
             "info"
         );
         localStorage.setItem(SUPPORT_MSG_KEY, 'true');
@@ -1041,7 +1037,7 @@ function mostrarToastNotificacion(mensaje, tipo) {
         }, 30);
     });
 
-    // Auto-eliminar despuÃ©s de 12 segundos con animaciÃ³n de salida
+    // Auto-eliminar después de 12 segundos con animación de salida
     setTimeout(() => {
         if (toast.parentElement) {
             toast.style.opacity = '0';
@@ -1060,7 +1056,7 @@ window.showAdminToast = function(message, type = 'success') {
 };
 
 
-// Filtra las pestaÃ±as de carrera segÃºn lo que el usuario eligiÃ³ en su perfil
+// Filtra las pestañas de carrera según lo que el usuario eligió en su perfil
 function filtrarCarrerasPorPerfil(selectedCarreras) {
     if (!selectedCarreras || selectedCarreras.length === 0) return;
 
@@ -1072,7 +1068,7 @@ function filtrarCarrerasPorPerfil(selectedCarreras) {
         }
     });
 
-    // Si la carrera activa no estÃ¡ en la selecciÃ³n, cambiar a la primera disponible
+    // Si la carrera activa no está en la selección, cambiar a la primera disponible
     if (!selectedCarreras.includes(carreraActual)) {
         cambiarCarrera(selectedCarreras[0]);
     }
@@ -1084,12 +1080,12 @@ function filtrarCarrerasPorPerfil(selectedCarreras) {
 // ===================================
 
 /**
- * FunciÃ³n auxiliar para unificar la preparaciÃ³n del Ã¡rea de captura
+ * Función auxiliar para unificar la preparación del área de captura
  */
 async function capturarAreaComoCanvas(area) {
     return await html2canvas(area, {
-        scale: 2, // Alta resoluciÃ³n
-        backgroundColor: '#000000', // Fondo negro sÃ³lido
+        scale: 2, // Alta resolución
+        backgroundColor: '#000000', // Fondo negro sólido
         logging: false,
         useCORS: true,
         allowTaint: true,
@@ -1131,7 +1127,7 @@ async function capturarAreaComoCanvas(area) {
 }
 
 /**
- * Captura el Ã¡rea de planificaciÃ³n y la descarga como PNG
+ * Captura el área de planificación y la descarga como PNG
  */
 async function descargarPlan() {
     const area = document.getElementById('export-area');
@@ -1189,7 +1185,7 @@ async function submitFeedback() {
     const session = window.supaAuth?.getCurrentSession();
     const userId = session ? session.user.id : null;
     
-    // Preparar UI para envÃ­o
+    // Preparar UI para envío
     const originalText = btnSubmit.innerHTML;
     btnSubmit.innerHTML = 'Enviando...';
     btnSubmit.disabled = true;
@@ -1197,7 +1193,7 @@ async function submitFeedback() {
     
     try {
         if (!window.supaAuth?.supabase) {
-            throw new Error("No hay conexiÃ³n con la base de datos.");
+            throw new Error("No hay conexión con la base de datos.");
         }
         
         const { error } = await window.supaAuth.supabase
@@ -1215,8 +1211,8 @@ async function submitFeedback() {
         // Cerrar modal y limpiar
         setTimeout(() => {
             document.getElementById('feedback-modal').classList.add('hidden');
-            successEl.classList.add('hidden'); // Resetear para la prÃ³xima vez
-            // Si mandÃ³ una idea, recargar sus mensajes por si abre la pestaÃ±a
+            successEl.classList.add('hidden'); // Resetear para la próxima vez
+            // Si mandó una idea, recargar sus mensajes por si abre la pestaña
             loadUserMessages();
         }, 2000);
         
@@ -1259,7 +1255,7 @@ async function loadUserMessages() {
     const listEl = document.getElementById('user-messages-list');
     const session = window.supaAuth?.getCurrentSession();
     if (!session || !window.supaAuth?.supabase) {
-        listEl.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">Inicia sesiÃ³n para ver tus mensajes.</p>';
+        listEl.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">Inicia sesión para ver tus mensajes.</p>';
         return;
     }
 
@@ -1275,11 +1271,11 @@ async function loadUserMessages() {
         if (error) throw error;
         
         if (!feedbacks || feedbacks.length === 0) {
-            listEl.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">No has enviado ninguna idea aÃºn.</p>';
+            listEl.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">No has enviado ninguna idea aún.</p>';
             return;
         }
 
-        // Marcar mensajes como leÃ­dos si tienen notificaciÃ³n
+        // Marcar mensajes como leídos si tienen notificación
         const unreadIds = feedbacks.filter(f => f.has_unread_reply).map(f => f.id);
         if (unreadIds.length > 0) {
             await window.supaAuth.supabase.from('user_feedback').update({ has_unread_reply: false }).in('id', unreadIds);
@@ -1321,11 +1317,11 @@ function openUserFeedbackChat(feedback) {
             <button onclick="switchFeedbackTab('messages')" class="text-gray-400 hover:text-white p-1 rounded hover:bg-white/10 transition-colors">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
             </button>
-            <h4 class="font-bold text-sm text-white">ConversaciÃ³n</h4>
+            <h4 class="font-bold text-sm text-white">Conversación</h4>
         </div>
         <div class="flex-1 overflow-y-auto space-y-3 mb-4 pr-2" id="user-chat-messages">
             <div class="bg-white/5 p-3 rounded-tr-xl rounded-b-xl max-w-[85%] self-start">
-                <p class="text-xs text-gray-400 font-bold mb-1">TÃº</p>
+                <p class="text-xs text-gray-400 font-bold mb-1">Tú</p>
                 <p class="text-sm text-white">${feedback.message}</p>
             </div>
     `;
@@ -1335,7 +1331,7 @@ function openUserFeedbackChat(feedback) {
             const isMe = msg.sender === 'user';
             chatHtml += `
                 <div class="${isMe ? 'bg-emerald-500/20 ml-auto rounded-tl-xl' : 'bg-blue-500/20 mr-auto rounded-tr-xl'} p-3 rounded-b-xl max-w-[85%]">
-                    <p class="text-xs ${isMe ? 'text-emerald-400 text-right' : 'text-blue-400'} font-bold mb-1">${isMe ? 'TÃº' : 'Admin'}</p>
+                    <p class="text-xs ${isMe ? 'text-emerald-400 text-right' : 'text-blue-400'} font-bold mb-1">${isMe ? 'Tú' : 'Admin'}</p>
                     <p class="text-sm text-white">${msg.msg}</p>
                 </div>
             `;
@@ -1386,7 +1382,7 @@ async function sendUserChatReply(feedbackId) {
         if (error) throw error;
 
         input.value = '';
-        // Recargar mensajes para ver la conversaciÃ³n actualizada
+        // Recargar mensajes para ver la conversación actualizada
         loadUserMessages();
     } catch (err) {
         console.error("Error sending reply", err);
@@ -1395,7 +1391,7 @@ async function sendUserChatReply(feedbackId) {
 }
 
 // ===================================
-// PANEL DE ADMIN â€” TABS Y ESTADO
+// PANEL DE ADMIN — TABS Y ESTADO
 // ===================================
 let _adminFeedbackAll = [];
 let _adminCurrentTab = 'pending';
@@ -1422,7 +1418,7 @@ async function loadNoticias() {
             .order('created_at', { ascending: false });
             
         if (error) {
-            // Ignorar el error si la tabla aÃºn no existe (42P01)
+            // Ignorar el error si la tabla aún no existe (42P01)
             if(error.code !== '42P01') console.error('Error cargando noticias:', error);
             return;
         }
@@ -1441,7 +1437,7 @@ async function loadNoticias() {
                 general: { icon: 'ðŸ“¢', color: 'purple' },
                 matricula: { icon: 'ðŸ“…', color: 'blue' },
                 actualizacion: { icon: 'ðŸ”„', color: 'emerald' },
-                aviso: { icon: 'âš ï¸', color: 'red' },
+                aviso: { icon: 'âš ï¸', color: 'red' },
                 nuevo: { icon: 'ðŸ†•', color: 'yellow' }
             };
             const m = map[cat || 'general'];
@@ -1473,7 +1469,7 @@ async function loadNoticias() {
                     <h3 class="text-xl font-bold text-white mb-3">${n.titulo}</h3>
                     <p class="text-gray-400 text-sm whitespace-pre-wrap leading-relaxed">${n.contenido}</p>
                     ${n.imagen_url ? `<img src="${n.imagen_url}" alt="${n.titulo}" class="mt-4 rounded-xl border border-white/10 max-h-64 object-cover w-full">` : ''}
-                    ${n.enlace_url ? `<a href="${n.enlace_url}" target="_blank" class="inline-flex items-center gap-2 mt-4 text-purple-400 hover:text-purple-300 text-sm font-bold transition-colors">Leer mÃ¡s <i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
+                    ${n.enlace_url ? `<a href="${n.enlace_url}" target="_blank" class="inline-flex items-center gap-2 mt-4 text-purple-400 hover:text-purple-300 text-sm font-bold transition-colors">Leer más <i data-lucide="external-link" class="w-4 h-4"></i></a>` : ''}
                 </div>
             `).join('');
             lucide.createIcons();
@@ -1482,7 +1478,7 @@ async function loadNoticias() {
             if (modalList) modalList.innerHTML = fullList.innerHTML;
         }
     } catch (e) {
-        console.error('ExcepciÃ³n al cargar noticias:', e);
+        console.error('Excepción al cargar noticias:', e);
     }
 }
 
@@ -1510,7 +1506,7 @@ async function loadAdminFeedbackData() {
 
         if (fbError) throw fbError;
 
-        // 2. Obtener perfiles de los usuarios Ãºnicos para mostrar nombres reales
+        // 2. Obtener perfiles de los usuarios únicos para mostrar nombres reales
         const userIds = [...new Set(feedbacks.filter(f => f.user_id).map(f => f.user_id))];
         let profilesMap = {};
 
@@ -1750,7 +1746,7 @@ function openAdminFeedbackChat(feedbackId, forceOpen = false) {
             const isMe = msg.sender === 'admin';
             chatHtml += `
                 <div class="${isMe ? 'bg-blue-500/10 ml-auto rounded-tl-xl border border-blue-500/10' : 'bg-emerald-500/10 mr-auto rounded-tr-xl border border-emerald-500/10'} p-3 rounded-b-xl max-w-[90%] mb-2">
-                    <p class="text-[9px] ${isMe ? 'text-blue-400 text-right' : 'text-emerald-400'} font-black uppercase tracking-widest mb-1">${isMe ? 'TÃº (Admin)' : 'Usuario'}</p>
+                    <p class="text-[9px] ${isMe ? 'text-blue-400 text-right' : 'text-emerald-400'} font-black uppercase tracking-widest mb-1">${isMe ? 'Tú (Admin)' : 'Usuario'}</p>
                     <p class="text-xs text-white">${msg.msg}</p>
                 </div>
             `;
@@ -1791,7 +1787,7 @@ async function sendAdminChatReply(feedbackId) {
         
         input.value = ''; // Limpiar input
         _actualizarContadoresAdmin();
-        openAdminFeedbackChat(feedbackId, true); // Forzar actualizaciÃ³n sin cerrar
+        openAdminFeedbackChat(feedbackId, true); // Forzar actualización sin cerrar
     } catch (err) {
         console.error("Error sending reply from admin", err);
         alert('Error al enviar mensaje');
@@ -1866,7 +1862,7 @@ async function deleteFeedback(feedbackId) {
     } catch (err) {
         console.error("Error al eliminar feedback:", err);
         alert("Error al eliminar el feedback: " + err.message);
-        // Restaurar si fallÃ³
+        // Restaurar si falló
         renderAdminFeedback(_adminCurrentTab);
     }
 }
@@ -2014,7 +2010,7 @@ function handleSwipeGesture() {
     const diffX = touchendX - touchstartX;
     const diffY = Math.abs(touchendY - touchstartY);
 
-    // Si el swipe empezÃ³ muy cerca del borde izquierdo (ej: < 40px)
+    // Si el swipe empezó muy cerca del borde izquierdo (ej: < 40px)
     // Y el swipe fue predominantemente horizontal hacia la derecha
     if (touchstartX < 40 && diffX > 60 && diffY < 50) {
         if (typeof navigateTo === 'function') {
@@ -2028,23 +2024,23 @@ if (document.readyState === 'loading') {
     inicializar();
 }
 
-// Establecer estado inicial en el historial para evitar que el primer "AtrÃ¡s" cierre la app
+// Establecer estado inicial en el historial para evitar que el primer "Atrás" cierre la app
 if (!history.state || !history.state.page) {
     const currentPage = document.documentElement.getAttribute('data-initial-page') || 'home';
     try {
         history.replaceState({ page: currentPage }, '', '#' + currentPage);
     } catch(e) {
-        console.warn("history.replaceState fallÃ³", e);
+        console.warn("history.replaceState falló", e);
     }
 }
 
-// Manejar el botÃ³n "AtrÃ¡s" del navegador/mÃ³vil
+// Manejar el botón "Atrás" del navegador/móvil
 window.addEventListener('popstate', (e) => {
     // Si hay un modal abierto, lo cerramos en lugar de navegar
     const modales = document.querySelectorAll('.modal-overlay:not(.hidden)');
     if (modales.length > 0) {
         modales.forEach(m => m.classList.add('hidden'));
-        // Evitamos que retroceda la pÃ¡gina visualmente
+        // Evitamos que retroceda la página visualmente
         history.pushState({ page: e.state ? e.state.page : 'home' }, '', window.location.hash);
         return;
     }
@@ -2059,12 +2055,12 @@ window.addEventListener('popstate', (e) => {
 });
 
 /**
- * Busca todos los cursos compartidos y replica el estado mÃ¡s avanzado en todas las carreras.
+ * Busca todos los cursos compartidos y replica el estado más avanzado en todas las carreras.
  */
 function sincronizarCompartidosGlobal() {
     let compartidosRevisados = new Set();
     
-    // Primero, encontrar el estado mÃ¡s alto para cada cÃ³digo de curso (ej: EG-1)
+    // Primero, encontrar el estado más alto para cada código de curso (ej: EG-1)
     let mejorEstadoPorCodigo = {};
     
     Object.keys(CARRERAS).forEach(cId => {
@@ -2078,7 +2074,7 @@ function sincronizarCompartidosGlobal() {
         });
     });
 
-    // Luego, aplicar ese estado mÃ¡s alto a todos los hermanos
+    // Luego, aplicar ese estado más alto a todos los hermanos
     Object.keys(CARRERAS).forEach(cId => {
         const cursos = CARRERAS[cId].cursos;
         if (!cursos) return;
@@ -2095,13 +2091,13 @@ function sincronizarCompartidosGlobal() {
 // LÃ“GICA DE SNAPSHOTS DEL PLAN
 // ===================================
 
-// guardarSnapshotPlan â€” definida mas abajo con soporte completo
+// guardarSnapshotPlan — definida mas abajo con soporte completo
 
 
 async function abrirModalHistorialPlanes() {
     const session = window.supaAuth?.getCurrentSession();
     if (!session) {
-        alert("Debes iniciar sesiÃ³n para ver tus respaldos guardados.");
+        alert("Debes iniciar sesión para ver tus respaldos guardados.");
         return;
     }
     document.getElementById('plan-history-modal').classList.remove('hidden');
@@ -2134,7 +2130,7 @@ async function cargarHistorialPlanes() {
         data.forEach(snap => {
             const dateStr = new Date(snap.created_at).toLocaleDateString('es-CR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
             
-            // Contar cuÃ¡ntos cursos guardados hay en total
+            // Contar cuántos cursos guardados hay en total
             let totalCursos = 0;
             if (snap.datos_json) {
                 Object.keys(snap.datos_json).forEach(cId => {
@@ -2146,7 +2142,7 @@ async function cargarHistorialPlanes() {
                 <div class="bg-black/40 border border-white/5 p-4 rounded-xl flex items-center justify-between group hover:border-yellow-500/30 transition-colors">
                     <div>
                         <div class="font-bold text-white text-sm">${snap.nombre}</div>
-                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">${dateStr} â€¢ ${totalCursos} cursos registrados</div>
+                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">${dateStr} • ${totalCursos} cursos registrados</div>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="abrirSnapshotPlan('${snap.id}')" title="Cargar y sobreescribir plan actual" class="bg-blue-500/10 hover:bg-blue-500/30 text-blue-500 p-2 rounded-lg transition-colors border border-blue-500/20">
@@ -2169,7 +2165,7 @@ async function cargarHistorialPlanes() {
 }
 
 async function abrirSnapshotPlan(snapshotId) {
-    if (!confirm("Â¿EstÃ¡s seguro de querer cargar este respaldo? ReemplazarÃ¡ tu progreso actual con los datos guardados.")) return;
+    if (!confirm("¿Estás seguro de querer cargar este respaldo? Reemplazará tu progreso actual con los datos guardados.")) return;
 
     try {
         const { data, error } = await window.supaAuth.supabase
@@ -2211,7 +2207,7 @@ async function abrirSnapshotPlan(snapshotId) {
         // 5. Renderizar interfaz y cerrar modal
         renderizarCarrera();
         document.getElementById('plan-history-modal').classList.add('hidden');
-        alert("Â¡Progreso cargado y sincronizado exitosamente!");
+        alert("¡Progreso cargado y sincronizado exitosamente!");
 
     } catch (err) {
         console.error("Error al abrir snapshot:", err);
@@ -2220,7 +2216,7 @@ async function abrirSnapshotPlan(snapshotId) {
 }
 
 async function eliminarSnapshotPlan(snapshotId) {
-    if (!confirm("Â¿EstÃ¡s seguro de eliminar este respaldo permanentemente?")) return;
+    if (!confirm("¿Estás seguro de eliminar este respaldo permanentemente?")) return;
 
     try {
         const { error } = await window.supaAuth.supabase
@@ -2246,9 +2242,9 @@ function abrirModalGuardarPlan() {
     const actionsContainer = document.getElementById('plan-save-actions');
     const nameInput = document.getElementById('plan-save-name');
     
-    // Si hay un plan previamente cargado, mostramos UI de "ActualizaciÃ³n"
+    // Si hay un plan previamente cargado, mostramos UI de "Actualización"
     if (window.currentLoadedSnapshotId) {
-        contextContainer.innerHTML = `<p class="text-xs text-yellow-500 font-bold mb-1">Â¡EstÃ¡s editando un plan existente!</p><p class="text-xs text-gray-400">Puedes sobreescribir este plan con los nuevos cambios, o guardarlo como una copia nueva.</p>`;
+        contextContainer.innerHTML = `<p class="text-xs text-yellow-500 font-bold mb-1">¡Estás editando un plan existente!</p><p class="text-xs text-gray-400">Puedes sobreescribir este plan con los nuevos cambios, o guardarlo como una copia nueva.</p>`;
         
         actionsContainer.innerHTML = `
             <button onclick="guardarSnapshotPlan(false)" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
@@ -2259,7 +2255,7 @@ function abrirModalGuardarPlan() {
             </button>
         `;
     } else {
-        contextContainer.innerHTML = `<p class="text-xs text-gray-400">GuardÃ¡ una versiÃ³n de tu avance actual en la nube. Ãštil por si cometÃ©s un error luego.</p>`;
+        contextContainer.innerHTML = `<p class="text-xs text-gray-400">Guardá una versión de tu avance actual en la nube. Útil por si cometés un error luego.</p>`;
         
         actionsContainer.innerHTML = `
             <button onclick="guardarSnapshotPlan(false)" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
@@ -2275,12 +2271,12 @@ function abrirModalGuardarPlan() {
 async function guardarSnapshotPlan(isNuevaCopia = false) {
     const session = window.supaAuth?.getCurrentSession();
     if (!session) {
-        alert("Debes iniciar sesiÃ³n para guardar tu progreso en la nube.");
+        alert("Debes iniciar sesión para guardar tu progreso en la nube.");
         return;
     }
 
     const nombreInput = document.getElementById('plan-save-name');
-    const nombre = nombreInput.value.trim() || 'Mi Respaldo AutomÃ¡tico';
+    const nombre = nombreInput.value.trim() || 'Mi Respaldo Automático';
     
     // Check if we are updating an existing snapshot
     const currentSnapshotId = isNuevaCopia ? null : (window.currentLoadedSnapshotId || null);
@@ -2294,7 +2290,7 @@ async function guardarSnapshotPlan(isNuevaCopia = false) {
         }
     });
 
-    // Obtener el botÃ³n que disparÃ³ la acciÃ³n (cualquier botÃ³n activo del modal)
+    // Obtener el botón que disparó la acción (cualquier botón activo del modal)
     const btn = document.querySelector('#plan-save-modal button[onclick*="guardarSnapshotPlan"]') ||
                  document.querySelector('#plan-save-modal button.bg-yellow-500');
     let oldText = '';
@@ -2315,7 +2311,7 @@ async function guardarSnapshotPlan(isNuevaCopia = false) {
                 })
                 .eq('id', currentSnapshotId);
             if (error) throw error;
-            alert("Â¡Plan actualizado exitosamente!");
+            alert("¡Plan actualizado exitosamente!");
         } else {
             // Guardar nuevo
             const { error } = await window.supaAuth.supabase
@@ -2326,7 +2322,7 @@ async function guardarSnapshotPlan(isNuevaCopia = false) {
                     datos_json: estado
                 }]);
             if (error) throw error;
-            alert("Â¡Nuevo respaldo guardado exitosamente!");
+            alert("¡Nuevo respaldo guardado exitosamente!");
         }
         document.getElementById('plan-save-modal').classList.add('hidden');
         document.getElementById('plan-save-name').value = '';
@@ -2345,7 +2341,7 @@ async function guardarSnapshotPlan(isNuevaCopia = false) {
 async function abrirModalHistorialPlanes() {
     const session = window.supaAuth?.getCurrentSession();
     if (!session) {
-        alert("Debes iniciar sesiÃ³n para ver tus respaldos guardados.");
+        alert("Debes iniciar sesión para ver tus respaldos guardados.");
         return;
     }
     document.getElementById('plan-history-modal').classList.remove('hidden');
@@ -2378,7 +2374,7 @@ async function cargarHistorialPlanes() {
         data.forEach(snap => {
             const dateStr = new Date(snap.created_at).toLocaleDateString('es-CR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
             
-            // Contar cuÃ¡ntos cursos guardados hay en total
+            // Contar cuántos cursos guardados hay en total
             let totalCursos = 0;
             if (snap.datos_json) {
                 Object.keys(snap.datos_json).forEach(cId => {
@@ -2390,7 +2386,7 @@ async function cargarHistorialPlanes() {
                 <div class="bg-black/40 border border-white/5 p-4 rounded-xl flex items-center justify-between group hover:border-yellow-500/30 transition-colors">
                     <div>
                         <div class="font-bold text-white text-sm">${snap.nombre}</div>
-                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">${dateStr} â€¢ ${totalCursos} cursos registrados</div>
+                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">${dateStr} • ${totalCursos} cursos registrados</div>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="abrirSnapshotPlan('${snap.id}')" title="Cargar y sobreescribir plan actual" class="bg-blue-500/10 hover:bg-blue-500/30 text-blue-500 p-2 rounded-lg transition-colors border border-blue-500/20">
@@ -2413,7 +2409,7 @@ async function cargarHistorialPlanes() {
 }
 
 async function abrirSnapshotPlan(snapshotId) {
-    if (!confirm("Â¿EstÃ¡s seguro de querer cargar este respaldo? ReemplazarÃ¡ tu progreso actual con los datos guardados.")) return;
+    if (!confirm("¿Estás seguro de querer cargar este respaldo? Reemplazará tu progreso actual con los datos guardados.")) return;
 
     try {
         const { data, error } = await window.supaAuth.supabase
@@ -2459,7 +2455,7 @@ async function abrirSnapshotPlan(snapshotId) {
         // Registrar globalmente el id cargado
         window.currentLoadedSnapshotId = snapshotId;
         
-        alert("Â¡Progreso cargado y sincronizado exitosamente!");
+        alert("¡Progreso cargado y sincronizado exitosamente!");
 
     } catch (err) {
         console.error("Error al abrir snapshot:", err);
@@ -2468,7 +2464,7 @@ async function abrirSnapshotPlan(snapshotId) {
 }
 
 async function eliminarSnapshotPlan(snapshotId) {
-    if (!confirm("Â¿EstÃ¡s seguro de eliminar este respaldo permanentemente?")) return;
+    if (!confirm("¿Estás seguro de eliminar este respaldo permanentemente?")) return;
 
     try {
         const { error } = await window.supaAuth.supabase
@@ -2515,7 +2511,7 @@ function setupRealtimeSubscription() {
                     }
                 }
                 
-                // Forzar sincronizaciÃ³n de compartidos si estÃ¡ definido
+                // Forzar sincronización de compartidos si está definido
                 if (typeof sincronizarCompartidosGlobal === 'function') {
                     sincronizarCompartidosGlobal();
                 }
@@ -2542,21 +2538,21 @@ function guardarEstadoLocalSilencioso() {
 }
 
 function iniciarTutorial() {
-    // Si ya lo viÃ³ o no cargÃ³ la librerÃ­a, ignorar
+    // Si ya lo vió o no cargó la librería, ignorar
     if (localStorage.getItem('tutorial_visto') === 'true') return;
     if (typeof introJs !== 'function') return;
 
     const intro = introJs();
     intro.setOptions({
         nextLabel: 'Siguiente',
-        prevLabel: 'AtrÃ¡s',
-        doneLabel: 'Â¡Comenzar!',
+        prevLabel: 'Atrás',
+        doneLabel: '¡Comenzar!',
         showStepNumbers: false,
         showProgress: true,
         exitOnOverlayClick: false,
         steps: [
             {
-                intro: "ðŸ‘‹ Â¡Bienvenido! Te darÃ© un recorrido rÃ¡pido de 30 segundos para que saquÃ©s el mÃ¡ximo provecho a la plataforma."
+                intro: "ðŸ‘‹ ¡Bienvenido! Te daré un recorrido rápido de 30 segundos para que saqués el máximo provecho a la plataforma."
             },
             {
                 element: document.querySelector('.malla-container') || document.querySelector('#plan-section'),
@@ -2565,12 +2561,12 @@ function iniciarTutorial() {
             },
             {
                 element: document.querySelector('.controls-left') || document.querySelector('.controls-container'),
-                intro: "ðŸ’¾ **Respaldos y ExportaciÃ³n:** GuardÃ¡ tu progreso en la nube o descargÃ¡ tu plan en formato imagen desde aquÃ­.",
+                intro: "ðŸ’¾ **Respaldos y Exportación:** Guardá tu progreso en la nube o descargá tu plan en formato imagen desde aquí.",
                 position: 'top'
             },
             {
                 element: document.querySelector('button[data-navigate="calculator"]') || document.querySelector('.mobile-nav'),
-                intro: "ðŸ”¢ **Herramientas Extra:** AccedÃ© a la Calculadora de Ponderado y al Generador de Horarios desde la navegaciÃ³n inferior.",
+                intro: "ðŸ”¢ **Herramientas Extra:** Accedé a la Calculadora de Ponderado y al Generador de Horarios desde la navegación inferior.",
                 position: 'top'
             }
         ]
@@ -2585,7 +2581,7 @@ function iniciarTutorial() {
     });
 
     setTimeout(() => {
-        // Asegurarse de que el usuario estÃ© en la pestaÃ±a de "Plan"
+        // Asegurarse de que el usuario esté en la pestaña de "Plan"
         const planSection = document.getElementById('plan-section');
         if (planSection && !planSection.classList.contains('hidden')) {
             intro.start();
