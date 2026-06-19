@@ -25,6 +25,8 @@ window._currentPage = document.documentElement.getAttribute('data-initial-page')
 window.navigateTo = (target, pushToHistory = true) => {
     // If navigating to the same page, do nothing to avoid UI blinking
     if (target === window._currentPage) return;
+    // Save current scroll position before leaving the page
+    try { saveScrollForPage(window._currentPage); } catch (e) { /* ignore */ }
     // ðŸ”’ Control de Acceso: Redirigir a login si no hay sesión
     const isAuthenticated = window.supaAuth && window.supaAuth.getCurrentSession();
     if (!isAuthenticated && target !== 'login') {
@@ -46,8 +48,8 @@ window.navigateTo = (target, pushToHistory = true) => {
         }
     }
 
-    // Asegurar que al cambiar de sección, volvemos arriba (útil en móviles)
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    // Restore saved scroll position for the target page (or go to top if none)
+    // (Will be applied after showing the target section)
 
     document.documentElement.removeAttribute('data-initial-page');
     document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
@@ -105,7 +107,39 @@ window.navigateTo = (target, pushToHistory = true) => {
 
     // update current page
     window._currentPage = target;
+    // restore vertical position for the target page (if any)
+    try { restoreScrollForPage(target); } catch (e) { /* ignore */ }
 };
+
+// Save/restore scroll helpers (persist per-page vertical position)
+function saveScrollForPage(page) {
+    if (!page) return;
+    try {
+        const key = `ucr_scroll_${page}`;
+        localStorage.setItem(key, String(window.scrollY || window.pageYOffset || 0));
+    } catch (e) {}
+}
+
+function restoreScrollForPage(page) {
+    if (!page) return;
+    try {
+        const key = `ucr_scroll_${page}`;
+        const v = localStorage.getItem(key);
+        const top = v ? parseInt(v, 10) : 0;
+        // use instant behavior to avoid visual jump animation
+        window.scrollTo({ top: isNaN(top) ? 0 : top, behavior: 'instant' });
+    } catch (e) {}
+}
+
+// Save scroll when page becomes hidden or before unload
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') saveScrollForPage(window._currentPage);
+});
+window.addEventListener('beforeunload', () => saveScrollForPage(window._currentPage));
+// Restore scroll on pageshow (when returning via bfcache or back navigation)
+window.addEventListener('pageshow', () => restoreScrollForPage(window._currentPage));
+// On initial load, try to restore scroll for initial page
+try { restoreScrollForPage(window._currentPage); } catch (e) {}
 
 // Delegación global de eventos para navegación
 document.addEventListener('click', (e) => {
