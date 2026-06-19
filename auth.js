@@ -16,6 +16,7 @@ let currentProfile = null;
 
 // Cache local del username para mostrar siempre el nombre correcto
 const UCR_USERNAME_KEY = 'ucr_last_username';
+const UCR_LAST_PAGE_KEY = 'ucr_last_page';
 function _getStoredUsername() { 
     let u = localStorage.getItem(UCR_USERNAME_KEY);
     if (u) return u;
@@ -29,6 +30,10 @@ function _getStoredUsername() {
 }
 function _setStoredUsername(u) { if (u) localStorage.setItem(UCR_USERNAME_KEY, u); }
 function _clearStoredUsername() { localStorage.removeItem(UCR_USERNAME_KEY); }
+function _getSavedLastPage() {
+    const page = localStorage.getItem(UCR_LAST_PAGE_KEY);
+    return page && page !== 'login' ? page : null;
+}
 
 // ==========================================
 // INICIALIZACIÓN Y ESCUCHA DE SESIÓN
@@ -277,8 +282,12 @@ async function fetchUserProfile(userId) {
         } else {
             if (typeof filtrarCarrerasPorPerfil === 'function') filtrarCarrerasPorPerfil(selected);
             if (typeof window.navigateTo === 'function') {
-                // Al iniciar sesión, siempre ir a home
-                window.navigateTo('home');
+                const savedPage = _getSavedLastPage();
+                if (savedPage) {
+                    window.navigateTo(savedPage, false);
+                } else {
+                    window.navigateTo('home', false);
+                }
             }
             if (typeof cargarEstado === 'function') cargarEstado();
         }
@@ -286,7 +295,10 @@ async function fetchUserProfile(userId) {
         console.error('[Auth] Error cargando perfil:', error);
         _actualizarNombreHome(); // <-- Asegurar que el UI se actualice aunque falle
         // Si falla, ir al home igual
-        if (typeof window.navigateTo === 'function') window.navigateTo('home');
+        if (typeof window.navigateTo === 'function') {
+            const savedPage = _getSavedLastPage();
+            window.navigateTo(savedPage || 'home', false);
+        }
     }
 }
 

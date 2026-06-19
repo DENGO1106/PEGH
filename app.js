@@ -276,7 +276,15 @@ window.addEventListener('beforeunload', () => saveScrollForPage(window._currentP
 
 // Restore scroll on pageshow (when returning via bfcache or back navigation)
 
-window.addEventListener('pageshow', () => restoreScrollForPage(window._currentPage));
+window.addEventListener('pageshow', () => {
+    const savedPage = localStorage.getItem(UCR_LAST_PAGE_KEY);
+    const pageToOpen = savedPage && savedPage !== 'login' ? savedPage : null;
+    if (pageToOpen && pageToOpen !== window._currentPage) {
+        window.navigateTo(pageToOpen, false);
+    } else {
+        restoreScrollForPage(window._currentPage);
+    }
+});
 
 // On initial load, try to restore scroll for initial page
 
@@ -2006,10 +2014,8 @@ function inicializar() {
     const savedPage = localStorage.getItem(UCR_LAST_PAGE_KEY);
     const hashPage = window.location.hash ? window.location.hash.replace('#', '') : '';
     const pageToOpen = hashPage || (savedPage && savedPage !== 'login' ? savedPage : null);
-    if (pageToOpen && pageToOpen !== window._currentPage) {
+    if (pageToOpen) {
         window.navigateTo(pageToOpen, false);
-    } else if (pageToOpen === window._currentPage) {
-        try { restoreScrollForPage(pageToOpen); } catch (e) {}
     }
 
 
