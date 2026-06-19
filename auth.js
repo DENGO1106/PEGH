@@ -308,6 +308,18 @@ function _mostrarSeleccionCarreras() {
     if (sec) sec.classList.remove('hidden');
 }
 
+function cerrarSeleccionCarreras() {
+    const sec = document.getElementById('career-selection-section');
+    if (sec) sec.classList.add('hidden');
+    if (typeof window.navigateTo === 'function') {
+        if (currentSession?.user) {
+            window.navigateTo('home', false);
+        } else {
+            window.navigateTo('login', false);
+        }
+    }
+}
+
 async function guardarSeleccionCarreras() {
     const checkboxes = document.querySelectorAll('.carrera-check:checked');
     const selected = Array.from(checkboxes).map(c => c.value);
